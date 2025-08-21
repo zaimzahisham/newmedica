@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import React from 'react';
 
 const Banner = () => {
@@ -21,9 +22,12 @@ const Banner = () => {
           focusing on safe, natural, and effective formulations, so you can provide your 
           patients with the highest standard of care.
         </p>
-        <button className="mt-8 bg-white text-black py-3 px-8 rounded-md hover:bg-gray-200 transition-colors">
-          Shop Now
-        </button>
+        <Link href="/products">
+          <button className="mt-8 bg-white text-black py-3 px-8 rounded-md hover:bg-gray-200 transition-colors">
+            Shop Now
+          </button>
+        </Link>
+       
       </div>
     </section>
   );

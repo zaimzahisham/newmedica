@@ -8,4 +8,5 @@ export type Product = {
   brochureUrl: string;
   image?: string;
   image2?: string;
+  dateAdded?: string;
 };
