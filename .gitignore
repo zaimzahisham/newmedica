@@ -1,3 +1,45 @@
 .env
 GEMINI.md
 # gemini-image-references/
+
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+# dependencies
+newmedica-frontend/node_modules
+newmedica-frontend/.pnp
+newmedica-frontend/.pnp.*
+newmedica-frontend/.yarn/*
+newmedica-frontend/!.yarn/patches
+newmedica-frontend/!.yarn/plugins
+newmedica-frontend/!.yarn/releases
+newmedica-frontend/!.yarn/versions
+
+# testing
+*/coverage
+
+# next.js
+newmedica-frontend/.next/
+newmedica-frontend/out/
+
+# production
+newmedica-frontend/build
+
+# misc
+newmedica-frontend/.DS_Store
+newmedica-frontend/*.pem
+
+# debug
+newmedica-frontend/npm-debug.log*
+newmedica-frontend/yarn-debug.log*
+newmedica-frontend/yarn-error.log*
+newmedica-frontend/.pnpm-debug.log*
+
+# env files (can opt-in for committing if needed)
+newmedica-frontend/.env*
+
+# vercel
+newmedica-frontend/.vercel
+
+# typescript
+newmedica-frontend/*.tsbuildinfo
+newmedica-frontend/next-env.d.ts
