@@ -1,34 +1,37 @@
 import { Product } from '@/types';
-import React from 'react';
+import Link from 'next/link';
+import React, { useState } from 'react';
 
 type ProductCardProps = {
   product: Product;
 };
 
 const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
+  const [isHovered, setIsHovered] = useState(false);
+  const fallbackImage = `https://picsum.photos/seed/${product.id}/400/300`;
+
+  const primaryImage = product.image || fallbackImage;
+  const secondaryImage = product.image2 || primaryImage;
+
   return (
-    <div className="bg-card border border-border rounded-lg p-4 shadow-sm hover:shadow-lg transition-shadow duration-300">
-      <div className="aspect-w-16 aspect-h-9 mb-4">
-        <img src={`https://picsum.photos/seed/${product.id}/400/225`} alt={product.name} className="object-cover rounded-md" />
+    <Link 
+      href={`/products/${product.id}`}
+      className="group block p-3 border rounded-lg border-transparent transition-all duration-300"
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
+      <div className="overflow-hidden rounded-lg">
+        <img 
+          src={isHovered ? secondaryImage : primaryImage} 
+          alt={product.name} 
+          className="w-full h-auto object-cover aspect-[1/1] group-hover:scale-105 transition-transform duration-300" 
+        />
       </div>
-      <h3 className="text-lg font-semibold text-foreground">{product.name}</h3>
-      <p className="text-foreground/70 text-sm mb-4 h-10">{product.description}</p>
-      <div className="flex justify-between items-center mb-4">
-        <span className="text-xl font-bold text-primary">${product.price.toFixed(2)}</span>
-        <span className="text-sm text-foreground/70 bg-background px-2 py-1 rounded-full">{product.category}</span>
+      <div className="mt-5 text-center">
+        <h3 className="text-xl font-semibold text-foreground">{product.name}</h3>
+        <p className="text-foreground/80 text-lg mt-2">RM{product.price.toFixed(2)}</p>
       </div>
-      <div className="flex flex-col space-y-2">
-        <a href={product.videoUrl} target="_blank" rel="noopener noreferrer" className="text-center bg-secondary text-white font-semibold py-2 rounded-md hover:bg-opacity-90 transition-colors">
-          Watch Video
-        </a>
-        <a href={product.brochureUrl} download className="text-center bg-border text-foreground py-2 rounded-md hover:bg-border/80 transition-colors">
-          Download Brochure
-        </a>
-        <button className="bg-accent text-white font-semibold py-2 rounded-md hover:bg-opacity-90 transition-colors">
-          Checkout
-        </button>
-      </div>
-    </div>
+    </Link>
   );
 };
 

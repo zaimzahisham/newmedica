@@ -6,4 +6,6 @@ export type Product = {
   category: string;
   videoUrl: string;
   brochureUrl: string;
+  image?: string;
+  image2?: string;
 };
