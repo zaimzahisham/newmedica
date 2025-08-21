@@ -3,10 +3,12 @@ from sqlmodel.ext.asyncio.session import AsyncSession
 from sqlmodel import select
 from passlib.context import CryptContext
 import uuid
+from typing import Optional
 
 from app.models.user import User
 from app.models.user_type import UserType
 from app.schemas.user import UserCreate
+from app.core.security import verify_password
 
 pwd_context = CryptContext(schemes=["argon2"], deprecated="auto")
 
@@ -37,3 +39,11 @@ class UserService:
         await self.db.commit()
         await self.db.refresh(db_user)
         return db_user
+
+    async def authenticate(self, email: str, password: str) -> Optional[User]:
+        user = await self.get_user_by_email(email)
+        if not user:
+            return None
+        if not verify_password(password, user.password_hash):
+            return None
+        return user
