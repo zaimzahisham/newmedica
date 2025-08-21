@@ -61,12 +61,53 @@ const LoginPage = () => {
     }
   };
 
-  const handleSignUp = (e: React.FormEvent) => {
+  const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Handle final registration logic
-    console.log({ email, name, password, userType, icNo, hpNo, /* etc */ });
-    alert('Registration successful! (Check console)');
-    // Here you would typically call an API, then login the user and redirect
+
+    const payload = {
+      email,
+      password,
+      userType,
+      extra_fields: {
+        firstName: name,
+        icNo,
+        hpNo,
+        hospitalName,
+        department,
+        position,
+        companyName,
+        companyAddress,
+        coRegNo,
+        coEmailAddress,
+        tinNo,
+        picEinvoice,
+        picEinvoiceEmail,
+        picEinvoiceTelNo,
+      }
+    };
+
+    try {
+      const response = await fetch("http://127.0.0.1:8000/api/v1/auth/register", {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.detail || 'Something went wrong');
+      }
+
+      alert('Registration successful! Please log in.');
+      // Reset to login view
+      setIsSignUp(false);
+      setStep(1);
+
+    } catch (error: any) {
+      alert(`Registration failed: ${error.message}`);
+    }
   };
 
   return (
@@ -149,7 +190,7 @@ const LoginPage = () => {
           <>
             <h1 className="text-3xl font-bold mb-2">Almost done</h1>
             <p className="text-gray-600 mb-8">We're excited to have you join our member. Fill in detail for your account</p>
-            <form onSubmit={handleContinue} className="text-left">
+            <form onSubmit={handleSignUp} className="text-left">
               <div className="mb-4">
                 <label htmlFor="name" className="block text-sm font-medium text-gray-700">Name</label>
                 <input 

@@ -43,3 +43,6 @@ newmedica-frontend/.vercel
 # typescript
 newmedica-frontend/*.tsbuildinfo
 newmedica-frontend/next-env.d.ts
+
+# backend
+newmedica-backend/.venv/
