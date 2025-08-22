@@ -1,51 +1,9 @@
 
 import pytest
-import pytest_asyncio
-from httpx import AsyncClient, ASGITransport
+from httpx import AsyncClient
 import uuid
-from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
-from sqlalchemy.orm import sessionmaker
-import asyncio
 
-from app.main import app
-from app.db.session import get_session
-from sqlmodel import SQLModel
-from app.models.user_type import UserType
-
-# Use an in-memory SQLite database for testing
-DATABASE_URL = "sqlite+aiosqlite:///:memory:"
-
-engine = create_async_engine(DATABASE_URL, echo=True, future=True)
-TestingSessionLocal = sessionmaker(
-    engine,
-    class_=AsyncSession,
-    expire_on_commit=False,
-)
-
-async def override_get_session() -> AsyncSession:
-    async with TestingSessionLocal() as session:
-        yield session
-
-app.dependency_overrides[get_session] = override_get_session
-
-@pytest_asyncio.fixture(scope="function")
-async def async_client():
-    async with engine.begin() as conn:
-        await conn.run_sync(SQLModel.metadata.create_all)
-        
-        # Pre-populate UserType
-        async with TestingSessionLocal() as session:
-            session.add(UserType(id=uuid.uuid4(), name="Basic"))
-            session.add(UserType(id=uuid.uuid4(), name="Agent"))
-            session.add(UserType(id=uuid.uuid4(), name="Healthcare"))
-            session.add(UserType(id=uuid.uuid4(), name="Admin"))
-            await session.commit()
-
-    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
-        yield client
-
-    async with engine.begin() as conn:
-        await conn.run_sync(SQLModel.metadata.drop_all)
+# The async_client fixture is defined in conftest.py
 
 @pytest.mark.asyncio
 async def test_user_registration_and_login(async_client: AsyncClient):

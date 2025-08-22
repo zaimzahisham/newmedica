@@ -67,8 +67,8 @@ const Navbar = () => {
             </Link>
             {isCatalogOpen && (
               <div className="absolute top-full left-0 mt-2 w-48 bg-white rounded-md shadow-lg border border-border py-2">
-                <Link href="/products/new-arrival" className="block px-4 py-2 text-sm text-foreground/80 hover:bg-gray-100">New arrival</Link>
-                <Link href="/products/hot-selling" className="block px-4 py-2 text-sm text-foreground/80 hover:bg-gray-100">Hot selling</Link>
+                <Link href="/products/category/new-arrival" className="block px-4 py-2 text-sm text-foreground/80 hover:bg-gray-100">New arrival</Link>
+                <Link href="/products/category/hot-selling" className="block px-4 py-2 text-sm text-foreground/80 hover:bg-gray-100">Hot selling</Link>
               </div>
             )}
           </div>

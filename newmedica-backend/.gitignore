@@ -1,0 +1,15 @@
+# Ignore virtualenv
+.venv/
+
+# Ignore pytest cache
+.pytest_cache/
+
+# Ignore ruff cache
+.ruff_cache/
+
+# Ignore uploaded media files
+media_uploads/
+
+# Ignore python cache
+__pycache__/
+*.pyc

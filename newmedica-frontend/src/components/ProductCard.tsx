@@ -1,3 +1,5 @@
+'use client';
+
 import { Product } from '@/types';
 import Link from 'next/link';
 import React, { useState } from 'react';
@@ -10,8 +12,8 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
   const [isHovered, setIsHovered] = useState(false);
   const fallbackImage = `https://picsum.photos/seed/${product.id}/400/300`;
 
-  const primaryImage = product.image || fallbackImage;
-  const secondaryImage = product.image2 || primaryImage;
+  const primaryImage = product.media?.[0]?.url || fallbackImage;
+  const secondaryImage = product.media?.[1]?.url || primaryImage;
 
   return (
     <Link 

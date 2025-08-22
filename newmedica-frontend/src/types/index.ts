@@ -1,14 +1,26 @@
-export type Product = {
-  id: number;
+
+export interface Category {
+  id: string;
+  name: string;
+  description: string;
+}
+
+export interface Product {
+  id: string;
   name: string;
   description: string;
   price: number;
-  category: string;
-  videoUrl: string;
-  brochureUrl: string;
-  image?: string;
-  image2?: string;
-  dateAdded?: string;
+  stock: number;
+  category_id: string;
+  category: Category;
+  media: ProductMedia[];
+}
+
+export interface ProductMedia {
+  id: string;
+  media_type: string;
+  url: string;
+  display_order: number;
 }
 
 export type UserType = 'Basic' | 'Agent' | 'Healthcare' | 'Admin';
