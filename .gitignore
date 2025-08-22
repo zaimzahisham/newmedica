@@ -46,3 +46,9 @@ newmedica-frontend/next-env.d.ts
 
 # backend
 newmedica-backend/.venv/
+newmedica-backend/*/__pycache__/*.pyc
+newmedica-backend/*/__pycache__/
+*.pyc
+newmedica-backend/*.pyc
+newmedica-backend/.pytest_cache/
+newmedica-backend/.ruff_cache/
