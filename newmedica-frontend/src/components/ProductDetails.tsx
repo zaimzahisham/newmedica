@@ -68,23 +68,22 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
         )}
 
         <div>
-          <span className="text-sm font-medium">Quantity</span>
-          <div className="flex items-center gap-4 mt-2">
-            <QuantitySelector quantity={quantity} setQuantity={setQuantity} />
-            <button 
-              onClick={handleAddToCart}
-              className="bg-primary text-primary-foreground px-8 py-3 rounded-lg font-semibold flex-grow hover:bg-primary/90 transition-colors"
-            >
-              Add to Cart
+          <span className="text-sm font-medium mb-2 block">Quantity</span>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <QuantitySelector quantity={quantity} setQuantity={setQuantity} />
+              <button 
+                onClick={handleAddToCart}
+                className="bg-primary text-primary-foreground px-8 py-3 rounded-lg font-semibold hover:bg-primary/90 transition-colors"
+              >
+                Add to Cart
+              </button>
+            </div>
+            <button className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors">
+              <Share2 size={16} />
+              <span>Share</span>
             </button>
           </div>
-        </div>
-
-        <div className="flex justify-end">
-          <button className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors">
-            <Share2 size={16} />
-            <span>Share</span>
-          </button>
         </div>
 
         <div 
