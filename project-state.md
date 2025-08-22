@@ -6,7 +6,7 @@ This document outlines the current state of the NewMedica e-commerce platform, s
 
 ## Overall Status
 
-The project is in the early stages of development. Core authentication and product catalog management are now functional on the backend. The frontend has been updated to fetch and display product data from the backend, replacing the previous static implementation. However, several UI and data issues have been identified and will be addressed before implementing new features. The project adheres to the guidelines in `GEMINI.md`.
+The project is in the early stages of development. Core authentication and product catalog management are now functional on the backend. The frontend has been updated to fetch and display product data from the backend, replacing the previous static implementation. A major debugging session has resolved critical issues related to data fetching and sorting. The project adheres to the guidelines in `GEMINI.md`.
 
 ---
 
@@ -24,7 +24,7 @@ The backend is built with FastAPI and SQLModel, with a clear separation of conce
 *   **Product & Category Management:**
     *   Full CRUD (Create, Read, Update, Delete) endpoints for Products are implemented.
     *   Endpoints for creating and listing Categories are implemented.
-    *   Product listing endpoint supports filtering by category name and basic sorting.
+    *   Product listing endpoint supports filtering by category name, a search term, and sorting by price and name. **Sorting by date is currently not functional.**
 *   **Database:**
     *   PostgreSQL service is defined in `docker-compose.yml`.
     *   SQLModel is used for ORM.
@@ -37,7 +37,8 @@ The backend is built with FastAPI and SQLModel, with a clear separation of conce
 
 ### Missing Features & Areas for Improvement
 
-*   **Product Filtering:** The product listing endpoint only supports basic filtering by category. It needs to be extended to handle search queries and more complex sorting options.
+*   **Missing Timestamps:** Database models lack `created_at` and `updated_at` fields, which prevents features like sorting by date and creates a significant data integrity gap. This is a high-priority issue to resolve.
+*   **Alembic Issues:** The Alembic auto-generation process is currently failing, which blocks schema changes. This needs to be investigated and fixed.
 *   **Domain Models:** `Cart` and `Order` models, services, and repositories are not yet implemented.
 *   **API Endpoints:** Endpoints for Cart and Orders are missing.
 *   **Admin Functionality:** No endpoints exist for admin-specific tasks, such as approving/rejecting `Agent` or `Healthcare` user registrations.
@@ -59,18 +60,16 @@ The frontend is built with Next.js (App Router) and Tailwind CSS. It has a funct
     *   The UI dynamically updates based on authentication state (e.g., showing user info in the navbar).
 *   **Pages & Components:**
     *   **Home Page:** Displays a product carousel with data fetched from the backend.
-    *   **Product Pages:** `products/` and `products/category/[category]` pages now fetch and display data from the backend API.
+    *   **Product Pages:** `products/` and `products/category/[category]` pages now fetch and display data from the backend API. These pages use a **robust client-side data fetching pattern** to handle dynamic search and sorting.
+    *   **Product Detail Page:** The `/products/[id]` page has been redesigned to match the target design, including a multi-image gallery, quantity selector, and dynamic promotions section. It now correctly renders rich text (HTML) for product descriptions.
     *   **Account Management:**
         *   `/account`: A dashboard page for logged-in users.
         *   `/account/details`: A page to view (but not yet edit) user profile information.
         *   `/account/address`: A page to view addresses.
-    *   **UI Components:** A reusable `Navbar`, `Footer`, `ProductCard`, `ProductCarousel`, `SearchBar`, and `SortDropdown` are implemented.
+    *   **UI Components:** A reusable `Navbar`, `Footer`, `ProductCard`, `ProductCarousel`, `SearchBar`, and `SortDropdown` are implemented. **Search and sort components are fully functional (except for date sorting).**
 
 ### Missing Features & Areas for Improvement
 
-*   **Product Page UI/UX:**
-    *   The search and sort components on the product listing pages are currently disabled.
-    *   The product detail page (`/products/[id]`) does not match the target design and is missing key e-commerce components (quantity selector, image gallery).
 *   **Cart & Checkout:** There is no shopping cart or checkout functionality.
 *   **User Profile:**
     *   The "Complete your profile" section on the account page is not functional.
