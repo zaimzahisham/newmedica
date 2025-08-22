@@ -9,7 +9,7 @@ type SortDropdownProps = {
 const SortDropdown: React.FC<SortDropdownProps> = ({ onSortChange }) => {
   return (
     <div className="flex items-center gap-2">
-      <span className="text-foreground/80">Sort by:</span>
+      <span className="text-foreground/80 text-nowrap">Sort by:</span>
       <select
         onChange={(e) => onSortChange(e.target.value)}
         className="p-2 border border-border rounded-md bg-card text-foreground focus:ring-2 focus:ring-primary focus:border-transparent"

@@ -47,12 +47,12 @@ function ProductList({ category }: { category: string }) {
 }
 
 export default function ProductsPage({ params }: ProductsPageProps) {
-  const pageTitle = params.category ? `Products in ${params.category.replace('-', ' ')}` : 'All Products';
+  const pageTitle = params.category ? `${params.category.replace('-', ' ')}` : 'All Products';
 
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="flex justify-between items-center mb-4">
-        <h1 className="text-3xl font-bold text-foreground capitalize">
+        <h1 className="text-3xl font-bold text-foreground capitalize text-nowrap pr-4">
           {pageTitle}
         </h1>
         <ProductFilters />

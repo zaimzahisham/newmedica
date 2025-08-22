@@ -37,7 +37,7 @@ export default function ProductFilters() {
   }, [searchTerm, sortBy, pathname, router, searchParams]);
 
   return (
-    <div className="flex items-center gap-4">
+    <div className="flex w-full items-center gap-4">
       <SearchBar value={searchTerm} onChange={setSearchTerm} />
       <SortDropdown onSortChange={setSortBy} />
     </div>
