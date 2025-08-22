@@ -8,23 +8,41 @@ interface ProductImageGalleryProps {
 }
 
 export default function ProductImageGallery({ media }: ProductImageGalleryProps) {
+  // Default to the first image or an empty string if no media is available
   const [selectedImage, setSelectedImage] = useState(media[0]?.url || '');
 
-  return (
-    <div>
-      <div className="mb-4">
-        <img src={selectedImage} alt="Selected product image" className="w-full rounded-lg" />
+  // Ensure there's a default image if the array is empty
+  if (!media || media.length === 0) {
+    return (
+      <div className="w-full h-96 bg-gray-200 rounded-lg flex items-center justify-center">
+        <span>No Image Available</span>
       </div>
-      <div className="flex space-x-2">
+    );
+  }
+
+  return (
+    <div className="flex flex-col gap-4">
+      <div className="w-full h-[450px] overflow-hidden rounded-lg border">
+        <img 
+          src={selectedImage} 
+          alt="Selected product image" 
+          className="w-full h-full object-cover" 
+        />
+      </div>
+      <div className="flex overflow-x-auto space-x-2 pb-2">
         {media.map((item) => (
           <button
             key={item.id}
             onClick={() => setSelectedImage(item.url)}
-            className={`w-20 h-20 rounded-lg overflow-hidden border-2 ${
+            className={`flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden border-2 transition-colors ${
               selectedImage === item.url ? 'border-primary' : 'border-transparent'
             }`}
           >
-            <img src={item.url} alt="Product thumbnail" className="w-full h-full object-cover" />
+            <img 
+              src={item.url} 
+              alt="Product thumbnail" 
+              className="w-full h-full object-cover" 
+            />
           </button>
         ))}
       </div>

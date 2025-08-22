@@ -3,6 +3,10 @@
 import { useState } from 'react';
 import QuantitySelector from './QuantitySelector';
 import { Product } from '@/types';
+import { Globe, ShieldCheck, Gem, Share2 } from 'lucide-react';
+import AddToCartConfirmation from './AddToCartConfirmation';
+import DOMPurify from 'dompurify';
+import { useAuth } from '@/context/AuthContext';
 
 interface ProductDetailsProps {
   product: Product;
@@ -10,35 +14,84 @@ interface ProductDetailsProps {
 
 export default function ProductDetails({ product }: ProductDetailsProps) {
   const [quantity, setQuantity] = useState(1);
+  const [showConfirmation, setShowConfirmation] = useState(false);
+  const { user } = useAuth(); // Get user from AuthContext
 
   const handleAddToCart = () => {
     // TODO: Implement actual add to cart logic in Phase 2
-    alert(`Added ${quantity} of ${product.name} to cart!`);
+    console.log(`Added ${quantity} of ${product.name} to cart!`);
+    setShowConfirmation(true);
   };
 
+  const handleCloseConfirmation = () => {
+    setShowConfirmation(false);
+  };
+
+  // Sanitize the HTML description only once, when the component renders
+  const sanitizedDescription = DOMPurify.sanitize(product.description);
+
+  const isSpecialUser = user && user.userType && (user.userType === 'Agent' || user.userType === 'Healthcare');
+
   return (
-    <div>
-      <h1 className="text-4xl font-bold text-foreground mb-4">{product.name}</h1>
-      <p className="text-2xl text-primary mb-6">RM{product.price.toFixed(2)}</p>
-      
-      <div className="prose dark:prose-invert max-w-none mb-6">
-        <p>{product.description}</p>
-      </div>
+    <>
+      {showConfirmation && (
+        <AddToCartConfirmation 
+          product={product} 
+          quantity={quantity} 
+          onClose={handleCloseConfirmation} 
+        />
+      )}
+      <div className="flex flex-col gap-4">
+        <h1 className="text-3xl font-bold text-foreground">{product.name}</h1>
+        <p className="text-2xl font-semibold text-primary">RM{product.price.toFixed(2)}</p>
+        
+        <div className="flex flex-col gap-2 text-sm text-muted-foreground border-y py-4">
+          <div className="flex items-center gap-2">
+            <Globe size={16} />
+            <span>Worldwide shipping</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <ShieldCheck size={16} />
+            <span>Secure payments</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <Gem size={16} />
+            <span>Authentic products</span>
+          </div>
+        </div>
 
-      <div className="flex items-center gap-4 mb-6">
-        <QuantitySelector quantity={quantity} setQuantity={setQuantity} />
-        <button 
-          onClick={handleAddToCart}
-          className="bg-primary text-primary-foreground px-8 py-3 rounded-lg font-semibold flex-grow"
-        >
-          Add to Cart
-        </button>
-      </div>
+        {isSpecialUser && (
+          <div className="p-4 bg-secondary/50 rounded-lg">
+            <h3 className="font-semibold mb-2">Promotions</h3>
+            <p className="text-sm text-muted-foreground">{user.userType.toUpperCase()} PRICE</p>
+          </div>
+        )}
 
-      <div className="mt-6 text-sm text-muted-foreground">
-        <p>Category: {product.category.name}</p>
-        <p>Stock: {product.stock > 0 ? `${product.stock} available` : 'Out of Stock'}</p>
+        <div>
+          <span className="text-sm font-medium">Quantity</span>
+          <div className="flex items-center gap-4 mt-2">
+            <QuantitySelector quantity={quantity} setQuantity={setQuantity} />
+            <button 
+              onClick={handleAddToCart}
+              className="bg-primary text-primary-foreground px-8 py-3 rounded-lg font-semibold flex-grow hover:bg-primary/90 transition-colors"
+            >
+              Add to Cart
+            </button>
+          </div>
+        </div>
+
+        <div className="flex justify-end">
+          <button className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors">
+            <Share2 size={16} />
+            <span>Share</span>
+          </button>
+        </div>
+
+        <div 
+          className="prose dark:prose-invert max-w-none mt-4"
+          dangerouslySetInnerHTML={{ __html: sanitizedDescription }} 
+        />
       </div>
-    </div>
+    </>
   );
 }
