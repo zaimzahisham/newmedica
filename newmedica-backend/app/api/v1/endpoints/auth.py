@@ -17,19 +17,16 @@ async def register_user(
     db: AsyncSession = Depends(get_session)
 ):
     user_service = UserService(db)
-    # Check if user type exists
-    user_type = await user_service.get_user_type_by_name(user_in.userType)
-    if not user_type:
-        raise HTTPException(status_code=400, detail=f"User type '{user_in.userType}' not found.")
-
-    # Check if user already exists
+    
     db_user = await user_service.get_user_by_email(user_in.email)
     if db_user:
         raise HTTPException(status_code=400, detail="Email already registered")
 
-    # Create user
-    user = await user_service.create_user(user_in, user_type.id)
-    return user
+    try:
+        user = await user_service.create_user(user_in)
+        return user
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
 
 @router.post("/login", response_model=Token)
 async def login_for_access_token(

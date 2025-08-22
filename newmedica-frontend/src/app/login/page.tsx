@@ -1,76 +1,80 @@
-
-"use client";
+'use client';
 
 import { useState } from 'react';
-import { UserType } from '@/types';
+import { useForm, SubmitHandler } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { useAuth } from '@/context/AuthContext';
 import { useRouter } from 'next/navigation';
+import { loginSchema, registerSchema, LoginFormData, RegisterFormData } from '@/lib/validations/auth';
 
 const LoginPage = () => {
   const { login } = useAuth();
   const router = useRouter();
   const [isSignUp, setIsSignUp] = useState(false);
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  
-  // ... (rest of the state declarations for sign up)
-  const [name, setName] = useState('');
-  const [userType, setUserType] = useState<UserType>('Basic');
-  const [icNo, setIcNo] = useState('');
-  const [hpNo, setHpNo] = useState('');
-  const [hospitalName, setHospitalName] = useState('');
-  const [department, setDepartment] = useState('');
-  const [position, setPosition] = useState('');
-  const [companyName, setCompanyName] = useState('');
-  const [companyAddress, setCompanyAddress] = useState('');
-  const [coRegNo, setCoRegNo] = useState('');
-  const [coEmailAddress, setCoEmailAddress] = useState('');
-  const [tinNo, setTinNo] = useState('');
-  const [picEinvoice, setPicEinvoice] = useState('');
-  const [picEinvoiceEmail, setPicEinvoiceEmail] = useState('');
+  const [apiError, setApiError] = useState<string | null>(null);
 
+  const { 
+    register: registerLogin, 
+    handleSubmit: handleLoginSubmit, 
+    formState: { errors: loginErrors }
+  } = useForm<LoginFormData>({
+    resolver: zodResolver(loginSchema),
+  });
 
-  const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const { 
+    register: registerSignUp, 
+    handleSubmit: handleSignUpSubmit, 
+    watch,
+    formState: { errors: signUpErrors } 
+  } = useForm<RegisterFormData>({
+    resolver: zodResolver(registerSchema),
+    defaultValues: {
+      userType: 'Basic',
+    },
+  });
+
+  const userType = watch('userType');
+
+  const onLogin: SubmitHandler<LoginFormData> = async (data) => {
+    setApiError(null);
     try {
-      await login(email, password);
+      await login(data.email, data.password);
       router.push('/account');
     } catch (error) {
-      alert('Login failed. Please check your credentials.');
+      setApiError('Login failed. Please check your credentials.');
       console.error(error);
     }
   };
 
-  const handleSignUp = async (e: React.FormEvent) => {
-    e.preventDefault();
-
+  const onSignUp: SubmitHandler<RegisterFormData> = async (data) => {
+    setApiError(null);
+    const { confirmPassword, ...rest } = data;
     const payload = {
-      email,
-      password,
-      userType,
+      email: rest.email,
+      password: rest.password,
+      userType: rest.userType,
       extra_fields: {
-        firstName: name,
-        icNo,
-        hpNo,
-        hospitalName,
-        department,
-        position,
-        companyName,
-        companyAddress,
-        coRegNo,
-        coEmailAddress,
-        tinNo,
-        picEinvoice,
-        picEinvoiceEmail,
-      }
+        firstName: rest.firstName,
+        icNo: rest.icNo,
+        hpNo: rest.hpNo,
+        hospitalName: rest.hospitalName,
+        department: rest.department,
+        position: rest.position,
+        companyName: rest.companyName,
+        companyAddress: rest.companyAddress,
+        coRegNo: rest.coRegNo,
+        coEmailAddress: rest.coEmailAddress,
+        tinNo: rest.tinNo,
+        picEinvoice: rest.picEinvoice,
+        picEinvoiceEmail: rest.picEinvoiceEmail,
+        picEinvoiceTelNo: rest.picEinvoiceTelNo,
+      },
     };
 
     try {
       const response = await fetch("http://127.0.0.1:8000/api/v1/auth/register", {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
       });
 
@@ -80,181 +84,184 @@ const LoginPage = () => {
       }
 
       alert('Registration successful! Please log in.');
-      // Reset to login view
       setIsSignUp(false);
-
     } catch (error: any) {
-      alert(`Registration failed: ${error.message}`);
+      setApiError(`Registration failed: ${error.message}`);
     }
   };
+
+  const baseInputClasses = "w-full p-3 h-12 border rounded-md";
+  const errorInputClasses = "border-red-500";
 
   return (
     <div className="container mx-auto px-4 py-16 flex justify-center items-center">
       <div className="max-w-md w-full text-center">
-        
-            <h1 className="text-3xl font-bold mb-2">Welcome</h1>
-            <p className="text-gray-600 mb-8">Sign up or log in to continue</p>
-            <div className="flex justify-center border-b mb-8">
-              <button 
-                className={`px-6 py-2 font-semibold ${isSignUp ? 'border-b-2 border-black' : 'text-gray-500'}`}
-                onClick={() => setIsSignUp(true)}
-              >
-                Sign up
-              </button>
-              <button 
-                className={`px-6 py-2 font-semibold ${!isSignUp ? 'border-b-2 border-black' : 'text-gray-500'}`}
-                onClick={() => setIsSignUp(false)}
-              >
-                Login
-              </button>
+        <h1 className="text-3xl font-bold mb-2">Welcome</h1>
+        <p className="text-gray-600 mb-8">Sign up or log in to continue</p>
+        <div className="flex justify-center border-b mb-8">
+          <button
+            className={`px-6 py-2 font-semibold ${isSignUp ? 'border-b-2 border-black' : 'text-gray-500'}`}
+            onClick={() => setIsSignUp(true)}
+          >
+            Sign up
+          </button>
+          <button
+            className={`px-6 py-2 font-semibold ${!isSignUp ? 'border-b-2 border-black' : 'text-gray-500'}`}
+            onClick={() => setIsSignUp(false)}
+          >
+            Login
+          </button>
+        </div>
+
+        {apiError && <p className="text-red-500 text-sm mb-4">{apiError}</p>}
+
+        {!isSignUp ? (
+          <form onSubmit={handleLoginSubmit(onLogin)} className="text-left space-y-4">
+            <div>
+              <input 
+                {...registerLogin('email')} 
+                placeholder={loginErrors.email?.message || "Email"} 
+                className={`${baseInputClasses} ${loginErrors.email ? errorInputClasses : 'border-gray-300'}`}
+              />
             </div>
-            {!isSignUp ? (
-              <form onSubmit={handleLogin}>
-                <input 
-                  type="email" 
-                  placeholder="Email" 
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="w-full p-3 h-12 border border-gray-300 rounded-md shadow-sm mb-4"
-                />
-                <input 
-                    type="password" 
-                    placeholder="Password" 
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    className="w-full p-3 h-12 border border-gray-300 rounded-md shadow-sm mb-4"
-                />
-                <button type="submit" className="w-full bg-black text-white py-3 rounded-md mb-4">
-                    Login
-                </button>
-                <div className="text-center">
-                    <a href="#" className="text-sm text-gray-600 hover:underline">Forgot your password?</a>
+            <div>
+              <input 
+                {...registerLogin('password')} 
+                type="password" 
+                placeholder={loginErrors.password?.message || "Password"} 
+                className={`${baseInputClasses} ${loginErrors.password ? errorInputClasses : 'border-gray-300'}`}
+              />
+            </div>
+            <button type="submit" className="w-full bg-black text-white py-3 rounded-md">Login</button>
+            <div className="text-center">
+              <a href="#" className="text-sm text-gray-600 hover:underline">Forgot your password?</a>
+            </div>
+          </form>
+        ) : (
+          <form onSubmit={handleSignUpSubmit(onSignUp)} className="text-left space-y-4">
+            {/* Common Fields */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700">Email</label>
+              <input {...registerSignUp('email')} className={`${baseInputClasses} ${signUpErrors.email ? errorInputClasses : 'border-gray-300'} mt-1`} />
+              {signUpErrors.email && <p className="text-red-500 text-xs mt-1">{signUpErrors.email.message}</p>}
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700">First Name</label>
+              <input {...registerSignUp('firstName')} className={`${baseInputClasses} ${signUpErrors.firstName ? errorInputClasses : 'border-gray-300'} mt-1`} />
+              {signUpErrors.firstName && <p className="text-red-500 text-xs mt-1">{signUpErrors.firstName.message}</p>}
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700">Password</label>
+              <input {...registerSignUp('password')} type="password" className={`${baseInputClasses} ${signUpErrors.password ? errorInputClasses : 'border-gray-300'} mt-1`} />
+              {signUpErrors.password && <p className="text-red-500 text-xs mt-1">{signUpErrors.password.message}</p>}
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700">Confirm Password</label>
+              <input {...registerSignUp('confirmPassword')} type="password" className={`${baseInputClasses} ${signUpErrors.confirmPassword ? errorInputClasses : 'border-gray-300'} mt-1`} />
+              {signUpErrors.confirmPassword && <p className="text-red-500 text-xs mt-1">{signUpErrors.confirmPassword.message}</p>}
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700">I am a...</label>
+              <select {...registerSignUp('userType')} className={`${baseInputClasses} ${signUpErrors.userType ? errorInputClasses : 'border-gray-300'} mt-1`}>
+                <option value="Basic">Basic User</option>
+                <option value="Agent">Agent</option>
+                <option value="Healthcare">Healthcare Professional</option>
+              </select>
+            </div>
+
+            {/* Conditional Fields */}
+            {userType === 'Healthcare' && (
+              <div className="space-y-4 pt-4 border-t">
+                <h3 className="font-semibold text-gray-800">Healthcare Professional Details</h3>
+                {signUpErrors._healthcareError && <p className="text-red-500 text-xs mt-1">{signUpErrors._healthcareError.message}</p>}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">IC No <span className="text-red-500">*</span></label>
+                  <input {...registerSignUp('icNo')} className={`${baseInputClasses} ${signUpErrors.icNo ? errorInputClasses : 'border-gray-300'} mt-1`} />
+                  {signUpErrors.icNo && <p className="text-red-500 text-xs mt-1">{signUpErrors.icNo.message}</p>}
                 </div>
-              </form>
-            ) : (
-              <>
-                <h1 className="text-3xl font-bold mb-2">Almost done</h1>
-                <p className="text-gray-600 mb-8">We're excited to have you join our member. Fill in detail for your account</p>
-                <form onSubmit={handleSignUp} className="text-left">
-                  <div className="mb-4">
-                    <label htmlFor="email" className="block text-sm font-medium text-gray-700">Email</label>
-                    <input 
-                      type="email" 
-                      id="email"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      className="w-full p-3 h-12 border border-gray-300 rounded-md mt-1"
-                    />
-                  </div>
-                  <div className="mb-4">
-                    <label htmlFor="name" className="block text-sm font-medium text-gray-700">Name</label>
-                    <input 
-                      type="text" 
-                      id="name"
-                      value={name}
-                      onChange={(e) => setName(e.target.value)}
-                      className="w-full p-3 h-12 border border-gray-300 rounded-md mt-1"
-                    />
-                  </div>
-                  <div className="mb-4">
-                    <label htmlFor="password"  className="block text-sm font-medium text-gray-700">Password</label>
-                    <input 
-                      type="password" 
-                      id="password"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      className="w-full p-3 h-12 border border-gray-300 rounded-md mt-1"
-                    />
-                  </div>
-                  <div className="mb-6">
-                    <label htmlFor="userType" className="block text-sm font-medium text-gray-700">I am a...</label>
-                    <select 
-                      id="userType" 
-                      value={userType} 
-                      onChange={(e) => setUserType(e.target.value as UserType)}
-                      className="w-full p-3 h-12 border border-gray-300 rounded-md mt-1"
-                    >
-                      <option value="Basic">Basic User</option>
-                      <option value="Agent">Agent</option>
-                      <option value="Healthcare">Healthcare Professional</option>
-                    </select>
-                  </div>
-                  
-                  {/* Conditional Fields Go Here */}
-                  {userType === 'Healthcare' && (
-                    <div className="space-y-4 mt-4 pt-4 mb-4 border-t">
-                      <h3 className="font-semibold text-gray-800">Healthcare Professional Details</h3>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700">IC No <span className="text-red-500">*</span> </label>
-                        <input required type="text" value={icNo} onChange={(e) => setIcNo(e.target.value)} className="w-full p-3 h-12 border border-gray-300 rounded-md mt-1" />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700">HP No <span className="text-red-500">*</span> </label>
-                        <input required type="text" value={hpNo} onChange={(e) => setHpNo(e.target.value)} className="w-full p-3 h-12 border border-gray-300 rounded-md mt-1" />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700">Hospital Name <span className="text-red-500">*</span> </label>
-                        <input required type="text" value={hospitalName} onChange={(e) => setHospitalName(e.target.value)} className="w-full p-3 h-12 border border-gray-300 rounded-md mt-1" />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700">Department <span className="text-red-500">*</span> </label>
-                        <input required type="text" value={department} onChange={(e) => setDepartment(e.target.value)} className="w-full p-3 h-12 border border-gray-300 rounded-md mt-1" />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700">Position <span className="text-red-500">*</span> </label>
-                        <input required type="text" value={position} onChange={(e) => setPosition(e.target.value)} className="w-full p-3 h-12 border border-gray-300 rounded-md mt-1" />
-                      </div>
-                    </div>
-                  )}
-
-                  {userType === 'Agent' && (
-                    <div className="space-y-4 mt-4 pt-4 mb-4 border-t">
-                      <h3 className="font-semibold text-gray-800">Agent Details</h3>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700">IC No <span className="text-red-500">*</span></label>
-                        <input required type="text" value={icNo} onChange={(e) => setIcNo(e.target.value)} className="w-full p-3 h-12 border border-gray-300 rounded-md mt-1" /> 
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700">HP No <span className="text-red-500">*</span></label>
-                        <input required type="text" value={hpNo} onChange={(e) => setHpNo(e.target.value)} className="w-full p-3 h-12 border border-gray-300 rounded-md mt-1" />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700">Company Name <span className="text-red-500">*</span></label>
-                        <input required type="text" value={companyName} onChange={(e) => setCompanyName(e.target.value)} className="w-full p-3 h-12 border border-gray-300 rounded-md mt-1" />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700">Company Address <span className="text-red-500">*</span></label>
-                        <input required type="text" value={companyAddress} onChange={(e) => setCompanyAddress(e.target.value)} className="w-full p-3 h-12 border border-gray-300 rounded-md mt-1" />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700">Co Reg No <span className="text-red-500">*</span></label>
-                        <input required type="text" value={coRegNo} onChange={(e) => setCoRegNo(e.target.value)} className="w-full p-3 h-12 border border-gray-300 rounded-md mt-1" />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700">Co Email Address <span className="text-red-500">*</span></label>
-                        <input required type="text" value={coEmailAddress} onChange={(e) => setCoEmailAddress(e.target.value)} className="w-full p-3 h-12 border border-gray-300 rounded-md mt-1" />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700">TIN No <span className="text-red-500">*</span></label>
-                        <input required type="text" value={tinNo} onChange={(e) => setTinNo(e.target.value)} className="w-full p-3 h-12 border border-gray-300 rounded-md mt-1" />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700">PIC of E-invoice <span className="text-red-500">*</span></label>
-                        <input required type="text" value={picEinvoice} onChange={(e) => setPicEinvoice(e.target.value)} className="w-full p-3 h-12 border border-gray-300 rounded-md mt-1" />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700">PIC of E-invoice, email address & tel no <span className="text-red-500">*</span></label>
-                        <input required type="text" value={picEinvoiceEmail} onChange={(e) => setPicEinvoiceEmail(e.target.value)} className="w-full p-3 h-12 border border-gray-300 rounded-md mt-1" />
-                      </div>
-                    </div>
-                  )}
-
-                  <button type="submit" className="w-full bg-black text-white py-3 rounded-md">
-                    Continue
-                  </button>
-                </form>
-              </>
+                 <div>
+                  <label className="block text-sm font-medium text-gray-700">HP No <span className="text-red-500">*</span></label>
+                  <input {...registerSignUp('hpNo')} className={`${baseInputClasses} ${signUpErrors.hpNo ? errorInputClasses : 'border-gray-300'} mt-1`} />
+                  {signUpErrors.hpNo && <p className="text-red-500 text-xs mt-1">{signUpErrors.hpNo.message}</p>}
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Hospital Name <span className="text-red-500">*</span></label>
+                  <input {...registerSignUp('hospitalName')} className={`${baseInputClasses} ${signUpErrors.hospitalName ? errorInputClasses : 'border-gray-300'} mt-1`} />
+                  {signUpErrors.hospitalName && <p className="text-red-500 text-xs mt-1">{signUpErrors.hospitalName.message}</p>}
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Department <span className="text-red-500">*</span></label>
+                  <input {...registerSignUp('department')} className={`${baseInputClasses} ${signUpErrors.department ? errorInputClasses : 'border-gray-300'} mt-1`} />
+                  {signUpErrors.department && <p className="text-red-500 text-xs mt-1">{signUpErrors.department.message}</p>}
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Position <span className="text-red-500">*</span></label>
+                  <input {...registerSignUp('position')} className={`${baseInputClasses} ${signUpErrors.position ? errorInputClasses : 'border-gray-300'} mt-1`} />
+                  {signUpErrors.position && <p className="text-red-500 text-xs mt-1">{signUpErrors.position.message}</p>}
+                </div>
+              </div>
             )}
+
+            {userType === 'Agent' && (
+               <div className="space-y-4 pt-4 border-t">
+                <h3 className="font-semibold text-gray-800">Agent Details</h3>
+                {signUpErrors._agentError && <p className="text-red-500 text-xs mt-1">{signUpErrors._agentError.message}</p>}
+                 <div>
+                  <label className="block text-sm font-medium text-gray-700">IC No <span className="text-red-500">*</span></label>
+                  <input {...registerSignUp('icNo')} className={`${baseInputClasses} ${signUpErrors.icNo ? errorInputClasses : 'border-gray-300'} mt-1`} />
+                  {signUpErrors.icNo && <p className="text-red-500 text-xs mt-1">{signUpErrors.icNo.message}</p>}
+                </div>
+                 <div>
+                  <label className="block text-sm font-medium text-gray-700">HP No <span className="text-red-500">*</span></label>
+                  <input {...registerSignUp('hpNo')} className={`${baseInputClasses} ${signUpErrors.hpNo ? errorInputClasses : 'border-gray-300'} mt-1`} />
+                  {signUpErrors.hpNo && <p className="text-red-500 text-xs mt-1">{signUpErrors.hpNo.message}</p>}
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Company Name <span className="text-red-500">*</span></label>
+                  <input {...registerSignUp('companyName')} className={`${baseInputClasses} ${signUpErrors.companyName ? errorInputClasses : 'border-gray-300'} mt-1`} />
+                  {signUpErrors.companyName && <p className="text-red-500 text-xs mt-1">{signUpErrors.companyName.message}</p>}
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Company Address <span className="text-red-500">*</span></label>
+                  <input {...registerSignUp('companyAddress')} className={`${baseInputClasses} ${signUpErrors.companyAddress ? errorInputClasses : 'border-gray-300'} mt-1`} />
+                  {signUpErrors.companyAddress && <p className="text-red-500 text-xs mt-1">{signUpErrors.companyAddress.message}</p>}
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Company Reg No <span className="text-red-500">*</span></label>
+                  <input {...registerSignUp('coRegNo')} className={`${baseInputClasses} ${signUpErrors.coRegNo ? errorInputClasses : 'border-gray-300'} mt-1`} />
+                  {signUpErrors.coRegNo && <p className="text-red-500 text-xs mt-1">{signUpErrors.coRegNo.message}</p>}
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Company Email Address <span className="text-red-500">*</span></label>
+                  <input {...registerSignUp('coEmailAddress')} className={`${baseInputClasses} ${signUpErrors.coEmailAddress ? errorInputClasses : 'border-gray-300'} mt-1`} />
+                  {signUpErrors.coEmailAddress && <p className="text-red-500 text-xs mt-1">{signUpErrors.coEmailAddress.message}</p>}
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">TIN No <span className="text-red-500">*</span></label>
+                  <input {...registerSignUp('tinNo')} className={`${baseInputClasses} ${signUpErrors.tinNo ? errorInputClasses : 'border-gray-300'} mt-1`} />
+                  {signUpErrors.tinNo && <p className="text-red-500 text-xs mt-1">{signUpErrors.tinNo.message}</p>}
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">PIC of E-invoice <span className="text-red-500">*</span></label>
+                  <input {...registerSignUp('picEinvoice')} className={`${baseInputClasses} ${signUpErrors.picEinvoice ? errorInputClasses : 'border-gray-300'} mt-1`} />
+                  {signUpErrors.picEinvoice && <p className="text-red-500 text-xs mt-1">{signUpErrors.picEinvoice.message}</p>}
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">PIC of E-invoice Email <span className="text-red-500">*</span></label>
+                  <input {...registerSignUp('picEinvoiceEmail')} className={`${baseInputClasses} ${signUpErrors.picEinvoiceEmail ? errorInputClasses : 'border-gray-300'} mt-1`} />
+                  {signUpErrors.picEinvoiceEmail && <p className="text-red-500 text-xs mt-1">{signUpErrors.picEinvoiceEmail.message}</p>}
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">PIC of E-invoice Tel No <span className="text-red-500">*</span></label>
+                  <input {...registerSignUp('picEinvoiceTelNo')} className={`${baseInputClasses} ${signUpErrors.picEinvoiceTelNo ? errorInputClasses : 'border-gray-300'} mt-1`} />
+                  {signUpErrors.picEinvoiceTelNo && <p className="text-red-500 text-xs mt-1">{signUpErrors.picEinvoiceTelNo.message}</p>}
+                </div>
+              </div>
+            )}
+
+            <button type="submit" className="w-full bg-black text-white py-3 rounded-md">Continue</button>
+          </form>
+        )}
       </div>
     </div>
   );
