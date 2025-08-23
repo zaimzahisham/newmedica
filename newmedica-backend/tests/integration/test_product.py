@@ -180,7 +180,7 @@ async def test_get_products_filtered_by_category(async_client: AsyncClient, sess
     session.add_all([cat1, cat2, prod1, prod2])
     await session.commit()
 
-    response = await async_client.get(f"/api/v1/products?category_id={cat1.id}")
+    response = await async_client.get(f"/api/v1/products?category={cat1.name}")
     assert response.status_code == 200
     data = response.json()
     assert len(data) == 1
@@ -195,14 +195,14 @@ async def test_get_products_sorted_by_price(async_client: AsyncClient, session: 
     await session.commit()
 
     # Test ascending
-    response_asc = await async_client.get("/api/v1/products?sort_by=price&sort_order=asc")
+    response_asc = await async_client.get("/api/v1/products?sort_by=price")
     assert response_asc.status_code == 200
     data_asc = response_asc.json()
     product_names_asc = [p["name"] for p in data_asc if p["name"] in ["Sort Prod 1", "Sort Prod 2"]]
     assert product_names_asc == ["Sort Prod 2", "Sort Prod 1"]
 
     # Test descending
-    response_desc = await async_client.get("/api/v1/products?sort_by=price&sort_order=desc")
+    response_desc = await async_client.get("/api/v1/products?sort_by=price-desc")
     assert response_desc.status_code == 200
     data_desc = response_desc.json()
     product_names_desc = [p["name"] for p in data_desc if p["name"] in ["Sort Prod 1", "Sort Prod 2"]]

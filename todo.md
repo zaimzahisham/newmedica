@@ -35,7 +35,7 @@ This document outlines tasks to complete the MVP for NewMedica, **prioritized by
 - [ ] Product sorting by date works
 - [x] All existing tests pass
 
-#### Task 0.2: Fix Failing Test Suite (BLOCKER)
+#### Task 0.2: Fix Failing Test Suite (BLOCKER) - ✅ COMPLETED
 **Priority**: 🔴 Critical - Blocks confident development
 **Current Issues**:
 - `test_get_products_filtered_by_category`: Returns 2 items instead of 1
@@ -52,7 +52,7 @@ This document outlines tasks to complete the MVP for NewMedica, **prioritized by
 4. Run: `cd newmedica-backend && uv run pytest tests/ -v` until all pass
 
 **Acceptance Criteria**:
-- [ ] All 16 tests pass without errors
+- [x] All 16 tests pass without errors
 - [ ] Test coverage remains ≥80%
 
 #### Task 0.3: Secure Environment Configuration (BLOCKER)

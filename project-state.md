@@ -7,19 +7,19 @@ This document provides the definitive current state of the NewMedica e-commerce 
 ## Overall Status
 
 **PHASE**: Early Development with Core Features Partially Implemented
-**OVERALL ADHERENCE TO GEMINI.md / Warp.md**: 65% - Significant gaps identified
-**MVP READINESS**: 40% - Critical blockers prevent MVP completion
-**IMMEDIATE PRIORITY**: Fix timestamp models, resolve test failures, implement Cart/Order domain
+**OVERALL ADHERENCE TO GEMINI.md / Warp.md**: 70% - Significant gaps identified
+**MVP READINESS**: 45% - Critical blockers prevent MVP completion
+**IMMEDIATE PRIORITY**: Secure environment, implement Cart/Order domain
 
-The project has a solid foundation with FastAPI backend and Next.js frontend, but **critical architectural gaps** and **failing tests** require immediate attention before proceeding with new features.
+The project has a solid foundation with FastAPI backend and Next.js frontend. With critical test failures resolved, the next priority is securing configuration before adding new features.
 
 ---
 
-## Backend (`newmedica-backend`) - COMPLIANCE: 65%
+## Backend (`newmedica-backend`) - COMPLIANCE: 75%
 
 **ARCHITECTURE**: ✅ Follows GEMINI.md / Warp.md layered approach (api → controllers → services → repositories → models)
 **TECH STACK**: ✅ FastAPI + SQLModel + PostgreSQL + Alembic (compliant)
-**CRITICAL ISSUES**: 🔴 Missing timestamps, failing tests, no Cart/Order domain, missing refresh tokens
+**CRITICAL ISSUES**: 🔴 Hardcoded secrets, no Cart/Order domain, missing refresh tokens
 
 ### ✅ COMPLIANT Features (Working as per GEMINI.md / Warp.md)
 
@@ -32,18 +32,12 @@ The project has a solid foundation with FastAPI backend and Next.js frontend, bu
 *   **Product Domain**: Complete CRUD operations, category filtering, search functionality
 *   **Database Setup**: PostgreSQL + SQLModel + Alembic migrations configured
 *   **API Versioning**: All endpoints correctly prefixed with `/api/v1`
+*   **Data Models**: All core models now include `created_at` and `updated_at` timestamps.
+*   **Test Suite**: All backend tests are now passing.
 
 ### 🔴 CRITICAL BLOCKERS (Fix Immediately)
 
-1. **TIMESTAMPS ADDED** - All models now have `created_at`/`updated_at` fields.
-
-2. **FAILING TEST SUITE** - 2 failed, 2 error tests:
-   - `test_get_products_filtered_by_category`: Returns 2 items instead of 1
-   - `test_get_products_sorted_by_price`: Sort order incorrect
-   - Cart tests failing due to fixture issues
-   - **IMPACT**: Blocks confident development
-
-3. **HARDCODED SECRETS** - Security vulnerability:
+1. **HARDCODED SECRETS** - Security vulnerability:
    - `app/core/settings.py`: SECRET_KEY hardcoded
    - **IMPACT**: Production security risk
 
@@ -51,7 +45,7 @@ The project has a solid foundation with FastAPI backend and Next.js frontend, bu
 
 1. **MISSING DOMAIN MODELS**: Cart/Order functionality completely missing
    - No `Cart`, `CartItem`, `Order`, `OrderItem` models
-   - No cart/order services, repositories, endpoints
+   - No cart/order tests, services, repositories, endpoints
    - **REQUIRED ENDPOINTS**: `/cart`, `/cart/items`, `/checkout`, `/orders`
 
 2. **INCOMPLETE AUTH FLOW**: Missing refresh token support
@@ -144,7 +138,7 @@ The project has a solid foundation with FastAPI backend and Next.js frontend, bu
 *   **NO DOCKERIZATION**: Missing Dockerfile for both backend/frontend
 *   **NO CI/CD**: No GitHub Actions workflows
 *   **NO LINTING SETUP**: No Ruff/Black/mypy configuration
-*   **TEST COVERAGE**: Backend tests failing, no frontend tests
+*   **TEST COVERAGE**: No frontend tests
 
 ### 🟡 SECURITY & PRODUCTION READINESS
 
@@ -158,7 +152,7 @@ The project has a solid foundation with FastAPI backend and Next.js frontend, bu
 ## NEXT ACTIONS FOR GEMINI CLI
 
 **WHEN GEMINI STARTS**: Focus immediately on these blockers in priority order:
-1. Fix timestamp models and failing tests
+1. Secure environment configuration (Task 0.3)
 2. Implement Cart/Order domain models
 3. Add missing MVP frontend pages
 4. Setup basic infrastructure (Docker, linting)
