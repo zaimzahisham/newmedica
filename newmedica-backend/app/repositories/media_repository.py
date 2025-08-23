@@ -1,7 +1,9 @@
-from sqlmodel.ext.asyncio.session import AsyncSession
 from uuid import UUID
 
+from sqlmodel.ext.asyncio.session import AsyncSession
+
 from app.models.product_media import ProductMedia
+
 
 class MediaRepository:
     def __init__(self, session: AsyncSession):

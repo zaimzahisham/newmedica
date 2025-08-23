@@ -1,20 +1,26 @@
-
-from pydantic import BaseModel, EmailStr, ConfigDict
-from typing import Dict, Any, Optional
 import uuid
+from typing import Any, Dict, Optional
+
+from pydantic import BaseModel, ConfigDict, EmailStr
+
 from .utils import to_camel
+
 
 class UserCreate(BaseModel):
     email: EmailStr
     password: str
-    userType: str # This will be the name like 'Basic', 'Agent', etc.
+    userType: str  # This will be the name like 'Basic', 'Agent', etc.
     extra_fields: Optional[Dict[str, Any]] = {}
 
+
 class UserRead(BaseModel):
-    model_config = ConfigDict(from_attributes=True, alias_generator=to_camel, populate_by_name=True)
+    model_config = ConfigDict(
+        from_attributes=True, alias_generator=to_camel, populate_by_name=True
+    )
 
     id: uuid.UUID
     email: EmailStr
+
 
 class UserReadWithDetails(UserRead):
     user_type: str

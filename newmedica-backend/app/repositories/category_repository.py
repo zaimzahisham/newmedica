@@ -1,9 +1,11 @@
-from sqlmodel.ext.asyncio.session import AsyncSession
-from sqlmodel import select
 from typing import List
+
+from sqlmodel import select
+from sqlmodel.ext.asyncio.session import AsyncSession
 
 from app.models.category import Category
 from app.schemas.category import CategoryCreate
+
 
 class CategoryRepository:
     def __init__(self, session: AsyncSession):
@@ -18,4 +20,4 @@ class CategoryRepository:
 
     async def get_all_categories(self) -> List[Category]:
         result = await self.session.execute(select(Category))
-        return result.scalars().all()
+        return result.scalars().all()  # type: ignore

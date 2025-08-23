@@ -1,8 +1,10 @@
-from sqlmodel.ext.asyncio.session import AsyncSession
-from uuid import UUID
 import os
+from uuid import UUID
+
+from sqlmodel.ext.asyncio.session import AsyncSession
 
 from app.repositories.media_repository import MediaRepository
+
 
 class MediaService:
     def __init__(self, db_session: AsyncSession):
@@ -14,11 +16,11 @@ class MediaService:
             # Attempt to delete the file from storage
             try:
                 # The URL starts with a /, so we strip it
-                file_path = media.url.lstrip('/')
+                file_path = media.url.lstrip("/")
                 if os.path.exists(file_path):
                     os.remove(file_path)
             except Exception as e:
                 # Log this error, but don't block the DB operation
                 print(f"Error deleting file {media.url}: {e}")
-            
+
             await self.repo.delete_media(media)

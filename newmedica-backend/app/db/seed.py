@@ -1,14 +1,16 @@
-
 import asyncio
 import sys
 from pathlib import Path
+
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlmodel import select
+
 from app.db.session import get_session
 from app.models.category import Category
 from app.models.product import Product
 from app.models.product_media import ProductMedia
-from sqlmodel import select
+
 
 async def seed_data():
     """
@@ -17,29 +19,39 @@ async def seed_data():
     """
     print("Seeding database...")
     session: AsyncSession = await anext(get_session())
-    
+
     try:
         # --- Upsert Categories ---
         print("Upserting categories...")
-        
+
         categories_to_upsert = {
             "Hot Selling": "Our most popular products.",
-            "New Arrival": "The latest additions to our catalog."
+            "New Arrival": "The latest additions to our catalog.",
         }
-        
+
         for cat_name, cat_desc in categories_to_upsert.items():
-            result = await session.execute(select(Category).where(Category.name == cat_name))
+            result = await session.execute(
+                select(Category).where(Category.name == cat_name)
+            )
             category = result.scalar_one_or_none()
             if not category:
                 category = Category(name=cat_name, description=cat_desc)
                 session.add(category)
-        
+
         await session.commit()
         print("Categories upserted.")
 
         # --- Get Categories for Product Seeding ---
-        hot_selling_cat = (await session.execute(select(Category).where(Category.name == "Hot Selling"))).scalar_one()
-        new_arrival_cat = (await session.execute(select(Category).where(Category.name == "New Arrival"))).scalar_one()
+        hot_selling_cat = (
+            await session.execute(
+                select(Category).where(Category.name == "Hot Selling")
+            )
+        ).scalar_one()
+        new_arrival_cat = (
+            await session.execute(
+                select(Category).where(Category.name == "New Arrival")
+            )
+        ).scalar_one()
 
         # --- Upsert Products ---
         print("Upserting products...")
@@ -68,14 +80,11 @@ async def seed_data():
             },
             {
                 "name": "Med-Cover Barrier Cream, 120g",
-                "description": "Durable and transparent barrier cream for skin protection.",
+                "description": (
+                    "Durable and transparent barrier cream for skin protection."
+                ),
                 "price": 59.90,
                 "stock": 75,
-                "category_id": new_arrival_cat.id,
-                "media": [
-                    {"url": "/assets/barrier-cream.jpeg", "display_order": 1},
-                    {"url": "/assets/barrier-cream-2.jpeg", "display_order": 2},
-                ],
             },
             {
                 "name": "Oral Wipes (Extra)",
@@ -90,7 +99,9 @@ async def seed_data():
             },
             {
                 "name": "Advanced Barrier Film",
-                "description": "A breathable, transparent film for advanced skin protection.",
+                "description": (
+                    "A breathable, transparent film for advanced skin protection."
+                ),
                 "price": 75.50,
                 "stock": 60,
                 "category_id": new_arrival_cat.id,
@@ -102,24 +113,24 @@ async def seed_data():
         ]
 
         for p_data in products_data:
-            result = await session.execute(select(Product).where(Product.name == p_data["name"]))
+            result = await session.execute(
+                select(Product).where(Product.name == p_data["name"])
+            )
             product = result.scalar_one_or_none()
-            
+
             if not product:
                 media_items = p_data.pop("media")
                 product = Product(**p_data)
                 session.add(product)
                 await session.commit()
                 await session.refresh(product)
-                
+
                 for m_data in media_items:
                     media = ProductMedia(
-                        product_id=product.id, 
-                        media_type="image", 
-                        **m_data
+                        product_id=product.id, media_type="image", **m_data
                     )
                     session.add(media)
-        
+
         await session.commit()
         print("Products and media upserted.")
         print("Database seeding complete.")
@@ -129,6 +140,7 @@ async def seed_data():
         await session.rollback()
     finally:
         await session.close()
+
 
 if __name__ == "__main__":
     asyncio.run(seed_data())

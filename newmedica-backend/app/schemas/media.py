@@ -1,5 +1,7 @@
-from pydantic import BaseModel
 import uuid
+
+from pydantic import BaseModel
+
 
 # Base Media Schema
 class ProductMediaBase(BaseModel):
@@ -7,8 +9,10 @@ class ProductMediaBase(BaseModel):
     url: str
     display_order: int
 
+
 class ProductMediaCreate(ProductMediaBase):
     pass
+
 
 class ProductMediaRead(ProductMediaBase):
     id: uuid.UUID

@@ -1,11 +1,11 @@
-
-from sqlmodel.ext.asyncio.session import AsyncSession
-from sqlmodel import select
 from typing import Optional
-import uuid
+
+from sqlmodel import select
+from sqlmodel.ext.asyncio.session import AsyncSession
 
 from app.models.user import User
 from app.models.user_type import UserType
+
 
 class UserRepository:
     def __init__(self, session: AsyncSession):
@@ -16,7 +16,9 @@ class UserRepository:
         return result.scalar_one_or_none()
 
     async def get_user_type_by_name(self, name: str) -> Optional[UserType]:
-        result = await self.session.execute(select(UserType).where(UserType.name == name))
+        result = await self.session.execute(
+            select(UserType).where(UserType.name == name)
+        )
         return result.scalar_one_or_none()
 
     async def create(self, user_data: dict) -> User:

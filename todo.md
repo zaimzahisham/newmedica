@@ -175,10 +175,15 @@ This document outlines tasks to complete the MVP for NewMedica, **prioritized by
 
 *Goal: Production readiness and development efficiency*
 
-### Task 2.1: Setup Linting & Formatting
+### Task 2.1: Setup Linting & Formatting (Backend ✅ COMPLETED)
 **Priority**: 🟠 Medium - Code quality
 
-**Backend**: Configure Ruff, Black, mypy
+**Backend**: Configure Ruff, Black, mypy.
+- [x] Ruff, Black, mypy installed and configured.
+- [x] Codebase formatted with Black.
+- [x] Linter errors fixed with Ruff.
+- [x] Mypy baseline established.
+
 **Frontend**: Configure ESLint, Prettier (already partially done)
 
 ### Task 2.2: Add Dockerization

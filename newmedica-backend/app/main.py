@@ -1,14 +1,14 @@
-
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.api.v1.endpoints import auth, users, categories, products, media
+
+from app.api.v1.endpoints import auth, categories, media, products, users
 
 app = FastAPI(title="Newmedica API")
 
 # CORS Configuration
 origins = [
-    "http://localhost:3000", # The default Next.js port
-    "http://localhost:3001", # A common alternative
+    "http://localhost:3000",  # The default Next.js port
+    "http://localhost:3001",  # A common alternative
 ]
 
 app.add_middleware(
@@ -24,6 +24,7 @@ app.include_router(users.router, prefix="/api/v1/users", tags=["users"])
 app.include_router(categories.router, prefix="/api/v1/categories", tags=["categories"])
 app.include_router(products.router, prefix="/api/v1/products", tags=["products"])
 app.include_router(media.router, prefix="/api/v1/media", tags=["media"])
+
 
 @app.get("/")
 def read_root():

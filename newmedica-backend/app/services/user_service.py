@@ -1,15 +1,15 @@
-
-from sqlmodel.ext.asyncio.session import AsyncSession
-from passlib.context import CryptContext
-import uuid
 from typing import Optional
 
-from app.models.user import User
-from app.schemas.user import UserCreate
+from passlib.context import CryptContext
+from sqlmodel.ext.asyncio.session import AsyncSession
+
 from app.core.security import verify_password
+from app.models.user import User
 from app.repositories.user_repository import UserRepository
+from app.schemas.user import UserCreate
 
 pwd_context = CryptContext(schemes=["argon2"], deprecated="auto")
+
 
 class UserService:
     def __init__(self, db_session: AsyncSession):
@@ -28,14 +28,14 @@ class UserService:
             raise ValueError(f"User type '{user_in.userType}' not found.")
 
         hashed_password = self.get_password_hash(user_in.password)
-        
+
         user_data = {
             "email": user_in.email,
             "password_hash": hashed_password,
             "user_type_id": user_type.id,
-            "extra_fields": user_in.extra_fields
+            "extra_fields": user_in.extra_fields,
         }
-        
+
         return await self.repo.create(user_data)
 
     async def authenticate(self, email: str, password: str) -> Optional[User]:

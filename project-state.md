@@ -59,7 +59,7 @@ All critical blockers have been resolved. The project is now in a stable state t
 
 *   **Admin Endpoints**: No approval system for Agent/Healthcare users
 *   **Validation**: `extra_fields` not validated against UserType schemas
-*   **Linting/Formatting**: No Ruff, Black, mypy configuration
+*   **Linting/Formatting**: ✅ Ruff, Black, mypy configured and baseline established.
 
 ---
 

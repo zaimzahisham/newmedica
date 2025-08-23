@@ -1,9 +1,11 @@
-from sqlmodel.ext.asyncio.session import AsyncSession
 from typing import List
 
+from sqlmodel.ext.asyncio.session import AsyncSession
+
+from app.models.category import Category
 from app.repositories.category_repository import CategoryRepository
 from app.schemas.category import CategoryCreate
-from app.models.category import Category
+
 
 class CategoryService:
     def __init__(self, db_session: AsyncSession):
