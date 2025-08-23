@@ -41,7 +41,7 @@ class ProductRepository:
             sort_map = {
                 "alphabetical": "name",
                 "price": "price",
-                "date": "created_at" # Assuming you have a timestamp field
+                "date": "updated_at"
             }
             
             sort_field_key, *sort_direction_parts = sort_by.split('-')

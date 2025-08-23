@@ -40,6 +40,9 @@ This document outlines tasks to complete the MVP for NewMedica, **prioritized by
 **Current Issues**:
 - `test_get_products_filtered_by_category`: Returns 2 items instead of 1
 - `test_get_products_sorted_by_price`: Incorrect sort order
+- IMPORTANT SORT TESTS MISSING: missing test get products sorted_by alphabetical and updated_at as handled at /newmedica-backend/app/repositories/product_repository.py
+    - IMPORTANT NOTE : at the frontend level, i am able to use the sort by filter just fine. meaning the api is working, but the test fails. 
+    - IMPORTANT NOTE : double check how frontend handles the sort by filter along with how the current api works before updating the test
 - Cart tests: Fixture name errors (`client` vs `async_client`)
 
 **Action Required**:
