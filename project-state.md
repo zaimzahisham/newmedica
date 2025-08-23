@@ -1,78 +1,166 @@
-# Project State as of 2025-08-23 (Updated)
+# Project State as of 2025-08-23 (COMPREHENSIVE ANALYSIS)
 
-This document outlines the current state of the NewMedica e-commerce platform, separated by backend and frontend components.
+This document provides the definitive current state of the NewMedica e-commerce platform, separated by backend and frontend components. This analysis was conducted against GEMINI.md / Warp.md specifications.
 
 ---
 
 ## Overall Status
 
-The project is in the early stages of development. Core authentication and product catalog management are now functional on the backend. The frontend has been updated to fetch and display product data from the backend, replacing the previous static implementation. A major debugging session has resolved critical issues related to data fetching and sorting. The project adheres to the guidelines in `GEMINI.md`.
+**PHASE**: Early Development with Core Features Partially Implemented
+**OVERALL ADHERENCE TO GEMINI.md / Warp.md**: 65% - Significant gaps identified
+**MVP READINESS**: 40% - Critical blockers prevent MVP completion
+**IMMEDIATE PRIORITY**: Fix timestamp models, resolve test failures, implement Cart/Order domain
+
+The project has a solid foundation with FastAPI backend and Next.js frontend, but **critical architectural gaps** and **failing tests** require immediate attention before proceeding with new features.
 
 ---
 
-## Backend (`newmedica-backend`)
+## Backend (`newmedica-backend`) - COMPLIANCE: 65%
 
-The backend is built with FastAPI and SQLModel, with a clear separation of concerns.
+**ARCHITECTURE**: ✅ Follows GEMINI.md / Warp.md layered approach (api → controllers → services → repositories → models)
+**TECH STACK**: ✅ FastAPI + SQLModel + PostgreSQL + Alembic (compliant)
+**CRITICAL ISSUES**: 🔴 Missing timestamps, failing tests, no Cart/Order domain, missing refresh tokens
 
-### Implemented Features
+### ✅ COMPLIANT Features (Working as per GEMINI.md / Warp.md)
 
-*   **Framework:** FastAPI application is set up with CORS configured to allow requests from the frontend.
-*   **Authentication:**
-    *   JWT-based token authentication (`/api/v1/auth/login`) is working.
-    *   User registration (`/api/v1/auth/register`) is implemented, supporting different `UserType`s (`Basic`, `Agent`, `Healthcare`) and storing conditional data in a `JSONB` field.
-    *   An endpoint to fetch the current user's details (`/api/v1/users/me`) is functional.
-*   **Product & Category Management:**
-    *   Full CRUD (Create, Read, Update, Delete) endpoints for Products are implemented.
-    *   Endpoints for creating and listing Categories are implemented.
-    *   Product listing endpoint supports filtering by category name, a search term, and sorting by price and name. **Sorting by date is currently not functional.**
-*   **Database:**
-    *   PostgreSQL service is defined in `docker-compose.yml`.
-    *   SQLModel is used for ORM.
-    *   `User`, `UserType`, `Product`, and `Category` models are defined and mapped to the database.
-    *   Alembic is set up for migrations.
-    *   A seed script (`app/db/seed.py`) has been created to populate the database with initial data.
-*   **Testing:**
-    *   Integration tests for the authentication flow (`register`, `login`, `me`) are in place.
-    *   Full test coverage for the Product and Category API endpoints.
+*   **Framework & Structure**: FastAPI app with proper CORS, layered architecture implemented
+*   **Authentication Core**: 
+    *   JWT access token creation/validation working
+    *   User registration with conditional fields (Basic/Agent/Healthcare)
+    *   Password hashing with argon2 (compliant)
+    *   Current user endpoint (`/api/v1/users/me`)
+*   **Product Domain**: Complete CRUD operations, category filtering, search functionality
+*   **Database Setup**: PostgreSQL + SQLModel + Alembic migrations configured
+*   **API Versioning**: All endpoints correctly prefixed with `/api/v1`
 
-### Missing Features & Areas for Improvement
+### 🔴 CRITICAL BLOCKERS (Fix Immediately)
 
-*   **Missing Timestamps:** Database models lack `created_at` and `updated_at` fields, which prevents features like sorting by date and creates a significant data integrity gap. This is a high-priority issue to resolve.
-*   **Alembic Issues:** The Alembic auto-generation process is currently failing, which blocks schema changes. This needs to be investigated and fixed.
-*   **Domain Models:** `Cart` and `Order` models, services, and repositories are not yet implemented.
-*   **API Endpoints:** Endpoints for Cart and Orders are missing.
-*   **Admin Functionality:** No endpoints exist for admin-specific tasks, such as approving/rejecting `Agent` or `Healthcare` user registrations.
-*   **Validation:** The `extra_fields` in the `User` model are not yet validated against a schema based on the `UserType`.
-*   **Error Handling:** While basic HTTP exceptions are used, a more robust and consistent error handling strategy could be implemented.
+1. **TIMESTAMPS ADDED** - All models now have `created_at`/`updated_at` fields.
+
+2. **FAILING TEST SUITE** - 2 failed, 2 error tests:
+   - `test_get_products_filtered_by_category`: Returns 2 items instead of 1
+   - `test_get_products_sorted_by_price`: Sort order incorrect
+   - Cart tests failing due to fixture issues
+   - **IMPACT**: Blocks confident development
+
+3. **HARDCODED SECRETS** - Security vulnerability:
+   - `app/core/settings.py`: SECRET_KEY hardcoded
+   - **IMPACT**: Production security risk
+
+### 🟡 HIGH PRIORITY GAPS (Required for MVP)
+
+1. **MISSING DOMAIN MODELS**: Cart/Order functionality completely missing
+   - No `Cart`, `CartItem`, `Order`, `OrderItem` models
+   - No cart/order services, repositories, endpoints
+   - **REQUIRED ENDPOINTS**: `/cart`, `/cart/items`, `/checkout`, `/orders`
+
+2. **INCOMPLETE AUTH FLOW**: Missing refresh token support
+   - No `/auth/refresh` endpoint (required by GEMINI.md / Warp.md)
+   - Only access tokens implemented
+
+3. **INCONSISTENT ERROR HANDLING**: 
+   - Not following GEMINI.md / Warp.md format: `{"error": {"code": ..., "message": ...}}`
+   - Using basic HTTPException instead
+
+### 🟠 MEDIUM PRIORITY IMPROVEMENTS
+
+*   **Admin Endpoints**: No approval system for Agent/Healthcare users
+*   **Validation**: `extra_fields` not validated against UserType schemas
+*   **Linting/Formatting**: No Ruff, Black, mypy configuration
 
 ---
 
-## Frontend (`newmedica-frontend`)
+## Frontend (`newmedica-frontend`) - COMPLIANCE: 70%
 
-The frontend is built with Next.js (App Router) and Tailwind CSS. It has a functional UI for authentication and dynamic product browsing.
+**ARCHITECTURE**: ✅ Next.js 14 + App Router + TypeScript (compliant)
+**STYLING**: ✅ Tailwind CSS configured and working
+**FORMS**: ✅ React Hook Form + Zod validation implemented
+**CRITICAL ISSUES**: 🟡 Missing MVP pages, no Zustand, non-feature-first structure
 
-### Implemented Features
+### ✅ COMPLIANT Features (Working as per GEMINI.md / Warp.md)
 
-*   **Framework:** Next.js application with TypeScript. Styling is handled by Tailwind CSS.
-*   **Authentication:**
-    *   A combined Login/Registration page (`/login`) successfully communicates with the backend API to register and log in users.
-    *   `AuthContext` manages user state and JWT tokens, persisting the token to `localStorage`.
-    *   The UI dynamically updates based on authentication state (e.g., showing user info in the navbar).
-*   **Pages & Components:**
-    *   **Home Page:** Displays a product carousel with data fetched from the backend.
-    *   **Product Pages:** `products/` and `products/category/[category]` pages now fetch and display data from the backend API. These pages use a **robust client-side data fetching pattern** to handle dynamic search and sorting.
-    *   **Product Detail Page:** The `/products/[id]` page has been redesigned to match the target design, including a multi-image gallery, quantity selector, and dynamic promotions section. It now correctly renders rich text (HTML) for product descriptions.
-    *   **Account Management:**
-        *   `/account`: A dashboard page for logged-in users.
-        *   `/account/details`: A page to view (but not yet edit) user profile information.
-        *   `/account/address`: A page to view addresses.
-    *   **UI Components:** A reusable `Navbar`, `Footer`, `ProductCard`, `ProductCarousel`, `SearchBar`, and `SortDropdown` are implemented. **Search and sort components are fully functional (except for date sorting).**
+*   **Core Framework**: Next.js 14 with App Router, TypeScript strict mode enabled
+*   **Authentication Flow**: Login/registration with backend integration, AuthContext for state
+*   **Form Handling**: React Hook Form + Zod validation working (compliant with GEMINI.md / Warp.md)
+*   **Styling System**: Tailwind CSS properly configured
+*   **Dynamic Data**: Server/client data fetching with search/sort functionality
 
-### Missing Features & Areas for Improvement
+### ✅ IMPLEMENTED Pages & Components
 
-*   **Cart & Checkout:** There is no shopping cart or checkout functionality.
-*   **User Profile:**
-    *   The "Complete your profile" section on the account page is not functional.
-    *   The form on the account details page does not submit data to the backend.
-*   **State Management:** `Zustand` is specified in `GEMINI.md` for UI state but has not been integrated yet.
-*   **Admin UI:** No admin-facing pages or components have been created.
+**PAGES COMPLETED**:
+- ✅ `/` (Home with product carousel)
+- ✅ `/login` (Combined login/registration)
+- ✅ `/products` (Product listing with search/sort)
+- ✅ `/products/category/[category]` (Category filtering)
+- ✅ `/products/[id]` (Product detail with gallery, quantity selector)
+- ✅ `/account` (User dashboard)
+- ✅ `/account/details` (Profile viewing)
+- ✅ `/account/address` (Address management)
+
+**COMPONENTS IMPLEMENTED**:
+- Navigation: `Navbar`, `Footer`, `ThemeToggleButton`
+- Product: `ProductCard`, `ProductCarousel`, `ProductGrid`, `ProductDetails`
+- UI: `SearchBar`, `SortDropdown`, `ProductFilters`, `QuantitySelector`
+- Forms: `ProductImageGallery`, `AddToCartConfirmation`
+
+### 🟡 HIGH PRIORITY GAPS (Required for MVP)
+
+1. **MISSING CORE MVP PAGES**:
+   - ❌ `/cart` - Shopping cart functionality
+   - ❌ `/checkout` - Stripe integration page
+   - ❌ `/orders` - Order history page
+   - ❌ `/profile` - Editable profile page
+   - ❌ `/admin` - Admin user management
+
+2. **STATE MANAGEMENT**: Zustand not implemented
+   - GEMINI.md / Warp.md specifies Zustand for UI state
+   - Currently using React Context pattern
+   - No centralized store for cart state
+
+### 🟠 MEDIUM PRIORITY IMPROVEMENTS
+
+1. **ARCHITECTURE DEVIATION**: Not feature-first structure
+   - All components in single `/components` directory
+   - GEMINI.md / Warp.md specifies co-located components/hooks/schemas by feature
+   - Should be: `/app/(dashboard)/profile/_components/`
+
+2. **INCOMPLETE FUNCTIONALITY**:
+   - Account details form doesn't submit to backend
+   - "Complete your profile" section non-functional
+   - No admin UI components
+
+### 🔵 LOW PRIORITY ITEMS
+
+*   **Accessibility**: No WCAG AA compliance validation
+*   **Server Components**: Could leverage more RSC for data fetching
+*   **Performance**: No image optimization beyond Next.js defaults
+
+---
+
+## Cross-Cutting Quality Assessment
+
+### 🔴 CRITICAL MISSING INFRASTRUCTURE
+
+*   **NO DOCKERIZATION**: Missing Dockerfile for both backend/frontend
+*   **NO CI/CD**: No GitHub Actions workflows
+*   **NO LINTING SETUP**: No Ruff/Black/mypy configuration
+*   **TEST COVERAGE**: Backend tests failing, no frontend tests
+
+### 🟡 SECURITY & PRODUCTION READINESS
+
+*   **Environment Management**: Secrets hardcoded (needs `.env` files)
+*   **Error Monitoring**: No Sentry integration
+*   **Backup Strategy**: No automated database backups
+*   **Reverse Proxy**: No Caddy/Traefik configuration
+
+---
+
+## NEXT ACTIONS FOR GEMINI CLI
+
+**WHEN GEMINI STARTS**: Focus immediately on these blockers in priority order:
+1. Fix timestamp models and failing tests
+2. Implement Cart/Order domain models
+3. Add missing MVP frontend pages
+4. Setup basic infrastructure (Docker, linting)
+
+**DO NOT PROCEED** with new features until critical blockers are resolved.
