@@ -1,6 +1,7 @@
 from sqlmodel import SQLModel, Field, Relationship
 import uuid
 from typing import List, TYPE_CHECKING
+from datetime import datetime
 
 if TYPE_CHECKING:
     from .category import Category
@@ -12,6 +13,8 @@ class Product(SQLModel, table=True):
     description: str
     price: float
     stock: int
+    created_at: datetime = Field(default_factory=datetime.utcnow, nullable=False)
+    updated_at: datetime = Field(default_factory=datetime.utcnow, nullable=False, sa_column_kwargs={"onupdate": datetime.utcnow})
 
     category_id: uuid.UUID = Field(foreign_key="category.id")
     category: "Category" = Relationship(back_populates="products")

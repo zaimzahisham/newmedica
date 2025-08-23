@@ -8,7 +8,7 @@ import uuid
 from app.db.init_db import seed_user_types
 from app.main import app
 from app.db.session import get_session
-from app.models import User, UserType # Use the __init__.py for imports
+from app.models import User, UserType, Category, Product, ProductMedia # Use the __init__.py for imports
 from app.core.security import create_access_token
 from sqlmodel import SQLModel, select
 

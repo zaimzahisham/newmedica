@@ -2,6 +2,8 @@ import pytest
 from httpx import AsyncClient
 from sqlmodel.ext.asyncio.session import AsyncSession
 import io
+from datetime import datetime, timedelta
+import uuid
 
 from app.models.category import Category
 from app.models.product import Product
@@ -30,6 +32,14 @@ async def test_create_product(async_client: AsyncClient, admin_token_headers: di
     assert response.status_code == 201
     data = response.json()
     assert data["name"] == "Test Product"
+
+    # Verify timestamps
+    product = await session.get(Product, uuid.UUID(data["id"]))
+    assert product.created_at is not None
+    assert isinstance(product.created_at, datetime)
+    assert product.updated_at is not None
+    assert isinstance(product.updated_at, datetime)
+    assert datetime.utcnow() - product.created_at < timedelta(seconds=10)
 
 @pytest.mark.asyncio
 async def test_get_products(async_client: AsyncClient, session: AsyncSession):
@@ -67,6 +77,14 @@ async def test_upload_media_for_product(async_client: AsyncClient, admin_token_h
     res = await async_client.get(f"/api/v1/products/{product.id}")
     product_data = res.json()
     assert len(product_data["media"]) == 1
+
+    # Verify timestamps
+    media = await session.get(ProductMedia, uuid.UUID(product_data["media"][0]["id"]))
+    assert media.created_at is not None
+    assert isinstance(media.created_at, datetime)
+    assert media.updated_at is not None
+    assert isinstance(media.updated_at, datetime)
+    assert datetime.utcnow() - media.created_at < timedelta(seconds=10)
 
 @pytest.mark.asyncio
 async def test_update_media_order(async_client: AsyncClient, admin_token_headers: dict, session: AsyncSession):

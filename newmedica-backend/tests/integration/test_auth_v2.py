@@ -2,11 +2,15 @@
 import pytest
 from httpx import AsyncClient
 import uuid
+from sqlmodel import select
+from app.models.user import User
+from sqlalchemy.ext.asyncio import AsyncSession
+from datetime import datetime, timedelta
 
 # The async_client fixture is defined in conftest.py
 
 @pytest.mark.asyncio
-async def test_user_registration_and_login(async_client: AsyncClient):
+async def test_user_registration_and_login(async_client: AsyncClient, session: AsyncSession):
     unique_email = f"test_user_{uuid.uuid4()}@example.com"
     password = "SecurePassword123!"
 
@@ -21,6 +25,14 @@ async def test_user_registration_and_login(async_client: AsyncClient):
     )
     assert register_response.status_code == 201, f"Registration failed: {register_response.text}"
     
+    # Verify timestamps
+    user = (await session.execute(select(User).where(User.email == unique_email))).scalar_one()
+    assert user.created_at is not None
+    assert isinstance(user.created_at, datetime)
+    assert user.updated_at is not None
+    assert isinstance(user.updated_at, datetime)
+    assert datetime.utcnow() - user.created_at < timedelta(seconds=10)
+
     login_response = await async_client.post(
         "/api/v1/auth/login",
         data={"username": unique_email, "password": password}
