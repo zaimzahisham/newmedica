@@ -4,6 +4,7 @@ import "./globals.css";
 import { ThemeProvider } from "@/context/ThemeProvider";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import CartProvider from "@/components/CartProvider";
 
 const alice = Alice({ subsets: ["latin"], weight: "400" });
 
@@ -21,9 +22,11 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body className={`${alice.className} flex flex-col min-h-screen`}>
         <ThemeProvider>
-          <Navbar />
-          <main className="flex-grow">{children}</main>
-          <Footer />
+          <CartProvider>
+            <Navbar />
+            <main className="flex-grow">{children}</main>
+            <Footer />
+          </CartProvider>
         </ThemeProvider>
       </body>
     </html>

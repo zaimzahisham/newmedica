@@ -3,6 +3,8 @@
 import { Product } from '@/types';
 import { Check, X } from 'lucide-react';
 import Link from 'next/link';
+import { motion } from 'framer-motion';
+import { useCartStore } from '@/store/cartStore';
 
 interface AddToCartConfirmationProps {
   product: Product;
@@ -10,9 +12,25 @@ interface AddToCartConfirmationProps {
   onClose: () => void;
 }
 
+const modalVariants = {
+  hidden: { opacity: 0, y: -20 },
+  visible: { opacity: 1, y: 0 },
+  exit: { opacity: 0, y: -20 },
+};
+
 export default function AddToCartConfirmation({ product, quantity, onClose }: AddToCartConfirmationProps) {
+  const cart = useCartStore((state) => state.cart);
+  const cartItemCount = cart?.items?.reduce((total, item) => total + item.quantity, 0) || 0;
+
   return (
-    <div className="fixed top-8 right-8 w-96 bg-white border rounded-lg shadow-lg z-50 animate-in fade-in-0 slide-in-from-top-5">
+    <motion.div 
+      className="fixed top-8 right-8 w-96 bg-white border rounded-lg shadow-lg z-50"
+      initial="hidden"
+      animate="visible"
+      exit="exit"
+      variants={modalVariants}
+      transition={{ duration: 0.3 }}
+    >
       <div className="p-4 border-b">
         <div className="flex items-center gap-2">
           <Check size={20} className="text-green-500" />
@@ -39,7 +57,7 @@ export default function AddToCartConfirmation({ product, quantity, onClose }: Ad
             href="/cart" 
             className="w-full text-center border border-border py-2 rounded-md hover:bg-secondary"
           >
-            View cart ({quantity})
+            View cart ({cartItemCount})
           </Link>
           <Link 
             href="/checkout" 
@@ -55,6 +73,6 @@ export default function AddToCartConfirmation({ product, quantity, onClose }: Ad
           </button>
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 }

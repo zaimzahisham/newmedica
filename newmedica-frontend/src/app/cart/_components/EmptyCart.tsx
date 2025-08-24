@@ -1,16 +1,15 @@
 import Link from 'next/link';
 import { ShoppingCart } from 'lucide-react';
 
-export default function EmptyCart() {
+export function EmptyCartDisplay() {
   return (
-    <div className="flex flex-col items-center justify-center h-full py-12">
-      <ShoppingCart className="w-24 h-24 text-muted-foreground" />
-      <h2 className="mt-6 text-2xl font-semibold">Your cart is empty</h2>
-      <p className="mt-2 text-muted-foreground">
-        Looks like you haven't added anything to your cart yet.
-      </p>
-      <Link href="/products" className="mt-6">
-        <button className="btn btn-primary">Start Shopping</button>
+    <div className="container mx-auto px-4 py-16 flex flex-col items-center text-center">
+      <ShoppingCart size={64} className="text-muted-foreground mb-6" />
+      <h1 className="text-4xl font-serif mb-4">Your cart is currently empty.</h1>
+      <Link href="/products" passHref>
+        <button className="mt-4 bg-black text-white px-8 py-3 rounded-full font-semibold hover:bg-gray-800 transition-colors">
+          Continue shopping
+        </button>
       </Link>
     </div>
   );

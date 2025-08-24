@@ -34,4 +34,8 @@ class CartItem(SQLModel, table=True):
     )
 
     cart: "Cart" = Relationship(back_populates="items")
-    product: "Product" = Relationship()
+    product: "Product" = Relationship(sa_relationship_kwargs={"lazy": "joined"})
+
+    @property
+    def price(self) -> float:
+        return self.product.price

@@ -58,3 +58,26 @@ export interface Address {
   country: string;
   isDefault: boolean;
 }
+
+export interface CartItem {
+  id: string;
+  product: Product;
+  quantity: number;
+  price: number;
+}
+
+export interface Cart {
+  id: string;
+  user_id: string;
+  items: CartItem[];
+  total_price: number;
+}
+
+export interface CartItemCreate {
+  product_id: string;
+  quantity: number;
+}
+
+export interface CartItemUpdate {
+  quantity: number;
+}

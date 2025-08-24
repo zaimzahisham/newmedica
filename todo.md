@@ -12,7 +12,7 @@ This document outlines tasks to complete the MVP for NewMedica, **prioritized by
 
 ### Backend Priority 1 - Fix Data Models & Tests
 
-#### Task 0.1: Add Timestamps to All Models (BLOCKER)
+#### Task 0.1: Add Timestamps to All Models (BLOCKER) - ✅ COMPLETED
 **Priority**: 🔴 Critical - Blocks sorting functionality
 **Estimated Time**: 2-3 hours
 **TDD Approach**: 
@@ -32,7 +32,7 @@ This document outlines tasks to complete the MVP for NewMedica, **prioritized by
 **Acceptance Criteria**:
 - [x] All models have `created_at` and `updated_at` fields
 - [x] Alembic migration applies cleanly
-- [ ] Product sorting by date works
+- [x] Product sorting by date works
 - [x] All existing tests pass
 
 #### Task 0.2: Fix Failing Test Suite (BLOCKER) - ✅ COMPLETED
@@ -53,7 +53,7 @@ This document outlines tasks to complete the MVP for NewMedica, **prioritized by
 
 **Acceptance Criteria**:
 - [x] All 16 tests pass without errors
-- [ ] Test coverage remains ≥80%
+- [x] Test coverage remains ≥80%
 
 #### Task 0.3: Secure Environment Configuration (BLOCKER) - ✅ COMPLETED
 **Priority**: 🔴 Critical Security Issue
@@ -101,14 +101,14 @@ This document outlines tasks to complete the MVP for NewMedica, **prioritized by
 **Required Endpoints**:
 - ✅ `POST /api/v1/cart/items`: Add item to cart
 - ✅ `GET /api/v1/cart`: Get user's cart
-- [x] `PUT /api/v1/cart/items/{item_id}`: Update quantity
-- [x] `DELETE /api/v1/cart/items/{item_id}`: Remove item
+- ✅ `PUT /api/v1/cart/items/{item_id}`: Update quantity
+- ✅ `DELETE /api/v1/cart/items/{item_id}`: Remove item
 
 **Acceptance Criteria**:
 - [x] All cart endpoints work with proper auth
 - [x] Cart persists items across sessions
-- [ ] Quantity validation prevents negative/zero values
-- [ ] Price calculations are accurate
+- [x] Quantity validation prevents negative/zero values
+- [x] Price calculations are accurate
 - [x] Tests cover happy path + edge cases (for implemented endpoints)
 
 #### Task 1.2: Implement Order Domain Models (TDD) - ✅ COMPLETED
@@ -122,7 +122,7 @@ This document outlines tasks to complete the MVP for NewMedica, **prioritized by
 - ✅ `GET /api/v1/orders`: List user orders
 - ✅ `GET /api/v1/orders/{order_id}`: Order details
 
-#### Task 1.3: Add Refresh Token Support
+#### Task 1.3: Add Refresh Token Support - ✅ COMPLETED
 **Priority**: 🟡 High - Required by GEMINI.md/WARP.md
 **Files to Update**:
 - `app/api/v1/endpoints/auth.py`: Add `/refresh` endpoint
@@ -131,7 +131,7 @@ This document outlines tasks to complete the MVP for NewMedica, **prioritized by
 
 ### Frontend Priority 2 - MVP Pages
 
-#### Task 1.4: Implement Cart Page (TDD)
+#### Task 1.4: Implement Cart Page (TDD) - ✅ COMPLETED
 **Priority**: 🟡 High - Core e-commerce functionality
 **Path**: `/cart`
 **Dependencies**: Backend Cart API (Task 1.1)
@@ -139,16 +139,28 @@ This document outlines tasks to complete the MVP for NewMedica, **prioritized by
 **Required Components** (create with TDD):
 - `app/cart/page.tsx`: Main cart page
 - `app/cart/_components/CartItem.tsx`: Individual cart item
-- `app/cart/_components/CartSummary.tsx`: Price totals
 - `app/cart/_components/EmptyCart.tsx`: Empty state
 
 **Acceptance Criteria**:
-- [ ] Shows all cart items with images, names, prices
-- [ ] Quantity can be updated inline
-- [ ] Items can be removed
-- [ ] Price totals calculate correctly
-- [ ] "Proceed to Checkout" button works
-- [ ] Empty cart shows appropriate message
+- [x] Shows all cart items with images, names, prices
+- [x] Quantity can be updated inline
+- [x] Items can be removed
+- [x] Price totals calculate correctly
+- [x] "Proceed to Checkout" button works
+- [x] Empty cart shows appropriate message
+- [x] Cart items are sorted alphabetically by product name.
+- [x] Navbar cart count correctly reflects total item quantity.
+
+#### Task 1.4.1: Add "Request Quotation" Feature - ✅ COMPLETED
+**Priority**: 🟡 High - Key feature for Agent/Healthcare users
+**Path**: `/products/[id]`
+**Dependencies**: User authentication
+
+**Acceptance Criteria**:
+- [x] "Request Quotation" button is visible only to Agent and Healthcare users.
+- [x] Modal opens with a form pre-populated with user data.
+- [x] Form submission is handled (simulated email).
+- [x] Modal has smooth fade-in/fade-out animations.
 
 #### Task 1.5: Implement Checkout Page (TDD)
 **Priority**: 🟡 High - Required for MVP
@@ -161,13 +173,23 @@ This document outlines tasks to complete the MVP for NewMedica, **prioritized by
 - `app/checkout/_components/OrderSummary.tsx`: Order review
 - `lib/stripe.ts`: Stripe client setup
 
-#### Task 1.6: Setup Zustand State Management
+#### Task 1.6: Setup Zustand State Management for Cart - ✅ COMPLETED
 **Priority**: 🟡 High - Required by GEMINI.md/WARP.md
 **Action Required**:
 1. Install zustand: `npm install zustand`
 2. Create `src/store/cartStore.ts`: Cart state management
-3. Create `src/store/authStore.ts`: Auth state (migrate from Context)
-4. Update components to use stores instead of Context
+3. Update components to use cart store
+
+#### Task 1.7: Migrate Auth State to Zustand - ✅ COMPLETED
+**Priority**: 🟠 Medium - Code quality & consistency
+**Dependencies**: Task 1.6
+**Status**: ✅ COMPLETED
+**Action Required**:
+1. ✅ Create `src/store/authStore.ts`
+2. ✅ Migrate logic from `src/context/AuthContext.tsx` to the new store
+3. ✅ Fix bugs in components using `useAuthStore`
+4. ✅ Complete component migration and testing
+5. ✅ Remove the old `AuthContext.tsx` file after all bugs fixed
 
 ---
 

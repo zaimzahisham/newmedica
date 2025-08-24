@@ -4,14 +4,22 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Search, User, ShoppingCart, ChevronDown } from 'lucide-react';
 import { useAuthStore } from '@/store/authStore';
-import { useState, useRef } from 'react';
+import { useCartStore } from '@/store/cartStore';
+import { useState, useRef, useEffect } from 'react';
 import Image from 'next/image';
 
 const Navbar = () => {
   const pathname = usePathname();
   const { user, logout } = useAuthStore();
+  const cart = useCartStore((state) => state.cart);
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
   const [isCatalogOpen, setIsCatalogOpen] = useState(false);
-  const catalogTimeoutRef = useRef<NodeJS.Timeout | null>(null); // Renamed for clarity
+  const catalogTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const [isUserDropdownOpen, setIsUserDropdownOpen] = useState(false);
   const userTimeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -33,7 +41,7 @@ const Navbar = () => {
   const handleCatalogMouseLeave = () => {
     catalogTimeoutRef.current = setTimeout(() => {
       setIsCatalogOpen(false);
-    }, 200); // Close after 200ms
+    }, 200);
   };
 
   const handleUserMouseEnter = () => {
@@ -46,8 +54,10 @@ const Navbar = () => {
   const handleUserMouseLeave = () => {
     userTimeoutRef.current = setTimeout(() => {
       setIsUserDropdownOpen(false);
-    }, 200); // Close after 200ms
+    }, 200);
   };
+
+  const cartItemCount = cart?.items?.reduce((total, item) => total + item.quantity, 0) || 0;
 
   return (
     <header className="sticky top-0 backdrop-blur-sm z-50">
@@ -102,8 +112,13 @@ const Navbar = () => {
               <User size={22} />
             </Link>
           )}
-          <Link href="/cart" className="text-foreground/70 hover:text-primary">
+          <Link href="/cart" className="relative text-foreground/70 hover:text-primary">
             <ShoppingCart size={22} />
+            {isClient && cartItemCount > 0 && (
+              <span className="absolute -top-2 -right-2 bg-primary text-primary-foreground text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                {cartItemCount}
+              </span>
+            )}
           </Link>
         </div>
       </nav>
