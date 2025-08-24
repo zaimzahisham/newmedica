@@ -1,12 +1,14 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlmodel.ext.asyncio.session import AsyncSession
+from jose import JWTError
 
-from app.core.security import create_access_token
+from app.core.security import create_access_token, create_refresh_token, get_current_user
 from app.db.session import get_session
 from app.schemas.token import Token
 from app.schemas.user import UserCreate, UserRead
 from app.services.user_service import UserService
+from app.models.user import User
 
 router = APIRouter()
 
@@ -42,4 +44,20 @@ async def login_for_access_token(
             headers={"WWW-Authenticate": "Bearer"},
         )
     access_token = create_access_token(subject=user.id)
-    return {"access_token": access_token, "token_type": "bearer"}
+    refresh_token = create_refresh_token(subject=user.id)
+    return {
+        "access_token": access_token,
+        "refresh_token": refresh_token,
+        "token_type": "bearer",
+    }
+
+
+@router.post("/refresh", response_model=Token)
+async def refresh_token(current_user: User = Depends(get_current_user)):
+    access_token = create_access_token(subject=current_user.id)
+    refresh_token = create_refresh_token(subject=current_user.id)
+    return {
+        "access_token": access_token,
+        "refresh_token": refresh_token,
+        "token_type": "bearer",
+    }

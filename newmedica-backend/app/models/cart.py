@@ -26,7 +26,12 @@ class CartItem(SQLModel, table=True):
     cart_id: uuid.UUID = Field(foreign_key="cart.id")
     product_id: uuid.UUID = Field(foreign_key="product.id")
     quantity: int
-    added_at: datetime = Field(default_factory=datetime.utcnow, nullable=False)
+    created_at: datetime = Field(default_factory=datetime.utcnow, nullable=False)
+    updated_at: datetime = Field(
+        default_factory=datetime.utcnow,
+        nullable=False,
+        sa_column_kwargs={"onupdate": datetime.utcnow},
+    )
 
     cart: "Cart" = Relationship(back_populates="items")
     product: "Product" = Relationship()
