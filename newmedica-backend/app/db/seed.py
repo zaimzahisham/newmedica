@@ -85,6 +85,11 @@ async def seed_data():
                 ),
                 "price": 59.90,
                 "stock": 75,
+                "category_id": new_arrival_cat.id,
+                "media": [
+                    {"url": "/assets/barrier-cream.jpeg", "display_order": 1},
+                    {"url": "/assets/barrier-cream-2.jpeg", "display_order": 2},
+                ],
             },
             {
                 "name": "Oral Wipes (Extra)",
@@ -106,8 +111,8 @@ async def seed_data():
                 "stock": 60,
                 "category_id": new_arrival_cat.id,
                 "media": [
-                    {"url": "/assets/barrier-cream.jpeg", "display_order": 1},
-                    {"url": "/assets/barrier-cream-2.jpeg", "display_order": 2},
+                    {"url": "/assets/barrier-cream.jpeg", "display_order": 2},
+                    {"url": "/assets/barrier-cream-2.jpeg", "display_order": 1},
                 ],
             },
         ]
@@ -127,7 +132,7 @@ async def seed_data():
 
                 for m_data in media_items:
                     media = ProductMedia(
-                        product_id=product.id, media_type="image", **m_data
+                        product_id=product.id, alt_text=p_data["name"], **m_data
                     )
                     session.add(media)
 

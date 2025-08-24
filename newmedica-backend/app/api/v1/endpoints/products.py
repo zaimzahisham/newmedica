@@ -17,7 +17,8 @@ from app.api.v1.dependencies import get_current_admin_user
 from app.db.session import get_session
 from app.models.user import User
 from app.schemas.media import ProductMediaRead
-from app.schemas.product import ProductCreate, ProductRead, ProductUpdate
+from app.schemas.product import ProductRead, ProductUpdate
+from app.schemas.product_create import ProductCreate
 from app.services.product_service import ProductService
 
 router = APIRouter()
@@ -91,7 +92,7 @@ async def delete_product(
 @router.post("/{product_id}/media", response_model=ProductMediaRead, status_code=201)
 async def upload_product_media(
     product_id: UUID,
-    media_type: str = Form(...),
+    alt_text: str = Form(...),
     display_order: int = Form(0),
     file: UploadFile = File(...),
     db: AsyncSession = Depends(get_session),
@@ -103,7 +104,7 @@ async def upload_product_media(
         raise HTTPException(status_code=404, detail="Product not found")
 
     media = await service.add_media_to_product(
-        product_id, file, media_type, display_order
+        product_id, file, alt_text, display_order
     )
     return media
 

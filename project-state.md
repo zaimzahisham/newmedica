@@ -30,6 +30,9 @@ All critical blockers have been resolved. The project is now in a stable state t
     *   Password hashing with argon2 (compliant)
     *   Current user endpoint (`/api/v1/users/me`)
 *   **Product Domain**: Complete CRUD operations, category filtering, search functionality
+*   **Cart Domain**:
+    *   `Cart` and `CartItem` models implemented.
+    *   `GET /api/v1/cart` and `POST /api/v1/cart/items` endpoints implemented.
 *   **Database Setup**: PostgreSQL + SQLModel + Alembic migrations configured
 *   **API Versioning**: All endpoints correctly prefixed with `/api/v1`
 *   **Data Models**: All core models now include `created_at` and `updated_at` timestamps.

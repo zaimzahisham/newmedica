@@ -38,6 +38,10 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
     return pwd_context.verify(plain_password, hashed_password)
 
 
+def get_password_hash(password: str) -> str:
+    return pwd_context.hash(password)
+
+
 async def get_current_user(
     db: AsyncSession = Depends(get_session), token: str = Depends(reusable_oauth2)
 ) -> User:

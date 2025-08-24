@@ -78,3 +78,36 @@ async def test_get_current_user(async_client: AsyncClient):
     assert response.status_code == 200
     user_data = response.json()
     assert user_data["email"] == email
+
+
+@pytest.mark.asyncio
+async def test_refresh_token(async_client: AsyncClient):
+    email = f"test_user_{uuid.uuid4()}@example.com"
+    password = "password123"
+
+    register_response = await async_client.post(
+        "/api/v1/auth/register",
+        json={
+            "email": email,
+            "password": password,
+            "userType": "Basic",
+            "extra_fields": {},
+        },
+    )
+    assert register_response.status_code == 201
+
+    login_response = await async_client.post(
+        "/api/v1/auth/login", data={"username": email, "password": password}
+    )
+    assert login_response.status_code == 200
+    token_data = login_response.json()
+    refresh_token = token_data["refresh_token"]
+
+    headers = {"Authorization": f"Bearer {refresh_token}"}
+    response = await async_client.post("/api/v1/auth/refresh", headers=headers)
+
+    assert response.status_code == 200
+    new_token_data = response.json()
+    assert "access_token" in new_token_data
+    assert "refresh_token" in new_token_data
+    assert new_token_data["token_type"] == "bearer"

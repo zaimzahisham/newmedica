@@ -1,7 +1,8 @@
 import uuid
 from typing import List, Optional
 
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict, Field
+from pydantic.alias_generators import to_camel
 
 from app.schemas.category import CategoryRead
 from app.schemas.media import ProductMediaRead
@@ -15,8 +16,7 @@ class ProductBase(BaseModel):
     stock: int
 
 
-class ProductCreate(ProductBase):
-    category_id: uuid.UUID
+
 
 
 class ProductUpdate(BaseModel):
@@ -32,5 +32,6 @@ class ProductRead(ProductBase):
     category: CategoryRead
     media: List[ProductMediaRead] = []
 
-    class Config:
-        orm_mode = True
+    model_config = ConfigDict(from_attributes=True, alias_generator=to_camel)
+    category: CategoryRead = Field(..., alias="category")
+    media: List[ProductMediaRead] = Field(default_factory=list, alias="media")

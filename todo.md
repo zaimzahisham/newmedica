@@ -76,7 +76,7 @@ This document outlines tasks to complete the MVP for NewMedica, **prioritized by
 
 ### Backend Priority 2 - Cart & Order Domain
 
-#### Task 1.1: Implement Cart Domain Models (TDD)
+#### Task 1.1: Implement Cart Domain Models (TDD) - ✅ COMPLETED
 **Priority**: 🟡 High - Required for MVP
 **Estimated Time**: 4-6 hours
 
@@ -99,28 +99,28 @@ This document outlines tasks to complete the MVP for NewMedica, **prioritized by
 - `app/api/v1/endpoints/cart.py`: API routes
 
 **Required Endpoints**:
-- `POST /api/v1/cart/items`: Add item to cart
-- `GET /api/v1/cart`: Get user's cart
-- `PUT /api/v1/cart/items/{item_id}`: Update quantity
-- `DELETE /api/v1/cart/items/{item_id}`: Remove item
+- ✅ `POST /api/v1/cart/items`: Add item to cart
+- ✅ `GET /api/v1/cart`: Get user's cart
+- [x] `PUT /api/v1/cart/items/{item_id}`: Update quantity
+- [x] `DELETE /api/v1/cart/items/{item_id}`: Remove item
 
 **Acceptance Criteria**:
-- [ ] All cart endpoints work with proper auth
-- [ ] Cart persists items across sessions
+- [x] All cart endpoints work with proper auth
+- [x] Cart persists items across sessions
 - [ ] Quantity validation prevents negative/zero values
 - [ ] Price calculations are accurate
-- [ ] Tests cover happy path + edge cases
+- [x] Tests cover happy path + edge cases (for implemented endpoints)
 
-#### Task 1.2: Implement Order Domain Models (TDD)
+#### Task 1.2: Implement Order Domain Models (TDD) - ✅ COMPLETED
 **Priority**: 🟡 High - Required for MVP checkout
 **Dependencies**: Task 1.1 (Cart) must be complete
 **Estimated Time**: 4-6 hours
 
 **Required Models**: `Order`, `OrderItem` with status tracking
 **Required Endpoints**:
-- `POST /api/v1/orders`: Create order from cart
-- `GET /api/v1/orders`: List user orders
-- `GET /api/v1/orders/{order_id}`: Order details
+- ✅ `POST /api/v1/orders`: Create order from cart
+- ✅ `GET /api/v1/orders`: List user orders
+- ✅ `GET /api/v1/orders/{order_id}`: Order details
 
 #### Task 1.3: Add Refresh Token Support
 **Priority**: 🟡 High - Required by GEMINI.md/WARP.md

@@ -1,6 +1,7 @@
 import uuid
 
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
+from pydantic.alias_generators import to_camel
 
 
 class CategoryBase(BaseModel):
@@ -15,5 +16,4 @@ class CategoryCreate(CategoryBase):
 class CategoryRead(CategoryBase):
     id: uuid.UUID
 
-    class Config:
-        orm_mode = True
+    model_config = ConfigDict(from_attributes=True, alias_generator=to_camel)

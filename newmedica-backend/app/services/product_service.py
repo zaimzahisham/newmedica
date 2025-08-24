@@ -10,7 +10,8 @@ from app.models.product import Product
 from app.models.product_media import ProductMedia
 from app.repositories.product_repository import ProductRepository
 from app.schemas.media import ProductMediaCreate
-from app.schemas.product import ProductCreate, ProductUpdate
+from app.schemas.product import ProductUpdate
+from app.schemas.product_create import ProductCreate
 
 
 class ProductService:
@@ -46,7 +47,7 @@ class ProductService:
         return await self.repo.delete_product(product_id)
 
     async def add_media_to_product(
-        self, product_id: UUID, file: UploadFile, media_type: str, display_order: int
+        self, product_id: UUID, file: UploadFile, alt_text: str, display_order: int
     ) -> ProductMedia:
         # Define the path to save the file
         upload_dir = "media_uploads"
@@ -57,7 +58,7 @@ class ProductService:
             shutil.copyfileobj(file.file, file_object)
 
         media_create = ProductMediaCreate(
-            media_type=media_type, url=f"/{file_location}", display_order=display_order
+            altText=alt_text, url=f"/{file_location}", displayOrder=display_order
         )
 
         return await self.repo.add_media_to_product(product_id, media_create)

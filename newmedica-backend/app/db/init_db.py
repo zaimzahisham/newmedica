@@ -16,11 +16,13 @@ USER_TYPES = ["Basic", "Agent", "Healthcare", "Admin"]
 
 
 async def seed_user_types(db: AsyncSession):
-    for type_name in USER_TYPES:
-        result = await db.execute(select(UserType).where(UserType.name == type_name))
-        if not result.scalar_one_or_none():
-            user_type = UserType(name=type_name)
-            db.add(user_type)
+    """
+    Initializes the UserType table with predefined user types.
+    """
+    user_types = ["Admin", "Agent", "Healthcare", "Basic"]
+    for type_name in user_types:
+        user_type = UserType(name=type_name)
+        db.add(user_type)
     await db.commit()
 
 

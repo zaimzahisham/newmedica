@@ -90,7 +90,7 @@ async def test_upload_media_for_product(
     await session.refresh(product)
 
     files = {"file": ("test_image.jpg", io.BytesIO(b"a test image"), "image/jpeg")}
-    data = {"media_type": "image", "display_order": 1}
+    data = {"alt_text": "A test image", "display_order": 1}
     response = await async_client.post(
         f"/api/v1/products/{product.id}/media",
         files=files,
@@ -125,10 +125,10 @@ async def test_update_media_order(
         category_id=category.id,
     )
     media1 = ProductMedia(
-        product=product, media_type="image", url="/url1", display_order=1
+        product=product, alt_text="Image 1", url="/url1", display_order=1
     )
     media2 = ProductMedia(
-        product=product, media_type="image", url="/url2", display_order=2
+        product=product, alt_text="Image 2", url="/url2", display_order=2
     )
     session.add_all([category, product, media1, media2])
     await session.commit()
@@ -162,7 +162,7 @@ async def test_delete_media(
         category_id=category.id,
     )
     media = ProductMedia(
-        product=product, media_type="image", url="/todelete", display_order=1
+        product=product, alt_text="Image to delete", url="/todelete", display_order=1
     )
     session.add_all([category, product, media])
     await session.commit()

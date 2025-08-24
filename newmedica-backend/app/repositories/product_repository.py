@@ -9,7 +9,8 @@ from app.models.category import Category
 from app.models.product import Product
 from app.models.product_media import ProductMedia
 from app.schemas.media import ProductMediaCreate
-from app.schemas.product import ProductCreate, ProductUpdate
+from app.schemas.product import ProductUpdate
+from app.schemas.product_create import ProductCreate
 
 
 class ProductRepository:
