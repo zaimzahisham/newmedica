@@ -6,7 +6,7 @@ import { Product } from '@/types';
 import { Globe, ShieldCheck, Gem, Share2 } from 'lucide-react';
 import AddToCartConfirmation from './AddToCartConfirmation';
 import DOMPurify from 'dompurify';
-import { useAuth } from '@/context/AuthContext';
+import { useAuthStore } from '@/store/authStore';
 
 interface ProductDetailsProps {
   product: Product;
@@ -15,7 +15,7 @@ interface ProductDetailsProps {
 export default function ProductDetails({ product }: ProductDetailsProps) {
   const [quantity, setQuantity] = useState(1);
   const [showConfirmation, setShowConfirmation] = useState(false);
-  const { user } = useAuth(); // Get user from AuthContext
+  const user = useAuthStore((state) => state.user); // Get user from authStore
 
   const handleAddToCart = () => {
     // TODO: Implement actual add to cart logic in Phase 2

@@ -1,14 +1,14 @@
 
 "use client";
 
-import { useAuth } from '@/context/AuthContext';
+import { useAuthStore } from '@/store/authStore';
 import Link from 'next/link';
 import { Lock, Mail } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 
 const AccountDetailsPage = () => {
-  const { user } = useAuth();
+  const user = useAuthStore((state) => state.user);
   const router = useRouter();
   const [dobType, setDobType] = useState(user?.dateOfBirth ? 'date' : 'text');
 

@@ -3,13 +3,13 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Search, User, ShoppingCart, ChevronDown } from 'lucide-react';
-import { useAuth } from '@/context/AuthContext';
+import { useAuthStore } from '@/store/authStore';
 import { useState, useRef } from 'react';
 import Image from 'next/image';
 
 const Navbar = () => {
   const pathname = usePathname();
-  const { user, logout } = useAuth();
+  const { user, logout } = useAuthStore();
   const [isCatalogOpen, setIsCatalogOpen] = useState(false);
   const catalogTimeoutRef = useRef<NodeJS.Timeout | null>(null); // Renamed for clarity
 

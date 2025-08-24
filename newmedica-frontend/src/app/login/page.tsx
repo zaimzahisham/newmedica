@@ -3,12 +3,12 @@
 import { useState } from 'react';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useAuth } from '@/context/AuthContext';
+import { useAuthStore } from '@/store/authStore';
 import { useRouter } from 'next/navigation';
 import { loginSchema, registerSchema, LoginFormData, RegisterFormData } from '@/lib/validations/auth';
 
 const LoginPage = () => {
-  const { login } = useAuth();
+  const login = useAuthStore((state) => state.login);
   const router = useRouter();
   const [isSignUp, setIsSignUp] = useState(false);
   const [apiError, setApiError] = useState<string | null>(null);

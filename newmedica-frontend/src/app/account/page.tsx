@@ -1,14 +1,14 @@
 
 "use client";
 
-import { useAuth } from '@/context/AuthContext';
+import { useAuthStore } from '@/store/authStore';
 import { Mail, MapPin, Phone, User as UserIcon, Briefcase, Building, FileText, AtSign, Info } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 
 const AccountPage = () => {
-  const { user, logout } = useAuth();
+  const { user, logout } = useAuthStore();
   const router = useRouter();
 
   useEffect(() => {
