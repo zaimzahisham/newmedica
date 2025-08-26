@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { User } from '@/types';
+import { useCartStore } from './cartStore'; // Import cartStore
 
 interface AuthState {
   user: User | null;
@@ -67,6 +68,7 @@ export const useAuthStore = create(
       logout: () => {
         set({ user: null });
         localStorage.removeItem('token');
+        useCartStore.getState().clearCart(); // Clear cart on logout
       },
     }),
     {

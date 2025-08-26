@@ -21,7 +21,7 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
   const [showQuotationModal, setShowQuotationModal] = useState(false);
   const [sanitizedDescription, setSanitizedDescription] = useState('');
 
-  const user = useAuthStore((state) => state.user);
+  const { user, loading: authLoading } = useAuthStore(); // Get user and authLoading state
   const addItemToCart = useCartStore((state) => state.addItem);
   const isLoading = useCartStore((state) => state.isLoading);
 
@@ -32,6 +32,13 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
   }, [product.description]);
 
   const handleAddToCart = async () => {
+    if (authLoading) return; // Do nothing if auth state is still loading
+
+    if (!user) {
+      alert('Please log in to add items to your cart.');
+      return;
+    }
+
     if (!product || !product.id) return;
     await addItemToCart({ product_id: product.id, quantity });
     setShowConfirmation(true);

@@ -1,6 +1,7 @@
 'use client';
 
 import { useCartStore } from '@/store/cartStore';
+import { useAuthStore } from '@/store/authStore'; // Import useAuthStore
 import CartItem from './_components/CartItem';
 import { EmptyCartDisplay } from './_components/EmptyCart';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -9,7 +10,39 @@ import Link from 'next/link';
 export default function CartView() {
   const cart = useCartStore((state) => state.cart);
   const isLoading = useCartStore((state) => state.isLoading);
+  const { user, loading: authLoading } = useAuthStore(); // Get user and authLoading state
 
+  // If auth is still loading, show a general loading state
+  if (authLoading) {
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <h1 className="text-4xl font-serif mb-6">Your Cart</h1>
+        <div className="space-y-4">
+          <Skeleton className="h-28 w-full" />
+          <Skeleton className="h-28 w-full" />
+        </div>
+      </div>
+    );
+  }
+
+  // If no user is logged in, prompt them to log in
+  if (!user) {
+    return (
+      <div className="container mx-auto px-4 py-8 text-center">
+        <h1 className="text-4xl font-serif mb-6">Your Cart</h1>
+        <p className="text-lg text-muted-foreground mb-8">
+          Please <Link href="/login" className="text-primary hover:underline">log in</Link> to view your cart.
+        </p>
+        <Link href="/login" passHref>
+          <button className="bg-black text-white px-8 py-3 rounded-full font-semibold hover:bg-gray-800 transition-colors">
+            Log In
+          </button>
+        </Link>
+      </div>
+    );
+  }
+
+  // Existing logic for logged-in users
   if (isLoading || !cart) {
     return (
       <div className="container mx-auto px-4 py-8">
