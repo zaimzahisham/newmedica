@@ -1,6 +1,6 @@
 'use client';
 
-import { Product } from '@/lib/api/types';
+import { Product } from '@/types';
 import React, { useState, useRef } from 'react';
 import ProductCard from './ProductCard';
 import { ChevronLeft, ChevronRight } from 'lucide-react';

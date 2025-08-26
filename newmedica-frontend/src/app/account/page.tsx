@@ -8,17 +8,17 @@ import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 
 const AccountPage = () => {
-  const { user, logout } = useAuthStore();
+  const { user, loading, logout } = useAuthStore();
   const router = useRouter();
 
   useEffect(() => {
-    if (!user) {
+    if (!loading && !user) {
       router.push('/login');
     }
-  }, [user, router]);
+  }, [user, loading, router]);
 
-  if (!user) {
-    return null; // or a loading spinner
+  if (loading || !user) {
+    return <div>Loading...</div>; // or a loading spinner
   }
 
   const incompleteFields = [];

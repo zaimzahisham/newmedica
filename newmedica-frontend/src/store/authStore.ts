@@ -8,6 +8,7 @@ interface AuthState {
   login: (email: string, password: string) => Promise<void>;
   logout: () => void;
   fetchUserProfile: (token: string) => Promise<void>;
+  setNotLoading: () => void;
 }
 
 export const useAuthStore = create(
@@ -15,7 +16,9 @@ export const useAuthStore = create(
     (set) => ({
       user: null,
       loading: true,
+      setNotLoading: () => set({ loading: false }),
       fetchUserProfile: async (token) => {
+        set({ loading: true });
         try {
           const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/users/me`, {
             headers: {
@@ -69,14 +72,11 @@ export const useAuthStore = create(
     {
       name: 'auth-storage', // name of the item in the storage (must be unique)
       onRehydrateStorage: () => (state) => {
-        if (state) {
-          state.loading = false;
-          const token = localStorage.getItem('token');
-          if (token) {
-            state.fetchUserProfile(token);
-          } else {
-            state.loading = false;
-          }
+        const token = localStorage.getItem('token');
+        if (token) {
+          useAuthStore.getState().fetchUserProfile(token);
+        } else {
+          useAuthStore.getState().setNotLoading();
         }
       },
     }
