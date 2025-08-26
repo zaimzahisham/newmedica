@@ -9,6 +9,17 @@ from sqlalchemy.orm import sessionmaker
 from sqlmodel import SQLModel, select
 from typing import AsyncGenerator
 
+import os
+os.environ["DATABASE_URL"] = "sqlite+aiosqlite:///:memory:"
+os.environ["SECRET_KEY"] = "testsecretkey"
+os.environ["JWT_SECRET_KEY"] = "testjwtsecretkey"
+os.environ["ALGORITHM"] = "HS256"
+os.environ["ACCESS_TOKEN_EXPIRE_MINUTES"] = "30"
+os.environ["REFRESH_TOKEN_EXPIRE_MINUTES"] = "10080"
+os.environ["PROJECT_NAME"] = "Newmedica API Test"
+os.environ["API_V1_STR"] = "/api/v1"
+os.environ["BACKEND_CORS_ORIGINS"] = "[\"http://localhost:3000\", \"http://localhost:3001\"]"
+
 from app.db.init_db import seed_user_types
 from app.db.session import get_session
 from app.main import app

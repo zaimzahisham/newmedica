@@ -1,32 +1,32 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Request, status
+from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.api.v1.endpoints import auth, categories, media, products, users, cart, orders, address
+from app.api.v1.api import api_router
+from app.core.config import settings
+from app.core.exceptions import APIException
 
-app = FastAPI(title="Newmedica API")
 
-# CORS Configuration
-origins = [
-    "http://localhost:3000",  # The default Next.js port
-    "http://localhost:3001",  # A common alternative
-]
+app = FastAPI(title=settings.PROJECT_NAME, openapi_url=f"{settings.API_V1_STR}/openapi.json")
+
+
+@app.exception_handler(APIException)
+async def api_exception_handler(request: Request, exc: APIException):
+    return JSONResponse(
+        status_code=exc.status_code,
+        content={"error": {"code": exc.code, "message": exc.message}},
+    )
+
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
+    allow_origins=[str(origin) for origin in settings.BACKEND_CORS_ORIGINS],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-app.include_router(auth.router, prefix="/api/v1/auth", tags=["auth"])
-app.include_router(users.router, prefix="/api/v1/users", tags=["users"])
-app.include_router(categories.router, prefix="/api/v1/categories", tags=["categories"])
-app.include_router(products.router, prefix="/api/v1/products", tags=["products"])
-app.include_router(media.router, prefix="/api/v1/media", tags=["media"])
-app.include_router(cart.router, prefix="/api/v1/cart", tags=["cart"])
-app.include_router(orders.router, prefix="/api/v1/orders", tags=["orders"])
-app.include_router(address.router, prefix="/api/v1/users/me/addresses", tags=["addresses"])
+app.include_router(api_router, prefix=settings.API_V1_STR)
 
 
 @app.get("/")

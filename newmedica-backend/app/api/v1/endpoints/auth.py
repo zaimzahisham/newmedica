@@ -1,8 +1,8 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, status
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlmodel.ext.asyncio.session import AsyncSession
-from jose import JWTError
 
+from app.core.exceptions import BadRequestException, ConflictException, UnauthorizedException
 from app.core.security import create_access_token, create_refresh_token, get_current_user
 from app.db.session import get_session
 from app.schemas.token import Token
@@ -19,13 +19,13 @@ async def register_user(user_in: UserCreate, db: AsyncSession = Depends(get_sess
 
     db_user = await user_service.get_user_by_email(user_in.email)
     if db_user:
-        raise HTTPException(status_code=400, detail="Email already registered")
+        raise ConflictException(message="Email already registered")
 
     try:
         user = await user_service.create_user(user_in)
         return user
     except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        raise BadRequestException(message=str(e))
 
 
 @router.post("/login", response_model=Token)
@@ -38,11 +38,7 @@ async def login_for_access_token(
         email=form_data.username, password=form_data.password
     )
     if not user:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Incorrect email or password",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
+        raise UnauthorizedException(message="Incorrect email or password")
     access_token = create_access_token(subject=user.id)
     refresh_token = create_refresh_token(subject=user.id)
     return {

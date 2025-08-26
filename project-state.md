@@ -15,7 +15,7 @@ All critical blockers have been resolved. The project is in a stable state to pr
 
 ---
 
-## Backend (`newmedica-backend`) - COMPLIANCE: 71.4%
+## Backend (`newmedica-backend`) - COMPLIANCE: 78.6%
 
 **ARCHITECTURE**: ✅ Follows GEMINI.md / Warp.md layered approach (api → controllers → services → repositories → models)
 **TECH STACK**: ✅ FastAPI + SQLModel + PostgreSQL + Alembic (compliant)
@@ -44,10 +44,6 @@ All critical blockers have been resolved. The project is in a stable state to pr
 *   **Configuration**: Secrets are managed via `.env` file.
 
 ### 🟡 HIGH PRIORITY GAPS (Required for MVP)
-
-1.  **INCONSISTENT ERROR HANDLING**:
-    *   Not following GEMINI.md / Warp.md format: `{"error": {"code": ..., "message": ...}}`
-    *   Using basic HTTPException instead
 
 ### 🟠 MEDIUM PRIORITY IMPROVEMENTS
 

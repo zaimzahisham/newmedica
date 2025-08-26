@@ -8,7 +8,7 @@ from passlib.context import CryptContext
 from sqlmodel import select
 from sqlmodel.ext.asyncio.session import AsyncSession
 
-from app.core.settings import settings
+from app.core.config import settings
 from app.db.session import get_session
 from app.models.user import User
 from app.schemas.token import TokenData
@@ -29,7 +29,7 @@ def create_access_token(
         )
     to_encode = {"exp": expire, "sub": str(subject), "token_type": "access"}
     encoded_jwt = jwt.encode(
-        to_encode, settings.SECRET_KEY, algorithm=settings.ALGORITHM
+        to_encode, settings.JWT_SECRET_KEY, algorithm=settings.ALGORITHM
     )
     return encoded_jwt
 
@@ -45,7 +45,7 @@ def create_refresh_token(
         )
     to_encode = {"exp": expire, "sub": str(subject), "token_type": "refresh"}
     encoded_jwt = jwt.encode(
-        to_encode, settings.SECRET_KEY, algorithm=settings.ALGORITHM
+        to_encode, settings.JWT_SECRET_KEY, algorithm=settings.ALGORITHM
     )
     return encoded_jwt
 
@@ -63,7 +63,7 @@ async def get_current_user(
 ) -> User:
     try:
         payload = jwt.decode(
-            token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM]
+            token, settings.JWT_SECRET_KEY, algorithms=[settings.ALGORITHM]
         )
         token_data = TokenData(**payload)
     except JWTError:

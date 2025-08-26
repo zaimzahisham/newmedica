@@ -111,3 +111,64 @@ async def test_refresh_token(async_client: AsyncClient):
     assert "access_token" in new_token_data
     assert "refresh_token" in new_token_data
     assert new_token_data["token_type"] == "bearer"
+
+
+@pytest.mark.asyncio
+async def test_register_existing_email_returns_conflict_error(async_client: AsyncClient):
+    email = f"test_user_{uuid.uuid4()}@example.com"
+    password = "SecurePassword123!"
+
+    # Register the user first
+    register_response = await async_client.post(
+        "/api/v1/auth/register",
+        json={
+            "email": email,
+            "password": password,
+            "userType": "Basic",
+            "extra_fields": {},
+        },
+    )
+    assert register_response.status_code == 201
+
+    # Attempt to register again with the same email
+    duplicate_register_response = await async_client.post(
+        "/api/v1/auth/register",
+        json={
+            "email": email,
+            "password": password,
+            "userType": "Basic",
+            "extra_fields": {},
+        },
+    )
+    assert duplicate_register_response.status_code == 409
+    error_data = duplicate_register_response.json()
+    assert "error" in error_data
+    assert error_data["error"]["code"] == "CONFLICT"
+    assert error_data["error"]["message"] == "Email already registered"
+
+
+@pytest.mark.asyncio
+async def test_login_incorrect_credentials_returns_unauthorized_error(async_client: AsyncClient):
+    email = f"test_user_{uuid.uuid4()}@example.com"
+    password = "SecurePassword123!"
+
+    # Register a user
+    await async_client.post(
+        "/api/v1/auth/register",
+        json={
+            "email": email,
+            "password": password,
+            "userType": "Basic",
+            "extra_fields": {},
+        },
+    )
+
+    # Attempt to login with incorrect password
+    login_response = await async_client.post(
+        "/api/v1/auth/login", data={"username": email, "password": "wrong_password"}
+    )
+    assert login_response.status_code == 401
+    error_data = login_response.json()
+    assert "error" in error_data
+    assert error_data["error"]["code"] == "UNAUTHORIZED"
+    assert error_data["error"]["message"] == "Incorrect email or password"
