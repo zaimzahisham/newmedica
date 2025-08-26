@@ -19,8 +19,8 @@ const modalVariants = {
 };
 
 export default function AddToCartConfirmation({ product, quantity, onClose }: AddToCartConfirmationProps) {
-  const cart = useCartStore((state) => state.cart);
-  const cartItemCount = cart?.items?.reduce((total, item) => total + item.quantity, 0) || 0;
+  const { items } = useCartStore();
+  const cartItemCount = items.reduce((total, item) => total + item.quantity, 0);
 
   return (
     <motion.div 

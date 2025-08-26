@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { User } from '@/types';
-import { useCartStore } from './cartStore'; // Import cartStore
+import { useCartStore } from './cartStore';
 
 interface AuthState {
   user: User | null;
@@ -9,15 +9,22 @@ interface AuthState {
   login: (email: string, password: string) => Promise<void>;
   logout: () => void;
   fetchUserProfile: (token: string) => Promise<void>;
-  setNotLoading: () => void;
+  checkAuth: () => void;
 }
 
 export const useAuthStore = create(
   persist<AuthState>(
-    (set) => ({
+    (set, get) => ({
       user: null,
       loading: true,
-      setNotLoading: () => set({ loading: false }),
+      checkAuth: () => {
+        const token = localStorage.getItem('token');
+        if (token) {
+          get().fetchUserProfile(token);
+        } else {
+          set({ loading: false });
+        }
+      },
       fetchUserProfile: async (token) => {
         set({ loading: true });
         try {
@@ -56,7 +63,7 @@ export const useAuthStore = create(
           if (response.ok) {
             const data = await response.json();
             localStorage.setItem('token', data.access_token);
-            await useAuthStore.getState().fetchUserProfile(data.access_token);
+            await get().fetchUserProfile(data.access_token);
           } else {
             throw new Error('Login failed');
           }
@@ -66,21 +73,13 @@ export const useAuthStore = create(
         }
       },
       logout: () => {
-        set({ user: null });
+        set({ user: null, loading: false });
         localStorage.removeItem('token');
         useCartStore.getState().clearCart(); // Clear cart on logout
       },
     }),
     {
-      name: 'auth-storage', // name of the item in the storage (must be unique)
-      onRehydrateStorage: () => (state) => {
-        const token = localStorage.getItem('token');
-        if (token) {
-          useAuthStore.getState().fetchUserProfile(token);
-        } else {
-          useAuthStore.getState().setNotLoading();
-        }
-      },
+      name: 'auth-storage',
     }
   )
 );

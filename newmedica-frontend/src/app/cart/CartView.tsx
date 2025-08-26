@@ -1,19 +1,17 @@
 'use client';
 
 import { useCartStore } from '@/store/cartStore';
-import { useAuthStore } from '@/store/authStore'; // Import useAuthStore
+import { useAuthStore } from '@/store/authStore';
 import CartItem from './_components/CartItem';
 import { EmptyCartDisplay } from './_components/EmptyCart';
 import { Skeleton } from '@/components/ui/skeleton';
 import Link from 'next/link';
 
 export default function CartView() {
-  const cart = useCartStore((state) => state.cart);
-  const isLoading = useCartStore((state) => state.isLoading);
-  const { user, loading: authLoading } = useAuthStore(); // Get user and authLoading state
+  const { items, total, isLoading } = useCartStore();
+  const { user, loading: authLoading } = useAuthStore();
 
-  // If auth is still loading, show a general loading state
-  if (authLoading) {
+  if (authLoading || isLoading) {
     return (
       <div className="container mx-auto px-4 py-8">
         <h1 className="text-4xl font-serif mb-6">Your Cart</h1>
@@ -25,7 +23,6 @@ export default function CartView() {
     );
   }
 
-  // If no user is logged in, prompt them to log in
   if (!user) {
     return (
       <div className="container mx-auto px-4 py-8 text-center">
@@ -42,24 +39,11 @@ export default function CartView() {
     );
   }
 
-  // Existing logic for logged-in users
-  if (isLoading || !cart) {
-    return (
-      <div className="container mx-auto px-4 py-8">
-        <h1 className="text-4xl font-serif mb-6">Your Cart</h1>
-        <div className="space-y-4">
-          <Skeleton className="h-28 w-full" />
-          <Skeleton className="h-28 w-full" />
-        </div>
-      </div>
-    );
-  }
-
-  const sortedItems = [...cart.items].sort((a, b) => a.product.name.localeCompare(b.product.name));
-
-  if (cart.items.length === 0) {
+  if (items.length === 0) {
     return <EmptyCartDisplay />;
   }
+
+  const sortedItems = [...items].sort((a, b) => a.product.name.localeCompare(b.product.name));
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -91,7 +75,7 @@ export default function CartView() {
       <div className="flex flex-col items-end mt-6">
         <div className="text-lg font-semibold">
           <span>Subtotal</span>
-          <span className="ml-4">RM{cart.total_price.toFixed(2)}</span>
+          <span className="ml-4">RM{total.toFixed(2)}</span>
         </div>
         <p className="text-sm text-muted-foreground mt-2">
           Shipping, taxes, and discounts will be calculated at checkout.

@@ -10,13 +10,15 @@ import Image from 'next/image';
 
 const Navbar = () => {
   const pathname = usePathname();
-  const { user, logout } = useAuthStore();
-  const cart = useCartStore((state) => state.cart);
+  const { user, logout, checkAuth } = useAuthStore();
+  const { items: cartItems, fetchCart } = useCartStore();
   const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
     setIsClient(true);
-  }, []);
+    checkAuth();
+    fetchCart();
+  }, [checkAuth, fetchCart]);
 
   const [isCatalogOpen, setIsCatalogOpen] = useState(false);
   const catalogTimeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -57,7 +59,7 @@ const Navbar = () => {
     }, 200);
   };
 
-  const cartItemCount = cart?.items?.reduce((total, item) => total + item.quantity, 0) || 0;
+  const cartItemCount = cartItems.reduce((total, item) => total + item.quantity, 0);
 
   return (
     <header className="sticky top-0 backdrop-blur-sm z-50">

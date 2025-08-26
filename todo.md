@@ -162,16 +162,59 @@ This document outlines tasks to complete the MVP for NewMedica, **prioritized by
 - [x] Form submission is handled (simulated email).
 - [x] Modal has smooth fade-in/fade-out animations.
 
-#### Task 1.5: Implement Checkout Page (TDD)
+#### Task 1.5: Implement Checkout Page (TDD) - 🟡 PARTIALLY COMPLETED / BLOCKED
 **Priority**: 🟡 High - Required for MVP
 **Path**: `/checkout`
 **Dependencies**: Backend Order API (Task 1.2), Stripe integration
+**New Blocker**: **Task 1.8 (Backend Address Management)** is required to pre-fill user address.
 
-**Integration Required**: Stripe Checkout sessions
-**Files to Create**:
-- `app/checkout/page.tsx`: Checkout form
-- `app/checkout/_components/OrderSummary.tsx`: Order review
-- `lib/stripe.ts`: Stripe client setup
+**Work Completed So Far**:
+- ✅ UI layout created based on reference design.
+- ✅ Form handling with validation (`react-hook-form`, `zod`) is implemented.
+- ✅ Stripe client and API route for session creation are complete.
+- ✅ Frontend logic to redirect to Stripe's hosted payment page is implemented.
+- ✅ Numerous state management and dependency bugs have been resolved.
+
+**Remaining Work**:
+- [ ] Pre-fill shipping address form with user's primary address (after Task 1.8 is done).
+- [ ] Implement server-side logic (webhooks) to confirm order after successful payment.
+
+**Original Files to Create**:
+- ✅ `app/checkout/page.tsx`: Checkout form
+- ✅ `app/checkout/_components/OrderSummary.tsx`: Order review
+- ✅ `lib/stripe.ts`: Stripe client setup
+
+#### Task 1.8: Implement Backend Address Management (TDD)
+**Priority**: 🟡 High - Required for user profiles and checkout
+**Dependencies**: None
+**Estimated Time**: 5-7 hours
+
+**TDD Steps**:
+1. **Write Tests First**: Create `tests/integration/test_address.py`
+2. **Create Model**: `Address` model with one-to-many relationship to `User`
+3. **Create Schemas**: Request/response DTOs for Address
+4. **Create Repository/Service/Controller/Router**: Follow layered architecture
+5. **Make Tests Pass**: Iterative implementation
+
+**Required Endpoints**:
+- `POST /api/v1/users/me/addresses`: Create a new address
+- `GET /api/v1/users/me/addresses`: Get all addresses
+- `PUT /api/v1/users/me/addresses/{address_id}`: Update an address
+- `DELETE /api/v1/users/me/addresses/{address_id}`: Delete an address
+- `POST /api/v1/users/me/addresses/{address_id}/set_primary`: Set as primary
+
+#### Task 1.9: Implement Frontend Address Management
+**Priority**: 🟡 High - User-facing feature
+**Dependencies**: Task 1.8 (Backend Address Management)
+**Path**: `/account/addresses`
+
+**Acceptance Criteria**:
+- [ ] User can view all their addresses on the `/account/addresses` page.
+- [ ] User can add a new address via a form.
+- [ ] User can edit an existing address.
+- [ ] User can delete an address.
+- [ ] User can set an address as their primary address.
+- [ ] Checkout page form is pre-filled with the primary address details.
 
 #### Task 1.6: Setup Zustand State Management for Cart - ✅ COMPLETED
 **Priority**: 🟡 High - Required by GEMINI.md/WARP.md
