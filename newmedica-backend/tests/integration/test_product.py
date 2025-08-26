@@ -1,6 +1,6 @@
 import io
 import uuid
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
 import pytest
 from httpx import AsyncClient
@@ -43,7 +43,7 @@ async def test_create_product(
     assert isinstance(product.created_at, datetime)  # type: ignore
     assert product.updated_at is not None  # type: ignore
     assert isinstance(product.updated_at, datetime)  # type: ignore
-    assert datetime.utcnow() - product.created_at < timedelta(seconds=10)  # type: ignore
+    assert datetime.now(timezone.utc) - product.created_at.replace(tzinfo=timezone.utc) < timedelta(seconds=10)  # type: ignore
 
 
 @pytest.mark.asyncio
@@ -109,7 +109,7 @@ async def test_upload_media_for_product(
     assert isinstance(media.created_at, datetime)  # type: ignore
     assert media.updated_at is not None  # type: ignore
     assert isinstance(media.updated_at, datetime)  # type: ignore
-    assert datetime.utcnow() - media.created_at < timedelta(seconds=10)  # type: ignore
+    assert datetime.now(timezone.utc) - media.created_at.replace(tzinfo=timezone.utc) < timedelta(seconds=10)  # type: ignore
 
 
 @pytest.mark.asyncio

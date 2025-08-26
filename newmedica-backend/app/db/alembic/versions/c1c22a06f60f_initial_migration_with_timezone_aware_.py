@@ -1,8 +1,8 @@
-"""initial_migration
+"""initial_migration_with_timezone_aware_timestamps
 
-Revision ID: 97766d342408
+Revision ID: c1c22a06f60f
 Revises: 
-Create Date: 2025-08-24 18:11:53.812418
+Create Date: 2025-08-26 22:19:38.559441
 
 """
 from typing import Sequence, Union
@@ -13,7 +13,7 @@ import sqlmodel
 
 
 # revision identifiers, used by Alembic.
-revision: str = '97766d342408'
+revision: str = 'c1c22a06f60f'
 down_revision: Union[str, Sequence[str], None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -26,8 +26,8 @@ def upgrade() -> None:
     sa.Column('id', sa.Uuid(), nullable=False),
     sa.Column('name', sqlmodel.sql.sqltypes.AutoString(), nullable=False),
     sa.Column('description', sqlmodel.sql.sqltypes.AutoString(), nullable=True),
-    sa.Column('created_at', sa.DateTime(), nullable=False),
-    sa.Column('updated_at', sa.DateTime(), nullable=False),
+    sa.Column('created_at', sa.DateTime(timezone=True), nullable=False),
+    sa.Column('updated_at', sa.DateTime(timezone=True), nullable=False),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_index(op.f('ix_category_id'), 'category', ['id'], unique=False)
@@ -35,6 +35,8 @@ def upgrade() -> None:
     op.create_table('usertype',
     sa.Column('id', sa.Uuid(), nullable=False),
     sa.Column('name', sqlmodel.sql.sqltypes.AutoString(), nullable=False),
+    sa.Column('created_at', sa.DateTime(timezone=True), nullable=False),
+    sa.Column('updated_at', sa.DateTime(timezone=True), nullable=False),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_index(op.f('ix_usertype_id'), 'usertype', ['id'], unique=False)
@@ -45,8 +47,8 @@ def upgrade() -> None:
     sa.Column('description', sqlmodel.sql.sqltypes.AutoString(), nullable=False),
     sa.Column('price', sa.Float(), nullable=False),
     sa.Column('stock', sa.Integer(), nullable=False),
-    sa.Column('created_at', sa.DateTime(), nullable=False),
-    sa.Column('updated_at', sa.DateTime(), nullable=False),
+    sa.Column('created_at', sa.DateTime(timezone=True), nullable=False),
+    sa.Column('updated_at', sa.DateTime(timezone=True), nullable=False),
     sa.Column('category_id', sa.Uuid(), nullable=False),
     sa.ForeignKeyConstraint(['category_id'], ['category.id'], ),
     sa.PrimaryKeyConstraint('id')
@@ -59,18 +61,37 @@ def upgrade() -> None:
     sa.Column('password_hash', sqlmodel.sql.sqltypes.AutoString(), nullable=False),
     sa.Column('user_type_id', sa.Uuid(), nullable=False),
     sa.Column('extra_fields', sa.JSON(), nullable=True),
-    sa.Column('created_at', sa.DateTime(), nullable=False),
-    sa.Column('updated_at', sa.DateTime(), nullable=False),
+    sa.Column('created_at', sa.DateTime(timezone=True), nullable=False),
+    sa.Column('updated_at', sa.DateTime(timezone=True), nullable=False),
     sa.ForeignKeyConstraint(['user_type_id'], ['usertype.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_index(op.f('ix_user_email'), 'user', ['email'], unique=True)
     op.create_index(op.f('ix_user_id'), 'user', ['id'], unique=False)
+    op.create_table('address',
+    sa.Column('id', sa.Uuid(), nullable=False),
+    sa.Column('user_id', sa.Uuid(), nullable=False),
+    sa.Column('first_name', sqlmodel.sql.sqltypes.AutoString(), nullable=False),
+    sa.Column('last_name', sqlmodel.sql.sqltypes.AutoString(), nullable=False),
+    sa.Column('phone', sqlmodel.sql.sqltypes.AutoString(), nullable=False),
+    sa.Column('address1', sqlmodel.sql.sqltypes.AutoString(), nullable=False),
+    sa.Column('address2', sqlmodel.sql.sqltypes.AutoString(), nullable=True),
+    sa.Column('city', sqlmodel.sql.sqltypes.AutoString(), nullable=False),
+    sa.Column('state', sqlmodel.sql.sqltypes.AutoString(), nullable=False),
+    sa.Column('postcode', sqlmodel.sql.sqltypes.AutoString(), nullable=False),
+    sa.Column('country', sqlmodel.sql.sqltypes.AutoString(), nullable=False),
+    sa.Column('is_primary', sa.Boolean(), nullable=False),
+    sa.Column('created_at', sa.DateTime(timezone=True), nullable=False),
+    sa.Column('updated_at', sa.DateTime(timezone=True), nullable=False),
+    sa.ForeignKeyConstraint(['user_id'], ['user.id'], ),
+    sa.PrimaryKeyConstraint('id')
+    )
+    op.create_index(op.f('ix_address_id'), 'address', ['id'], unique=False)
     op.create_table('cart',
     sa.Column('id', sa.Uuid(), nullable=False),
     sa.Column('user_id', sa.Uuid(), nullable=False),
-    sa.Column('created_at', sa.DateTime(), nullable=False),
-    sa.Column('updated_at', sa.DateTime(), nullable=False),
+    sa.Column('created_at', sa.DateTime(timezone=True), nullable=False),
+    sa.Column('updated_at', sa.DateTime(timezone=True), nullable=False),
     sa.ForeignKeyConstraint(['user_id'], ['user.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
@@ -81,8 +102,8 @@ def upgrade() -> None:
     sa.Column('user_id', sa.Uuid(), nullable=False),
     sa.Column('total_amount', sa.Float(), nullable=False),
     sa.Column('payment_status', sqlmodel.sql.sqltypes.AutoString(), nullable=False),
-    sa.Column('created_at', sa.DateTime(), nullable=False),
-    sa.Column('updated_at', sa.DateTime(), nullable=False),
+    sa.Column('created_at', sa.DateTime(timezone=True), nullable=False),
+    sa.Column('updated_at', sa.DateTime(timezone=True), nullable=False),
     sa.ForeignKeyConstraint(['user_id'], ['user.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
@@ -93,8 +114,8 @@ def upgrade() -> None:
     sa.Column('url', sqlmodel.sql.sqltypes.AutoString(), nullable=False),
     sa.Column('alt_text', sqlmodel.sql.sqltypes.AutoString(), nullable=False),
     sa.Column('display_order', sa.Integer(), nullable=False),
-    sa.Column('created_at', sa.DateTime(), nullable=False),
-    sa.Column('updated_at', sa.DateTime(), nullable=False),
+    sa.Column('created_at', sa.DateTime(timezone=True), nullable=False),
+    sa.Column('updated_at', sa.DateTime(timezone=True), nullable=False),
     sa.ForeignKeyConstraint(['product_id'], ['product.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
@@ -104,7 +125,8 @@ def upgrade() -> None:
     sa.Column('cart_id', sa.Uuid(), nullable=False),
     sa.Column('product_id', sa.Uuid(), nullable=False),
     sa.Column('quantity', sa.Integer(), nullable=False),
-    sa.Column('added_at', sa.DateTime(), nullable=False),
+    sa.Column('created_at', sa.DateTime(timezone=True), nullable=False),
+    sa.Column('updated_at', sa.DateTime(timezone=True), nullable=False),
     sa.ForeignKeyConstraint(['cart_id'], ['cart.id'], ),
     sa.ForeignKeyConstraint(['product_id'], ['product.id'], ),
     sa.PrimaryKeyConstraint('id')
@@ -116,6 +138,8 @@ def upgrade() -> None:
     sa.Column('product_id', sa.Uuid(), nullable=False),
     sa.Column('quantity', sa.Integer(), nullable=False),
     sa.Column('unit_price', sa.Float(), nullable=False),
+    sa.Column('created_at', sa.DateTime(timezone=True), nullable=False),
+    sa.Column('updated_at', sa.DateTime(timezone=True), nullable=False),
     sa.ForeignKeyConstraint(['order_id'], ['order.id'], ),
     sa.ForeignKeyConstraint(['product_id'], ['product.id'], ),
     sa.PrimaryKeyConstraint('id')
@@ -138,6 +162,8 @@ def downgrade() -> None:
     op.drop_index(op.f('ix_cart_user_id'), table_name='cart')
     op.drop_index(op.f('ix_cart_id'), table_name='cart')
     op.drop_table('cart')
+    op.drop_index(op.f('ix_address_id'), table_name='address')
+    op.drop_table('address')
     op.drop_index(op.f('ix_user_id'), table_name='user')
     op.drop_index(op.f('ix_user_email'), table_name='user')
     op.drop_table('user')

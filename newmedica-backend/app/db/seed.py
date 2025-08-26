@@ -10,6 +10,7 @@ from app.db.session import get_session
 from app.models.category import Category
 from app.models.product import Product
 from app.models.product_media import ProductMedia
+from app.models.user_type import UserType
 
 
 async def seed_data():
@@ -40,6 +41,23 @@ async def seed_data():
 
         await session.commit()
         print("Categories upserted.")
+
+        # --- Upsert UserTypes ---
+        print("Upserting user types...")
+
+        usertypes_to_upsert = ["Admin", "Customer", "Agent", "Healthcare"]
+
+        for ut_name in usertypes_to_upsert:
+            result = await session.execute(
+                select(UserType).where(UserType.name == ut_name)
+            )
+            user_type = result.scalar_one_or_none()
+            if not user_type:
+                user_type = UserType(name=ut_name)
+                session.add(user_type)
+
+        await session.commit()
+        print("User types upserted.")
 
         # --- Get Categories for Product Seeding ---
         hot_selling_cat = (

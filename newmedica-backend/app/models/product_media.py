@@ -1,8 +1,9 @@
 import uuid
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import TYPE_CHECKING
 
 from sqlmodel import Field, SQLModel, Relationship
+from sqlalchemy import Column, DateTime
 
 if TYPE_CHECKING:
     from .product import Product
@@ -17,11 +18,10 @@ class ProductMedia(SQLModel, table=True):
     url: str
     alt_text: str
     display_order: int = Field(default=0)
-    created_at: datetime = Field(default_factory=datetime.utcnow, nullable=False)
+    created_at: datetime = Field(sa_column=Column(DateTime(timezone=True), nullable=False), default_factory=lambda: datetime.now(timezone.utc))
     updated_at: datetime = Field(
-        default_factory=datetime.utcnow,
-        nullable=False,
-        sa_column_kwargs={"onupdate": datetime.utcnow},
+        default_factory=lambda: datetime.now(timezone.utc),
+        sa_column=Column(DateTime(timezone=True), nullable=False, onupdate=lambda: datetime.now(timezone.utc)),
     )
 
     product: "Product" = Relationship(back_populates="media")

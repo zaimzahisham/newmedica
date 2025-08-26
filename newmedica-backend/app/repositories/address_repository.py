@@ -17,7 +17,7 @@ class AddressRepository:
         return await self.session.get(Address, address_id)
 
     async def create_address(self, address_create: AddressCreate, user_id: uuid.UUID) -> Address:
-        new_address = Address(**address_create.dict(), user_id=user_id)
+        new_address = Address(**address_create.model_dump(), user_id=user_id)
         self.session.add(new_address)
         await self.session.commit()
         await self.session.refresh(new_address)
@@ -26,7 +26,7 @@ class AddressRepository:
     async def update_address(self, address_id: uuid.UUID, address_update: AddressUpdate) -> Optional[Address]:
         address = await self.get_address_by_id(address_id)
         if address:
-            for key, value in address_update.dict(exclude_unset=True).items():
+            for key, value in address_update.model_dump(exclude_unset=True).items():
                 setattr(address, key, value)
             await self.session.commit()
             await self.session.refresh(address)

@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
 import pytest
 from httpx import AsyncClient
@@ -32,7 +32,7 @@ async def test_create_category(
     assert isinstance(category.created_at, datetime)
     assert category.updated_at is not None
     assert isinstance(category.updated_at, datetime)
-    assert datetime.utcnow() - category.created_at < timedelta(seconds=10)
+    assert datetime.now(timezone.utc) - category.created_at.replace(tzinfo=timezone.utc) < timedelta(seconds=10)
 
 
 @pytest.mark.asyncio

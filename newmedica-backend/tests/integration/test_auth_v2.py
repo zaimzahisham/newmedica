@@ -1,5 +1,5 @@
 import uuid
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
 import pytest
 from httpx import AsyncClient
@@ -39,7 +39,7 @@ async def test_user_registration_and_login(
     assert isinstance(user.created_at, datetime)
     assert user.updated_at is not None
     assert isinstance(user.updated_at, datetime)
-    assert datetime.utcnow() - user.created_at < timedelta(seconds=10)
+    assert datetime.now(timezone.utc) - user.created_at.replace(tzinfo=timezone.utc) < timedelta(seconds=10)
 
     login_response = await async_client.post(
         "/api/v1/auth/login", data={"username": unique_email, "password": password}

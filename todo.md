@@ -68,6 +68,19 @@ This document outlines tasks to complete the MVP for NewMedica, **prioritized by
 - Update `app/core/settings.py` to use environment variables
 - Update `newmedica-backend/.gitignore`
 
+#### Task 0.4: Address Backend Deprecation Warnings (BLOCKER) - ✅ COMPLETED
+**Priority**: 🔴 Critical - Code quality and future compatibility
+**Estimated Time**: 3-5 hours
+**Action Required**:
+1. Updated `datetime.datetime.utcnow()` to `datetime.datetime.now(timezone.utc)` where applicable.
+2. Migrated Pydantic V1 `dict()` and `from_orm()` methods to Pydantic V2 `model_dump()` and `model_validate()` with `model_config['from_attributes']=True`.
+3. Addressed all deprecation warnings identified during test runs, except for external library warnings.
+4. Ran: `cd newmedica-backend && uv run pytest tests/ -v` and all tests passed with minimal external warnings.
+
+**Acceptance Criteria**:
+- [x] No `DeprecationWarning` messages related to `datetime.datetime.utcnow()` or Pydantic V1 methods are displayed during test runs.
+- [x] All existing tests pass.
+
 ---
 
 ## 🟡 PHASE 1: HIGH PRIORITY MVP FEATURES
@@ -75,6 +88,24 @@ This document outlines tasks to complete the MVP for NewMedica, **prioritized by
 *Goal: Implement core e-commerce functionality*
 
 ### Backend Priority 2 - Cart & Order Domain
+
+#### Task 1.10: Implement Backend Consistent Error Handling (TDD)
+**Priority**: 🟡 High - Required for consistent API responses
+**Dependencies**: None
+**Estimated Time**: 3-4 hours
+
+**TDD Steps**:
+1. **Write Tests First**: Create tests for various error scenarios (e.g., 404 Not Found, 400 Bad Request, 401 Unauthorized) expecting the consistent error format.
+2. **Implement Error Handling Middleware/Exception Handlers**: Create a custom exception handler or middleware to catch `HTTPException` and other potential errors, formatting them into the `{"error": {"code": ..., "message": ...}}` structure.
+3. **Update Existing Endpoints**: Modify existing endpoints to raise custom exceptions or use the new error handling mechanism.
+4. **Make Tests Pass**: Ensure all error tests pass and existing functionality remains intact.
+
+**Acceptance Criteria**:
+- [ ] All API error responses adhere to the `{"error": {"code": ..., "message": ...}}` format.
+- [ ] Appropriate HTTP status codes are returned for different error types.
+- [ ] Error messages are clear and informative.
+- [ ] All existing tests pass.
+
 
 #### Task 1.1: Implement Cart Domain Models (TDD) - ✅ COMPLETED
 **Priority**: 🟡 High - Required for MVP
@@ -162,11 +193,10 @@ This document outlines tasks to complete the MVP for NewMedica, **prioritized by
 - [x] Form submission is handled (simulated email).
 - [x] Modal has smooth fade-in/fade-out animations.
 
-#### Task 1.5: Implement Checkout Page (TDD) - 🟡 PARTIALLY COMPLETED / UNBLOCKED
+#### Task 1.5: Implement Checkout Page (TDD) - 🟡 PARTIALLY COMPLETED
 **Priority**: 🟡 High - Required for MVP
 **Path**: `/checkout`
-**Dependencies**: Backend Order API (Task 1.2), Stripe integration
-**New Blocker**: **Task 1.8 (Backend Address Management)** is required to pre-fill user address.
+**Dependencies**: Backend Order API (Task 1.2), Stripe integration, Frontend Address Management (Task 1.9)
 
 **Work Completed So Far**:
 - ✅ UI layout created based on reference design.
@@ -176,7 +206,7 @@ This document outlines tasks to complete the MVP for NewMedica, **prioritized by
 - ✅ Numerous state management and dependency bugs have been resolved.
 
 **Remaining Work**:
-- [ ] Pre-fill shipping address form with user's primary address (after Task 1.8 is done).
+- [ ] Pre-fill shipping address form with user's primary address (after Task 1.9 is done).
 - [ ] Implement server-side logic (webhooks) to confirm order after successful payment.
 
 **Original Files to Create**:
@@ -184,7 +214,7 @@ This document outlines tasks to complete the MVP for NewMedica, **prioritized by
 - ✅ `app/checkout/_components/OrderSummary.tsx`: Order review
 - ✅ `lib/stripe.ts`: Stripe client setup
 
-#### Task 1.8: Implement Backend Address Management (TDD)
+#### Task 1.8: Implement Backend Address Management (TDD) - ✅ COMPLETED
 **Priority**: 🟡 High - Required for user profiles and checkout
 **Dependencies**: None
 **Estimated Time**: 5-7 hours
@@ -197,15 +227,15 @@ This document outlines tasks to complete the MVP for NewMedica, **prioritized by
 5. **Make Tests Pass**: Iterative implementation
 
 **Required Endpoints**:
-- `POST /api/v1/users/me/addresses`: Create a new address
-- `GET /api/v1/users/me/addresses`: Get all addresses
-- `PUT /api/v1/users/me/addresses/{address_id}`: Update an address
-- `DELETE /api/v1/users/me/addresses/{address_id}`: Delete an address
-- `POST /api/v1/users/me/addresses/{address_id}/set_primary`: Set as primary
+- ✅ `POST /api/v1/users/me/addresses`: Create a new address
+- ✅ `GET /api/v1/users/me/addresses`: Get all addresses
+- ✅ `PUT /api/v1/users/me/addresses/{address_id}`: Update an address
+- ✅ `DELETE /api/v1/users/me/addresses/{address_id}`: Delete an address
+- ✅ `POST /api/v1/users/me/addresses/{address_id}/set_primary`: Set as primary
 
 #### Task 1.9: Implement Frontend Address Management
 **Priority**: 🟡 High - User-facing feature
-**Dependencies**: Task 1.8 (Backend Address Management)
+**Dependencies**: Task 1.8 (Backend Address Management) - ✅ COMPLETED
 **Path**: `/account/addresses`
 
 **Acceptance Criteria**:
@@ -240,7 +270,7 @@ This document outlines tasks to complete the MVP for NewMedica, **prioritized by
 
 *Goal: Production readiness and development efficiency*
 
-### Task 2.1: Setup Linting & Formatting (Backend ✅ COMPLETED)
+### Task 2.1: Setup Linting & Formatting (Backend ✅ COMPLETED, Frontend 🟡 PENDING)
 **Priority**: 🟠 Medium - Code quality
 
 **Backend**: Configure Ruff, Black, mypy.
@@ -249,7 +279,26 @@ This document outlines tasks to complete the MVP for NewMedica, **prioritized by
 - [x] Linter errors fixed with Ruff.
 - [x] Mypy baseline established.
 
-**Frontend**: Configure ESLint, Prettier (already partially done)
+**Frontend**: Configure ESLint, Prettier.
+- [ ] ESLint and Prettier installed and configured.
+- [ ] Codebase formatted with Prettier.
+- [ ] Linter errors fixed with ESLint.
+
+### Task 2.4: Frontend Architecture Refactoring (Feature-first)
+**Priority**: 🟠 Medium - Code quality and maintainability
+**Dependencies**: None
+**Estimated Time**: 8-12 hours
+**Action Required**:
+1. Refactor frontend file structure to align with GEMINI.md / Warp.md's feature-first architecture (e.g., `/app/(dashboard)/profile/_components/`).
+2. Co-locate components, hooks, and schemas by feature.
+3. Ensure all imports are updated correctly.
+4. Verify application functionality after refactoring.
+
+**Acceptance Criteria**:
+- [ ] Frontend project structure adheres to the feature-first layout specified in GEMINI.md / Warp.md.
+- [ ] All components, hooks, and schemas are logically grouped within their respective feature directories.
+- [ ] The application builds and runs without errors.
+- [ ] All existing frontend functionality remains intact.
 
 ### Task 2.2: Add Dockerization
 **Priority**: 🟠 Medium - Deployment readiness
@@ -272,17 +321,66 @@ This document outlines tasks to complete the MVP for NewMedica, **prioritized by
 
 *Goal: Complete MVP feature set*
 
-### Task 3.1: Admin User Management
-- `/admin` page for approving Agent/Healthcare users
-- Admin endpoints for user approval/rejection
+### Task 3.1: Admin User Management (Backend & Frontend)
+**Priority**: 🔵 Low - Admin functionality
+**Dependencies**: None
+**Estimated Time**: 6-8 hours
 
-### Task 3.2: Profile Management
-- Editable `/profile` page
-- Update user details functionality
+**Backend Action Required**:
+1. Implement `GET /api/v1/admin/users` to list pending Agent/Healthcare users.
+2. Implement `POST /api/v1/admin/users/{id}/approve` to approve a user.
 
-### Task 3.3: Order History
-- `/orders` page showing user's order history
-- Order status tracking
+**Frontend Action Required**:
+1. Create `/admin` page with a UI to list and approve/reject Agent/Healthcare users.
+
+**Acceptance Criteria**:
+- [ ] Admin users can view a list of pending Agent/Healthcare registrations.
+- [ ] Admin users can approve or reject pending registrations.
+- [ ] Backend endpoints are secured for admin access only.
+
+### Task 3.2: Profile Management (Frontend)
+**Priority**: 🔵 Low - User-facing feature
+**Dependencies**: Backend Profile Update (future task)
+**Path**: `/account/details`
+**Action Required**:
+1. Implement form submission logic to update user details on the backend.
+2. Ensure form fields are pre-filled with current user data.
+3. Add validation for input fields.
+
+**Acceptance Criteria**:
+- [ ] User can update their profile information (e.g., name, email) via the `/account/details` page.
+- [ ] Changes are successfully persisted to the backend.
+- [ ] Form displays appropriate success/error messages.
+
+### Task 3.3: Order History (Frontend)
+**Priority**: 🔵 Low - User-facing feature
+**Dependencies**: Backend Order API (Task 1.2) - ✅ COMPLETED
+**Path**: `/orders`
+
+**Action Required**:
+1. Create `/orders` page to display a list of the user's past orders.
+2. Fetch order data from the backend `/api/v1/orders` endpoint.
+3. Display order details (e.g., order ID, total amount, payment status, items).
+
+**Acceptance Criteria**:
+- [ ] User can view a list of their past orders on the `/orders` page.
+- [ ] Each order displays relevant details.
+- [ ] Navigation to individual order details is possible (if applicable).
+
+### Task 3.5: Implement Backend `extra_fields` Validation (TDD)
+**Priority**: 🔵 Low - Data integrity
+**Dependencies**: None
+**Estimated Time**: 3-4 hours
+**Action Required**:
+1. **Write Tests First**: Create unit/integration tests to verify `extra_fields` validation for different `UserType`s (Agent, Healthcare).
+2. **Implement Validation Logic**: Add Pydantic validation to the `UserCreate` schema or a dedicated service layer to ensure `extra_fields` conform to the expected structure and required fields for each `UserType`.
+3. **Integrate with Registration/Profile Update**: Ensure this validation is applied during user registration and profile updates.
+4. **Make Tests Pass**: Ensure all validation tests pass.
+
+**Acceptance Criteria**:
+- [ ] `extra_fields` are correctly validated based on `UserType` during registration and profile updates.
+- [ ] Invalid `extra_fields` data results in appropriate error responses.
+- [ ] All existing tests pass.
 
 ---
 
