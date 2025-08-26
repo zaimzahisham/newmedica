@@ -23,3 +23,6 @@ class ProductMediaRead(ProductMediaBase):
     id: uuid.UUID
 
     model_config = ConfigDict(from_attributes=True, alias_generator=to_camel)
+
+class ProductMediaUpdate(ProductMediaBase):
+    pass

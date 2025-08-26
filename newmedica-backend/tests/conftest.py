@@ -9,7 +9,6 @@ from sqlalchemy.orm import sessionmaker
 from sqlmodel import SQLModel, select
 from typing import AsyncGenerator
 
-from app.core.security import create_access_token
 from app.db.init_db import seed_user_types
 from app.db.session import get_session
 from app.main import app
@@ -102,6 +101,7 @@ async def admin_user(session: AsyncSession):
 
 @pytest.fixture
 def admin_token_headers(admin_user: User):
+    from app.core.security import create_access_token
     access_token = create_access_token(subject=admin_user.id)
     headers = {"Authorization": f"Bearer {access_token}"}
     return headers
@@ -131,6 +131,7 @@ def basic_user_token_headers(basic_user: User) -> dict[str, str]:
     """
     Returns authorization headers for a basic user.
     """
+    from app.core.security import create_access_token
     access_token = create_access_token(subject=basic_user.id)
     return {"Authorization": f"Bearer {access_token}"}
 

@@ -15,6 +15,9 @@ class ProductBase(BaseModel):
     price: float
     stock: int
 
+class ProductCreate(ProductBase):
+    category_id: uuid.UUID
+
 
 
 

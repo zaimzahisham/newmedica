@@ -162,7 +162,7 @@ This document outlines tasks to complete the MVP for NewMedica, **prioritized by
 - [x] Form submission is handled (simulated email).
 - [x] Modal has smooth fade-in/fade-out animations.
 
-#### Task 1.5: Implement Checkout Page (TDD) - 🟡 PARTIALLY COMPLETED / BLOCKED
+#### Task 1.5: Implement Checkout Page (TDD) - 🟡 PARTIALLY COMPLETED / UNBLOCKED
 **Priority**: 🟡 High - Required for MVP
 **Path**: `/checkout`
 **Dependencies**: Backend Order API (Task 1.2), Stripe integration

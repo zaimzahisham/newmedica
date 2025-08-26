@@ -9,7 +9,7 @@ This document provides the definitive current state of the NewMedica e-commerce 
 **PHASE**: MVP Feature Implementation
 **OVERALL ADHERENCE TO GEMINI.md / Warp.md**: 90%
 **MVP READINESS**: 80%
-**IMMEDIATE PRIORITY**: Implement Frontend Checkout Page (Task 1.5)
+**IMMEDIATE PRIORITY**: Implement Frontend Address Management (Task 1.9)
 
 All critical blockers have been resolved. The cart is now fully functional and the project is in a stable state to proceed with the checkout implementation.
 

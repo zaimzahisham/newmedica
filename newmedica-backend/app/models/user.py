@@ -1,9 +1,11 @@
 import uuid
 from datetime import datetime
-from typing import Any, Dict, Optional
+from typing import TYPE_CHECKING, Any, Dict, List, Optional
 
-from sqlmodel import JSON, Column, Field, SQLModel
+from sqlmodel import JSON, Column, Field, Relationship, SQLModel
 
+if TYPE_CHECKING:
+    from .address import Address
 
 class User(SQLModel, table=True):
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True, index=True)
@@ -17,3 +19,5 @@ class User(SQLModel, table=True):
         nullable=False,
         sa_column_kwargs={"onupdate": datetime.utcnow},
     )
+
+    addresses: List["Address"] = Relationship(back_populates="user")
