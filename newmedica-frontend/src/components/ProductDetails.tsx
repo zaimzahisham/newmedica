@@ -10,6 +10,7 @@ import { useAuthStore } from '@/store/authStore';
 import { useCartStore } from '@/store/cartStore';
 import RequestQuotationModal from './RequestQuotationModal';
 import { AnimatePresence } from 'framer-motion';
+import { showWarningAlert } from './CustomAlert'; // Import CustomAlert
 
 interface ProductDetailsProps {
   product: Product;
@@ -35,7 +36,7 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
     if (authLoading) return; // Do nothing if auth state is still loading
 
     if (!user) {
-      alert('Please log in to add items to your cart.');
+      showWarningAlert('Please log in to add items to your cart.');
       return;
     }
 

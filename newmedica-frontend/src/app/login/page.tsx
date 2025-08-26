@@ -6,6 +6,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useAuthStore } from '@/store/authStore';
 import { useRouter } from 'next/navigation';
 import { loginSchema, registerSchema, LoginFormData, RegisterFormData } from '@/lib/validations/auth';
+import { showSuccessToast } from '@/components/CustomAlert';
 
 const LoginPage = () => {
   const login = useAuthStore((state) => state.login);
@@ -83,7 +84,7 @@ const LoginPage = () => {
         throw new Error(errorData.detail || 'Something went wrong');
       }
 
-      alert('Registration successful! Please log in.');
+      showSuccessToast('Registration successful! Please log in.');
       setIsSignUp(false);
     } catch (error: any) {
       setApiError(`Registration failed: ${error.message}`);

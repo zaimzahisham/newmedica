@@ -24,7 +24,7 @@ export default function AddToCartConfirmation({ product, quantity, onClose }: Ad
 
   return (
     <motion.div 
-      className="fixed top-8 right-8 w-96 bg-white border rounded-lg shadow-lg z-50"
+      className="fixed top-20 right-8 w-96 bg-white border rounded-lg shadow-lg z-50"
       initial="hidden"
       animate="visible"
       exit="exit"
