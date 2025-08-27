@@ -233,18 +233,22 @@ This document outlines tasks to complete the MVP for NewMedica, **prioritized by
 - ✅ `DELETE /api/v1/users/me/addresses/{address_id}`: Delete an address
 - ✅ `POST /api/v1/users/me/addresses/{address_id}/set_primary`: Set as primary
 
-#### Task 1.9: Implement Frontend Address Management
+#### Task 1.9: Implement Frontend Address Management - ✅ COMPLETED
 **Priority**: 🟡 High - User-facing feature
 **Dependencies**: Task 1.8 (Backend Address Management) - ✅ COMPLETED
 **Path**: `/account/addresses`
 
 **Acceptance Criteria**:
-- [ ] User can view all their addresses on the `/account/addresses` page.
-- [ ] User can add a new address via a form.
-- [ ] User can edit an existing address.
-- [ ] User can delete an address.
-- [ ] User can set an address as their primary address.
-- [ ] Checkout page form is pre-filled with the primary address details.
+- [x] User can view all their addresses on the `/account/address` page.
+- [x] User can add a new address via a form.
+- [x] User can edit an existing address.
+- [x] User can delete an address.
+- [x] User can set an address as their primary address.
+- [x] Checkout page form is pre-filled with the primary address details.
+
+**Notes**:
+- Added modal animations and `CustomAlert` notifications for create/update/delete/set-primary.
+- Prefill implemented on `/checkout` with "Use saved address" dropdown and "New address" option.
 
 #### Task 1.6: Setup Zustand State Management for Cart - ✅ COMPLETED
 **Priority**: 🟡 High - Required by GEMINI.md/WARP.md
