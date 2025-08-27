@@ -51,3 +51,13 @@ class OrderRepository:
             )
         )
         return result.scalar_one_or_none()
+
+    async def update_payment_status(self, order_id: uuid.UUID, status: str) -> Order | None:
+        order = await self.session.get(Order, order_id)
+        if not order:
+            return None
+        order.payment_status = status
+        self.session.add(order)
+        await self.session.commit()
+        await self.session.refresh(order)
+        return order

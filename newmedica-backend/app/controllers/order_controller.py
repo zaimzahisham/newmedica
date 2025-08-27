@@ -4,13 +4,16 @@ from app.services.order_service import OrderService
 
 class OrderController:
     def __init__(self, session: AsyncSession):
-        self.service = OrderService(session)
+        self.order_service = OrderService(session)
 
     async def create_order_from_cart(self, user_id: uuid.UUID):
-        return await self.service.create_order_from_cart(user_id)
+        return await self.order_service.create_order_from_cart(user_id)
 
     async def get_orders(self, user_id: uuid.UUID):
-        return await self.service.get_orders_by_user_id(user_id)
+        return await self.order_service.get_orders_by_user_id(user_id)
 
     async def get_order_by_id(self, order_id: uuid.UUID):
-        return await self.service.get_order_by_id(order_id)
+        return await self.order_service.get_order_by_id(order_id)
+
+    async def mark_order_paid(self, order_id: uuid.UUID):
+        return await self.order_service.mark_order_paid(order_id)

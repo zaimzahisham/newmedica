@@ -23,6 +23,7 @@ const CheckoutPage = () => {
   const { user } = useAuthStore();
   const { items: cartItems } = useCartStore();
   const [isLoading, setIsLoading] = useState(false);
+  const [useDifferentBilling, setUseDifferentBilling] = useState(false);
   const [addresses, setAddresses] = useState<AddressDto[] | null>(null);
   const [selectedAddressId, setSelectedAddressId] = useState<string | null>(null);
 
@@ -86,35 +87,42 @@ const CheckoutPage = () => {
     loadAddresses();
   }, [reset]);
 
+  const [paymentMethod, setPaymentMethod] = useState<'stripe' | 'bank_transfer' | 'duitnow_qr' | 'fpx' | 'visa_master'>('stripe');
+
   const onSubmit: SubmitHandler<ShippingAddressFormData> = async (data) => {
     if (!stripePromise) {
-        alert('Stripe is not configured correctly. Please check the console for errors.');
-        setIsLoading(false);
-        return;
+        console.warn('Stripe publishable key not set. Non-Stripe methods can proceed as dummy.');
     }
 
     setIsLoading(true);
     try {
-      const response = await fetch('/api/checkout_sessions', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ items: cartItems, shippingInfo: data }),
-      });
+      if (paymentMethod === 'stripe') {
+        const response = await fetch('/api/checkout_sessions', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ items: cartItems, shippingInfo: data }),
+        });
 
-      if (!response.ok) {
-        throw new Error('Failed to create Stripe session');
+        if (!response.ok) {
+          throw new Error('Failed to create Stripe session');
+        }
+
+        const { sessionId } = await response.json();
+
+        const stripe = await stripePromise;
+        if (!stripe) {
+          throw new Error('Stripe.js has not loaded yet.');
+        }
+
+        await stripe.redirectToCheckout({ sessionId });
+      } else {
+        // Dummy flow: just navigate to success and create order
+        const params = new URLSearchParams();
+        params.set('order_id', 'pending');
+        window.location.href = `/orders/success?${params.toString()}`;
       }
-
-      const { sessionId } = await response.json();
-
-      const stripe = await stripePromise;
-      if (!stripe) {
-        throw new Error('Stripe.js has not loaded yet.');
-      }
-
-      await stripe.redirectToCheckout({ sessionId });
 
     } catch (error) {
       console.error(error);
@@ -155,7 +163,7 @@ const CheckoutPage = () => {
                           <label htmlFor="addressSelect" className="text-sm text-gray-600">Use saved address:</label>
                           <select
                             id="addressSelect"
-                            className="border rounded-md h-10 px-2"
+                            className="border rounded-md h-10 px-2 w-75"
                             value={selectedAddressId ?? 'new'}
                             onChange={(e) => {
                               const value = e.target.value;
@@ -226,17 +234,81 @@ const CheckoutPage = () => {
                     </div>
 
                     <div className="pt-6">
-                        <h3 className="text-lg font-semibold">Billing address</h3>
-                        <div className="mt-2 space-y-2 border rounded-md">
-                            <div className="p-4 border-b">
-                                <input type="radio" id="same_billing" name="billing_address" value="same" defaultChecked/>
-                                <label htmlFor="same_billing" className="ml-2">Same with shipping address</label>
+                      <h3 className="text-lg font-semibold">Billing address</h3>
+                      <div className="mt-2 space-y-2 border rounded-md">
+                        <label className="p-4 border-b flex items-center gap-2 cursor-pointer">
+                          <input
+                            type="radio"
+                            name="billing_address"
+                            checked={!useDifferentBilling}
+                            onChange={() => setUseDifferentBilling(false)}
+                          />
+                          <span>Same with shipping address</span>
+                        </label>
+                        <label className="p-4 flex items-center gap-2 cursor-pointer">
+                          <input
+                            type="radio"
+                            name="billing_address"
+                            checked={useDifferentBilling}
+                            onChange={() => setUseDifferentBilling(true)}
+                          />
+                          <span>Use a different billing address</span>
+                        </label>
+                      </div>
+                      {useDifferentBilling && (
+                        <div className="mt-4 grid grid-cols-1 gap-4">
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                              <input type="text" placeholder="First name" {...register('billingFirstName')} className={inputClasses(false)} />
                             </div>
-                            <div className="p-4">
-                                <input type="radio" id="different_billing" name="billing_address" value="different" />
-                                <label htmlFor="different_billing" className="ml-2">Use a different billing address</label>
+                            <div>
+                              <input type="text" placeholder="Last name" {...register('billingLastName')} className={inputClasses(false)} />
                             </div>
+                          </div>
+                          <div>
+                            <input type="text" placeholder="Address line 1" {...register('billingAddress1')} className={inputClasses(false)} />
+                          </div>
+                          <div>
+                            <input type="text" placeholder="Address line 2 (optional)" {...register('billingAddress2')} className={inputClasses(false)} />
+                          </div>
+                          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div>
+                              <input type="text" placeholder="City" {...register('billingCity')} className={inputClasses(false)} />
+                            </div>
+                            <div>
+                              <input type="text" placeholder="State" {...register('billingState')} className={inputClasses(false)} />
+                            </div>
+                            <div>
+                              <input type="text" placeholder="Postcode" {...register('billingPostcode')} className={inputClasses(false)} />
+                            </div>
+                          </div>
+                          <div>
+                            <input type="text" placeholder="Country" {...register('billingCountry')} className={inputClasses(false)} />
+                          </div>
                         </div>
+                      )}
+                    </div>
+
+                    <div className="pt-6">
+                      <h3 className="text-lg font-semibold">Payment method</h3>
+                      <div className="mt-2 space-y-2 border rounded-md">
+                        <label className="p-4 border-b flex items-center gap-2 cursor-pointer">
+                          <input type="radio" name="payment_method" checked={paymentMethod==='stripe'} onChange={() => setPaymentMethod('stripe')} />
+                          <span>Stripe (VISA/Master/FPX)</span>
+                        </label>
+                        <label className="p-4 border-b flex items-center gap-2 cursor-pointer">
+                          <input type="radio" name="payment_method" checked={paymentMethod==='fpx'} onChange={() => setPaymentMethod('fpx')} />
+                          <span>Internet Banking (FPX Malaysia)</span>
+                        </label>
+                        <label className="p-4 border-b flex items-center gap-2 cursor-pointer">
+                          <input type="radio" name="payment_method" checked={paymentMethod==='duitnow_qr'} onChange={() => setPaymentMethod('duitnow_qr')} />
+                          <span>DuitNow QR</span>
+                        </label>
+                        <label className="p-4 flex items-center gap-2 cursor-pointer">
+                          <input type="radio" name="payment_method" checked={paymentMethod==='bank_transfer'} onChange={() => setPaymentMethod('bank_transfer')} />
+                          <span>Bank transfer</span>
+                        </label>
+                      </div>
                     </div>
 
                     <div className="pt-6">

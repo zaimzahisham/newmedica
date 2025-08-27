@@ -10,24 +10,30 @@ export async function POST(request: Request) {
       return new NextResponse('No items in cart', { status: 400 });
     }
 
-    const line_items = items.map(item => ({
-      price_data: {
-        currency: 'myr', // Malaysian Ringgit
-        product_data: {
-          name: item.product.name,
-          images: item.product.media?.map(m => m.url),
+    const origin = request.headers.get('origin') || '';
+    const line_items = items.map(item => {
+      const rawImages = item.product.media?.map(m => m.url) || [];
+      const validImages = rawImages.filter((u) => /^https?:\/\//i.test(u));
+      const product_data: any = { name: item.product.name };
+      if (validImages.length > 0) {
+        product_data.images = validImages.slice(0, 8);
+      }
+      return {
+        price_data: {
+          currency: 'myr',
+          product_data,
+          unit_amount: Math.round(item.product.price * 100),
         },
-        unit_amount: Math.round(item.product.price * 100), // Price in cents
-      },
-      quantity: item.quantity,
-    }));
+        quantity: item.quantity,
+      };
+    });
 
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card', 'fpx'],
       line_items,
       mode: 'payment',
-      success_url: `${request.headers.get('origin')}/order/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${request.headers.get('origin')}/cart`,
+      success_url: `${request.headers.get('origin')}/orders/success?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${request.headers.get('origin')}/orders/cancel`,
     });
 
     return NextResponse.json({ sessionId: session.id });

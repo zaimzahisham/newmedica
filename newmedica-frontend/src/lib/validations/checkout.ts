@@ -13,6 +13,16 @@ export const shippingAddressSchema = z.object({
   postcode: z.string().min(1, { message: 'Postcode is required' }),
   country: z.string().min(1, { message: 'Country is required' }),
   remark: z.string().optional(),
+  // Billing (optional for MVP; validated only when provided)
+  billingSame: z.boolean().optional(),
+  billingFirstName: z.string().optional(),
+  billingLastName: z.string().optional(),
+  billingAddress1: z.string().optional(),
+  billingAddress2: z.string().optional(),
+  billingCity: z.string().optional(),
+  billingState: z.string().optional(),
+  billingPostcode: z.string().optional(),
+  billingCountry: z.string().optional(),
 });
 
 export type ShippingAddressFormData = z.infer<typeof shippingAddressSchema>;

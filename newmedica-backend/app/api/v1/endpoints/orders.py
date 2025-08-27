@@ -7,6 +7,7 @@ from app.db.session import get_session
 from app.models.user import User
 from app.controllers.order_controller import OrderController
 from app.schemas.order import OrderRead
+from fastapi import HTTPException, status
 
 router = APIRouter()
 
@@ -48,3 +49,26 @@ async def get_order_by_id(
     """
     order_controller = OrderController(session)
     return await order_controller.get_order_by_id(order_id=order_id)
+
+
+@router.post("/{order_id}/mark-paid", response_model=OrderRead)
+async def mark_order_paid(
+    *,
+    session: AsyncSession = Depends(get_session),
+    current_user: User = Depends(get_current_user),
+    order_id: UUID,
+):
+    """
+    Mark an order as paid (MVP helper when webhooks are not used).
+    """
+    order_controller = OrderController(session)
+    order = await order_controller.get_order_by_id(order_id=order_id)
+    if not order or order.user_id != current_user.id:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Order not found")
+
+    # Use service to mark paid
+    service = order_controller.order_service
+    updated = await service.mark_order_paid(order_id)
+    if not updated:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Unable to update payment status")
+    return updated

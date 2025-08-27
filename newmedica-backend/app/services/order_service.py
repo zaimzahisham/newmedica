@@ -29,3 +29,6 @@ class OrderService:
 
     async def get_order_by_id(self, order_id: uuid.UUID) -> Order | None:
         return await self.order_repository.get_order_by_id(order_id)
+
+    async def mark_order_paid(self, order_id: uuid.UUID) -> Order | None:
+        return await self.order_repository.update_payment_status(order_id, status="paid")
