@@ -8,7 +8,7 @@ This document provides the definitive current state of the NewMedica e-commerce 
 
 **PHASE**: MVP Feature Implementation
 **OVERALL ADHERENCE TO GEMINI.md / Warp.md**: 70%
-**MVP READINESS**: 64%
+**MVP READINESS**: 66%
 **IMMEDIATE PRIORITY**: Implement Frontend Checkout Page (Remaining Work) (Task 1.5)
 
 All critical blockers have been resolved. The project is in a stable state to proceed with the next high-priority tasks.
@@ -53,7 +53,7 @@ All critical blockers have been resolved. The project is in a stable state to pr
 
 ---
 
-## Frontend (`newmedica-frontend`) - COMPLIANCE: 64%
+## Frontend (`newmedica-frontend`) - COMPLIANCE: 66%
 
 **ARCHITECTURE**: ✅ Next.js 14 + App Router + TypeScript (compliant)
 **STYLING**: ✅ Tailwind CSS configured and working
@@ -89,7 +89,7 @@ All critical blockers have been resolved. The project is in a stable state to pr
 - ✅ `/account/details` (Profile viewing)
 - ✅ `/account/address` (Address management: list/add/edit/delete/set-primary with animations and alerts)
 - ✅ `/cart` (Shopping cart is now fully functional)
-- 🟡 `/checkout` (Prefill from primary address implemented; added "Use saved address" dropdown and "New address" option; Stripe redirect not yet tested, functionality status unknown)
+- ✅ `/checkout` (Prefill from primary; “Use saved address” with “New address”; Payment method section; Stripe redirect working; success/cancel pages)
 
 **COMPONENTS IMPLEMENTED**:
 - Navigation: `Navbar` (with dynamic cart count), `Footer`, `ThemeToggleButton`
@@ -148,4 +148,4 @@ All critical blockers have been resolved. The project is in a stable state to pr
 ## NEXT ACTIONS FOR GEMINI CLI
 
 **WHEN GEMINI STARTS**: Focus immediately on these high-priority tasks:
-1. Implement Frontend Checkout Page (Remaining Work) (Task 1.5)
+1. Task 1.11: Order Domain v2 — pricing, vouchers, shipping (backend + minimal frontend)

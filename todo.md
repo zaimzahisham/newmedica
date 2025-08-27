@@ -214,6 +214,42 @@ This document outlines tasks to complete the MVP for NewMedica, **prioritized by
 - ✅ `app/checkout/_components/OrderSummary.tsx`: Order review
 - ✅ `lib/stripe.ts`: Stripe client setup
 
+#### Task 1.11: Order Domain v2 — pricing, vouchers, shipping (TDD)
+**Priority**: 🟡 High - Required for production-ready checkout and reporting
+**Dependencies**: Task 1.2 (baseline orders) ✅, Task 1.5 (checkout form) 🟡
+
+**Business Rules Recap**:
+- Users: Basic, Agent, Healthcare. Agent/Healthcare receive automatic user-type voucher on registration; admins can assign vouchers to users/user-types; vouchers may also be global.
+- Shipping: dynamic, admin-configurable quantity-based fee (first item fee; additional item fee). Future: larger-product rules.
+
+**Data Model Changes (Migrations)**:
+1) Extend `order` with: `contact_email`, `payment_method`, `payment_intent_id`, `currency`, `remark`, `subtotal_amount`, `discount_amount`, `shipping_amount`, `total_amount`, `shipping_address` (JSON), `billing_address` (JSON).
+2) Extend `order_item` with: `line_subtotal`, `discount_amount`, `line_total`, `snapshot_name`, `snapshot_price`, `snapshot_media_url`.
+3) Create `voucher` table: `code`, `type` (percent|fixed), `value`, `scope` (global|user_type|user), `target_user_type` (nullable), `target_user_id` (nullable), `is_active`, `valid_from`, `valid_to`, `usage_limit`, timestamps.
+4) Create `shipping_config` table: `base_fee_first_item`, `additional_fee_per_item`, optional `rules` JSON, `is_active`, `updated_at`.
+
+**API Changes**:
+- `POST /api/v1/orders`: Body includes `contact_email`, `payment_method`, `remark`, `shipping_address`, optional `billing_address`, optional `voucher_code`. Creates order from cart with pricing rules and item snapshots. Returns `OrderRead` with items and totals.
+- `POST /api/v1/orders/{id}/mark-paid`: Keep existing.
+- Admin (scaffold): `GET/PUT /api/v1/admin/shipping-config`. (Voucher CRUD can follow later.)
+
+**Service Logic**:
+- Compute subtotal from cart; auto-apply best applicable voucher (user-type/user/global); compute shipping via `shipping_config`; persist all amounts and addresses; default `payment_status=pending`.
+
+**Frontend Changes**:
+- Checkout submit should include payment method, shipping/billing addresses, contact email, remark, optional voucher code; use server totals for display after order creation. Stripe flow may create order pre-redirect, then mark-paid on success (current helper) — webhook later.
+
+**Acceptance Criteria**:
+- [ ] Orders persist shipping/billing JSON, payment method, contact email, remark, currency, and computed amounts (subtotal/discount/shipping/total).
+- [ ] Order items store snapshot fields and line totals.
+- [ ] Shipping fees sourced from `shipping_config` and can be updated without code.
+- [ ] Agent/Healthcare auto voucher applies; admin-assigned voucher applies when valid.
+- [ ] `payment_status` transitions to `paid` via existing endpoint (webhook follow-up).
+- [ ] Migrations created and applied cleanly; existing orders backfilled (discount=0, shipping=0, subtotal=total).
+
+**Out of Scope (follow-up tasks)**:
+- Stripe webhooks to auto-mark paid; voucher CRUD UI; advanced shipping rules; product-level price tiers.
+
 #### Task 1.8: Implement Backend Address Management (TDD) - ✅ COMPLETED
 **Priority**: 🟡 High - Required for user profiles and checkout
 **Dependencies**: None
