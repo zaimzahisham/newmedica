@@ -1,17 +1,18 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { shippingAddressSchema, ShippingAddressFormData } from '@/lib/validations/checkout';
 import OrderSummary from './_components/OrderSummary';
 import { useAuthStore } from '@/store/authStore';
 import { useCartStore } from '@/store/cartStore';
-import { loadStripe } from '@stripe/stripe-js';
+import { loadStripe, type Stripe } from '@stripe/stripe-js';
+import { getAddresses, getPrimaryAddress, type AddressDto } from '@/lib/api/address';
 
 // Make sure to put your publishable key in .env.local
 const stripePublishableKey = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY;
-let stripePromise;
+let stripePromise: Promise<Stripe | null> | undefined;
 if (stripePublishableKey) {
   stripePromise = loadStripe(stripePublishableKey);
 } else {
@@ -22,11 +23,14 @@ const CheckoutPage = () => {
   const { user } = useAuthStore();
   const { items: cartItems } = useCartStore();
   const [isLoading, setIsLoading] = useState(false);
+  const [addresses, setAddresses] = useState<AddressDto[] | null>(null);
+  const [selectedAddressId, setSelectedAddressId] = useState<string | null>(null);
 
   const {
     register,
     handleSubmit,
     formState: { errors },
+    reset,
   } = useForm<ShippingAddressFormData>({
     resolver: zodResolver(shippingAddressSchema),
     defaultValues: {
@@ -34,6 +38,53 @@ const CheckoutPage = () => {
         state: 'Kuala Lumpur',
     }
   });
+
+  const applyAddressToForm = (addr: AddressDto) => {
+    reset({
+      phone: addr.phone || '',
+      firstName: addr.first_name || '',
+      lastName: addr.last_name || '',
+      address1: addr.address1 || '',
+      address2: addr.address2 || '',
+      city: addr.city || '',
+      state: addr.state || 'Kuala Lumpur',
+      postcode: addr.postcode || '',
+      country: addr.country || 'Malaysia',
+      remark: '',
+    });
+  };
+
+  const clearAddressForm = () => {
+    reset({
+      phone: '',
+      firstName: '',
+      lastName: '',
+      address1: '',
+      address2: '',
+      city: '',
+      state: 'Kuala Lumpur',
+      postcode: '',
+      country: 'Malaysia',
+      remark: '',
+    });
+  };
+
+  useEffect(() => {
+    const loadAddresses = async () => {
+      try {
+        const list = await getAddresses();
+        setAddresses(list);
+        const primary = list.find(a => a.is_primary) || (await getPrimaryAddress());
+        if (primary) {
+          setSelectedAddressId(primary.id);
+          applyAddressToForm(primary);
+        }
+      } catch {
+        // ignore if unauthenticated or no addresses
+      }
+    };
+    loadAddresses();
+  }, [reset]);
 
   const onSubmit: SubmitHandler<ShippingAddressFormData> = async (data) => {
     if (!stripePromise) {
@@ -97,7 +148,39 @@ const CheckoutPage = () => {
                         {errors.phone && <p className="text-red-500 text-xs mt-1">{errors.phone.message}</p>}
                     </div>
 
-                    <h2 className="text-xl font-semibold pt-4">Shipping address</h2>
+                    <div className="flex items-center justify-between pt-4">
+                      <h2 className="text-xl font-semibold">Shipping address</h2>
+                      {addresses && addresses.length > 0 && (
+                        <div className="flex items-center gap-2">
+                          <label htmlFor="addressSelect" className="text-sm text-gray-600">Use saved address:</label>
+                          <select
+                            id="addressSelect"
+                            className="border rounded-md h-10 px-2"
+                            value={selectedAddressId ?? 'new'}
+                            onChange={(e) => {
+                              const value = e.target.value;
+                              if (value === 'new') {
+                                setSelectedAddressId(null);
+                                clearAddressForm();
+                                return;
+                              }
+                              const id = value;
+                              setSelectedAddressId(id);
+                              const chosen = addresses.find(a => a.id === id);
+                              if (chosen) applyAddressToForm(chosen);
+                            }}
+                          >
+                            <option value="new">New address</option>
+                            {addresses.map(a => (
+                              <option key={a.id} value={a.id}>
+                                {a.first_name} {a.last_name} — {a.address1}, {a.city}
+                                {a.is_primary ? ' (Primary)' : ''}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+                      )}
+                    </div>
                     
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
@@ -124,12 +207,7 @@ const CheckoutPage = () => {
                             {errors.city && <p className="text-red-500 text-xs mt-1">{errors.city.message}</p>}
                         </div>
                         <div>
-                            <select {...register('state')} className={inputClasses(!!errors.state)}>
-                                <option>Kuala Lumpur</option>
-                                <option>Selangor</option>
-                                <option>Johor</option>
-                                {/* Add other states */}
-                            </select>
+                            <input type="text" placeholder="State" {...register('state')} className={inputClasses(!!errors.state)} />
                             {errors.state && <p className="text-red-500 text-xs mt-1">{errors.state.message}</p>}
                         </div>
                         <div>
@@ -138,9 +216,7 @@ const CheckoutPage = () => {
                         </div>
                     </div>
                     <div>
-                        <select {...register('country')} className={inputClasses(!!errors.country)}>
-                            <option>Malaysia</option>
-                        </select>
+                        <input type="text" placeholder="Country" {...register('country')} className={inputClasses(!!errors.country)} />
                         {errors.country && <p className="text-red-500 text-xs mt-1">{errors.country.message}</p>}
                     </div>
 

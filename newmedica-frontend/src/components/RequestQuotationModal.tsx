@@ -31,11 +31,12 @@ interface RequestQuotationModalProps {
 const backdropVariants = {
   visible: { opacity: 1 },
   hidden: { opacity: 0 },
+  exit: { opacity: 0 },
 };
 
 const modalVariants = {
   hidden: { opacity: 0, scale: 0.95 },
-  visible: { opacity: 1, scale: 1, transition: { delay: 0.1 } },
+  visible: { opacity: 1, scale: 1, transition: { delay: 0.05 } },
   exit: { opacity: 0, scale: 0.95 },
 };
 
@@ -94,10 +95,10 @@ export default function RequestQuotationModal({ product, user, onClose }: Reques
   if (submissionSuccess) {
     return (
       <motion.div 
-        className="fixed inset-0 bg-gray-900 bg-opacity-30 backdrop-blur-sm flex justify-center items-center z-50 p-4"
+        className="fixed inset-0 bg-black/0 backdrop-blur-md flex justify-center items-center z-50 p-4"
         initial="hidden"
         animate="visible"
-        exit="hidden"
+        exit="exit"
         variants={backdropVariants}
       >
         <motion.div 
@@ -114,10 +115,10 @@ export default function RequestQuotationModal({ product, user, onClose }: Reques
 
   return (
     <motion.div 
-      className="fixed inset-0 bg-gray-900 bg-opacity-30 backdrop-blur-sm flex justify-center items-center z-50 p-4"
+      className="fixed inset-0 bg-black/0 backdrop-blur-md flex justify-center items-center z-50 p-4"
       initial="hidden"
       animate="visible"
-      exit="hidden"
+      exit="exit"
       variants={backdropVariants}
       onClick={onClose}
     >

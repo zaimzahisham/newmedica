@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { Lock, Mail } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { getPrimaryAddress } from '@/lib/api/address';
 
 const AccountDetailsPage = () => {
   const user = useAuthStore((state) => state.user);
@@ -22,7 +23,31 @@ const AccountDetailsPage = () => {
     return null; // Or a loading spinner
   }
 
-  const defaultAddress = user.addresses?.find(addr => addr.isDefault);
+  const [primaryAddress, setPrimaryAddress] = useState<{
+    first_name: string;
+    last_name: string;
+    phone: string;
+    address1: string;
+    address2?: string | null;
+    city: string;
+    state: string;
+    postcode: string;
+    country: string;
+    is_primary: boolean;
+  } | null>(null);
+
+  useEffect(() => {
+    const loadPrimary = async () => {
+      if (!user) return;
+      try {
+        const addr = await getPrimaryAddress();
+        setPrimaryAddress(addr);
+      } catch {
+        setPrimaryAddress(null);
+      }
+    };
+    loadPrimary();
+  }, [user]);
 
   return (
     <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -154,18 +179,18 @@ const AccountDetailsPage = () => {
       <div className="mb-10">
         <h2 className="text-xl font-semibold text-gray-700 mb-6 border-b pb-2">Primary Address</h2>
         <div className="border border-gray-200 rounded-md p-6">
-          {defaultAddress ? (
+          {primaryAddress ? (
             <>
-              <p className="font-semibold">{user.firstName} {user.lastName}</p>
-              <p>{defaultAddress.street}</p>
-              <p>{defaultAddress.city}, {defaultAddress.state} {defaultAddress.zipCode}</p>
-              <p>{defaultAddress.country}</p>
+              <p className="font-semibold">{primaryAddress.first_name} {primaryAddress.last_name}</p>
+              <p>{primaryAddress.address1}{primaryAddress.address2 ? `, ${primaryAddress.address2}` : ''}</p>
+              <p>{primaryAddress.postcode} {primaryAddress.city}, {primaryAddress.state}</p>
+              <p>{primaryAddress.country}</p>
             </>
           ) : (
-            <p>No default address set.</p>
+            <p>No primary address set.</p>
           )}
           <Link href="/account/address" className="text-sm text-indigo-600 hover:underline mt-4 inline-block">
-            View Addresses ({user.addresses?.length || 0})
+            Manage Addresses
           </Link>
         </div>
       </div>
