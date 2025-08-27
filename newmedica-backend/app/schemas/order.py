@@ -20,4 +20,9 @@ class OrderRead(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
 class OrderCreate(BaseModel):
-    pass
+    contact_email: str | None = None
+    payment_method: str | None = None
+    remark: str | None = None
+    shipping_address: dict | None = None
+    billing_address: dict | None = None
+    clear_cart: bool | None = None

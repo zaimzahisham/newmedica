@@ -4,6 +4,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 from sqlalchemy.ext.asyncio import AsyncSession
+import uuid
 from sqlmodel import select
 
 from app.db.session import get_session
@@ -11,6 +12,7 @@ from app.models.category import Category
 from app.models.product import Product
 from app.models.product_media import ProductMedia
 from app.models.user_type import UserType
+from app.models.voucher import Voucher, VoucherProductLink
 
 
 async def seed_data():
@@ -156,6 +158,99 @@ async def seed_data():
 
         await session.commit()
         print("Products and media upserted.")
+
+        # --- Seed Vouchers ---
+        print("Upserting vouchers...")
+
+        # fetch target product by given id or name fallback
+        barrier_product = (
+            await session.execute(
+                select(Product).where(Product.id == uuid.UUID("9f487ce0-a98f-49f0-9445-564ae0fc0c73"))
+            )
+        ).scalar_one_or_none()
+        if not barrier_product:
+            barrier_product = (
+                await session.execute(
+                    select(Product).where(Product.name == "Med-Cover Barrier Cream, 120g")
+                )
+            ).scalar_one_or_none()
+
+        agent_type = (
+            await session.execute(select(UserType).where(UserType.name == "Agent"))
+        ).scalar_one()
+        healthcare_type = (
+            await session.execute(select(UserType).where(UserType.name == "Healthcare"))
+        ).scalar_one()
+
+        # Healthcare voucher: RM20 off for Barrier Cream
+        code_health = "HEALTHCARE_BARRIER_RM20"
+        v_health = (
+            await session.execute(select(Voucher).where(Voucher.code == code_health))
+        ).scalar_one_or_none()
+        if not v_health:
+            v_health = Voucher(
+                code=code_health,
+                discount_type="fixed",
+                amount=20.0,
+                scope="product_list",
+                target_user_type_id=healthcare_type.id,
+                min_quantity=1,
+                per_unit=False,
+                is_active=True,
+            )
+            session.add(v_health)
+            await session.commit()
+            await session.refresh(v_health)
+        # link to product
+        if barrier_product:
+            link = (
+                await session.execute(
+                    select(VoucherProductLink).where(
+                        VoucherProductLink.voucher_id == v_health.id,
+                        VoucherProductLink.product_id == barrier_product.id,
+                    )
+                )
+            ).scalar_one_or_none()
+            if not link:
+                session.add(
+                    VoucherProductLink(voucher_id=v_health.id, product_id=barrier_product.id)
+                )
+
+        # Agent voucher: RM40 off per Barrier Cream if qty >= 10
+        code_agent = "AGENT_BARRIER_RM40_PER_10PLUS"
+        v_agent = (
+            await session.execute(select(Voucher).where(Voucher.code == code_agent))
+        ).scalar_one_or_none()
+        if not v_agent:
+            v_agent = Voucher(
+                code=code_agent,
+                discount_type="fixed",
+                amount=40.0,
+                scope="product_list",
+                target_user_type_id=agent_type.id,
+                min_quantity=10,
+                per_unit=True,
+                is_active=True,
+            )
+            session.add(v_agent)
+            await session.commit()
+            await session.refresh(v_agent)
+        if barrier_product:
+            link2 = (
+                await session.execute(
+                    select(VoucherProductLink).where(
+                        VoucherProductLink.voucher_id == v_agent.id,
+                        VoucherProductLink.product_id == barrier_product.id,
+                    )
+                )
+            ).scalar_one_or_none()
+            if not link2:
+                session.add(
+                    VoucherProductLink(voucher_id=v_agent.id, product_id=barrier_product.id)
+                )
+
+        await session.commit()
+        print("Vouchers upserted.")
         print("Database seeding complete.")
 
     except Exception as e:

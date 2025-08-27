@@ -28,9 +28,18 @@ class OrderRepository:
 
         await self.session.commit()
         
-        # Eagerly load the items relationship
+        # Eagerly load items and nested product relationships for response schemas
         result = await self.session.execute(
-            select(Order).where(Order.id == order.id).options(selectinload(Order.items))
+            select(Order)
+            .where(Order.id == order.id)
+            .options(
+                selectinload(Order.items)
+                .selectinload(OrderItem.product)
+                .selectinload(Product.category),
+                selectinload(Order.items)
+                .selectinload(OrderItem.product)
+                .selectinload(Product.media),
+            )
         )
         return result.scalar_one()
 
@@ -51,6 +60,12 @@ class OrderRepository:
             )
         )
         return result.scalar_one_or_none()
+
+    async def get_pending_order_by_user_id(self, user_id: uuid.UUID) -> Order | None:
+        result = await self.session.execute(
+            select(Order).where(Order.user_id == user_id, Order.payment_status == "pending")
+        )
+        return result.scalars().first()
 
     async def update_payment_status(self, order_id: uuid.UUID, status: str) -> Order | None:
         order = await self.session.get(Order, order_id)

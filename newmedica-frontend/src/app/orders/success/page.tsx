@@ -60,11 +60,29 @@ export default function OrderSuccessPage() {
       }
     };
 
-    // If order_id is provided (non-Stripe path), just show success without creating again
+    // If order_id is provided (Stripe path with pre-created order), mark it as paid
     if (passedOrderId) {
-      setOrderId(passedOrderId);
-      setStatus('success');
-      clearCart();
+      (async () => {
+        setStatus('creating');
+        try {
+          const token = getAuthToken();
+          if (!token) {
+            setStatus('error');
+            setMessage('You must be logged in to confirm the order.');
+            return;
+          }
+          await fetch(`${API_URL}/api/v1/orders/${passedOrderId}/mark-paid`, {
+            method: 'POST',
+            headers: { 'Authorization': `Bearer ${token}` },
+          });
+          setOrderId(passedOrderId);
+          setStatus('success');
+          clearCart();
+        } catch (e) {
+          setStatus('error');
+          setMessage('We could not confirm your order payment. Please contact support if you were charged.');
+        }
+      })();
       return;
     }
 

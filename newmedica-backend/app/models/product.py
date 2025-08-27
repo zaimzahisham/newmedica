@@ -3,11 +3,13 @@ from datetime import datetime, timezone
 from typing import TYPE_CHECKING, List
 
 from sqlmodel import Field, Relationship, SQLModel
+from .voucher import VoucherProductLink
 from sqlalchemy import Column, DateTime
 
 if TYPE_CHECKING:
     from .category import Category
     from .product_media import ProductMedia
+    from .voucher import Voucher
 
 
 class Product(SQLModel, table=True):
@@ -29,3 +31,4 @@ class Product(SQLModel, table=True):
         back_populates="product",
         sa_relationship_kwargs={"order_by": "ProductMedia.display_order"},
     )
+    vouchers: List["Voucher"] = Relationship(link_model=VoucherProductLink)

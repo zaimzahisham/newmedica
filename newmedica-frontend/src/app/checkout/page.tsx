@@ -9,6 +9,7 @@ import { useAuthStore } from '@/store/authStore';
 import { useCartStore } from '@/store/cartStore';
 import { loadStripe, type Stripe } from '@stripe/stripe-js';
 import { getAddresses, getPrimaryAddress, type AddressDto } from '@/lib/api/address';
+import { getAuthToken } from '@/lib/utils';
 
 // Make sure to put your publishable key in .env.local
 const stripePublishableKey = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY;
@@ -97,12 +98,66 @@ const CheckoutPage = () => {
     setIsLoading(true);
     try {
       if (paymentMethod === 'stripe') {
+        // Create a pending order first with full payload
+        const token = getAuthToken();
+        const orderPayload = {
+          contact_email: user?.email ?? undefined,
+          payment_method: 'stripe',
+          remark: data.remark || undefined,
+          shipping_address: {
+            first_name: data.firstName,
+            last_name: data.lastName,
+            address1: data.address1,
+            address2: data.address2 || undefined,
+            city: data.city,
+            state: data.state,
+            postcode: data.postcode,
+            country: data.country,
+            phone: data.phone,
+          },
+          billing_address: useDifferentBilling ? {
+            first_name: (data as any).billingFirstName,
+            last_name: (data as any).billingLastName,
+            address1: (data as any).billingAddress1,
+            address2: (data as any).billingAddress2 || undefined,
+            city: (data as any).billingCity,
+            state: (data as any).billingState,
+            postcode: (data as any).billingPostcode,
+            country: (data as any).billingCountry,
+          } : {
+            first_name: data.firstName,
+            last_name: data.lastName,
+            address1: data.address1,
+            address2: data.address2 || undefined,
+            city: data.city,
+            state: data.state,
+            postcode: data.postcode,
+            country: data.country,
+          },
+          clear_cart: false,
+        };
+
+        const apiBase = process.env.NEXT_PUBLIC_API_BASE_URL || process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+        const createRes = await fetch(`${apiBase}/api/v1/orders`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
+          },
+          body: JSON.stringify(orderPayload),
+        });
+
+        if (!createRes.ok) {
+          throw new Error('Failed to create order');
+        }
+        const createdOrder = await createRes.json();
+
         const response = await fetch('/api/checkout_sessions', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({ items: cartItems, shippingInfo: data }),
+          body: JSON.stringify({ items: cartItems, orderId: createdOrder.id }),
         });
 
         if (!response.ok) {
@@ -118,10 +173,59 @@ const CheckoutPage = () => {
 
         await stripe.redirectToCheckout({ sessionId });
       } else {
-        // Dummy flow: just navigate to success and create order
-        const params = new URLSearchParams();
-        params.set('order_id', 'pending');
-        window.location.href = `/orders/success?${params.toString()}`;
+        // Non-stripe flow: create order directly in backend with provided addresses/method
+        const token = getAuthToken();
+        const payload = {
+          contact_email: user?.email ?? undefined,
+          payment_method: paymentMethod,
+          remark: data.remark || undefined,
+          shipping_address: {
+            first_name: data.firstName,
+            last_name: data.lastName,
+            address1: data.address1,
+            address2: data.address2 || undefined,
+            city: data.city,
+            state: data.state,
+            postcode: data.postcode,
+            country: data.country,
+            phone: data.phone,
+          },
+          billing_address: useDifferentBilling ? {
+            first_name: (data as any).billingFirstName,
+            last_name: (data as any).billingLastName,
+            address1: (data as any).billingAddress1,
+            address2: (data as any).billingAddress2 || undefined,
+            city: (data as any).billingCity,
+            state: (data as any).billingState,
+            postcode: (data as any).billingPostcode,
+            country: (data as any).billingCountry,
+          } : {
+            first_name: data.firstName,
+            last_name: data.lastName,
+            address1: data.address1,
+            address2: data.address2 || undefined,
+            city: data.city,
+            state: data.state,
+            postcode: data.postcode,
+            country: data.country,
+          },
+        };
+
+        const apiBase = process.env.NEXT_PUBLIC_API_BASE_URL || process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+        const res = await fetch(`${apiBase}/api/v1/orders`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
+          },
+          body: JSON.stringify(payload),
+        });
+
+        if (!res.ok) {
+          throw new Error('Failed to create order');
+        }
+        const created = await res.json();
+        window.location.href = `/orders/success?order_id=${created.id}`;
       }
 
     } catch (error) {

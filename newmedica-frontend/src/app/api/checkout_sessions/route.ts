@@ -4,7 +4,7 @@ import { CartItem } from '@/types';
 
 export async function POST(request: Request) {
   try {
-    const { items } = await request.json() as { items: CartItem[] };
+    const { items, orderId } = await request.json() as { items: CartItem[]; orderId?: string };
 
     if (!items || items.length === 0) {
       return new NextResponse('No items in cart', { status: 400 });
@@ -32,7 +32,7 @@ export async function POST(request: Request) {
       payment_method_types: ['card', 'fpx'],
       line_items,
       mode: 'payment',
-      success_url: `${request.headers.get('origin')}/orders/success?session_id={CHECKOUT_SESSION_ID}`,
+      success_url: `${request.headers.get('origin')}/orders/success?session_id={CHECKOUT_SESSION_ID}${orderId ? `&order_id=${orderId}` : ''}`,
       cancel_url: `${request.headers.get('origin')}/orders/cancel`,
     });
 

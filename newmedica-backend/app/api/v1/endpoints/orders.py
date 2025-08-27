@@ -6,7 +6,12 @@ from app.core.security import get_current_user
 from app.db.session import get_session
 from app.models.user import User
 from app.controllers.order_controller import OrderController
-from app.schemas.order import OrderRead
+from app.schemas.order import OrderRead, OrderCreate
+from sqlalchemy.orm import selectinload
+from sqlmodel import select
+from app.models.order import Order
+from app.models.order import OrderItem
+from app.models.product import Product
 from fastapi import HTTPException, status
 
 router = APIRouter()
@@ -16,12 +21,45 @@ async def create_order_from_cart(
     *,
     session: AsyncSession = Depends(get_session),
     current_user: User = Depends(get_current_user),
+    payload: OrderCreate | None = None,
 ):
     """
     Create an order from the current user's cart.
     """
     order_controller = OrderController(session)
-    return await order_controller.create_order_from_cart(user_id=current_user.id)
+    # For Stripe we want to reserve and not clear the cart yet
+    clear_cart = True
+    if payload and payload.payment_method == "stripe":
+        clear_cart = False
+    order = await order_controller.create_order_from_cart(user_id=current_user.id, clear_cart=clear_cart)
+    # Persist optional fields if provided (best-effort)
+    if payload:
+        if payload.shipping_address is not None:
+            order.shipping_address = payload.shipping_address
+        if payload.billing_address is not None:
+            order.billing_address = payload.billing_address
+        # If billing address is not provided, use the shipping address
+        elif payload.shipping_address is not None:
+            order.billing_address = payload.shipping_address
+        if payload.remark is not None:
+            order.remark = payload.remark
+        if payload.payment_method is not None:
+            order.payment_method = payload.payment_method
+        await session.commit()
+    # Re-fetch with eager-loaded items for response serialization
+    result = await session.execute(
+        select(Order)
+        .where(Order.id == order.id)
+        .options(
+            selectinload(Order.items)
+            .selectinload(OrderItem.product)
+            .options(
+                selectinload(Product.category),
+                selectinload(Product.media),
+            )
+        )
+    )
+    return result.scalar_one()
 
 
 @router.get("", response_model=list[OrderRead])

@@ -6,8 +6,8 @@ class OrderController:
     def __init__(self, session: AsyncSession):
         self.order_service = OrderService(session)
 
-    async def create_order_from_cart(self, user_id: uuid.UUID):
-        return await self.order_service.create_order_from_cart(user_id)
+    async def create_order_from_cart(self, user_id: uuid.UUID, clear_cart: bool = True):
+        return await self.order_service.create_order_from_cart(user_id, clear_cart=clear_cart)
 
     async def get_orders(self, user_id: uuid.UUID):
         return await self.order_service.get_orders_by_user_id(user_id)
