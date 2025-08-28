@@ -6,6 +6,7 @@ from sqlmodel.ext.asyncio.session import AsyncSession
 from app.core.security import verify_password
 from app.models.user import User
 from app.repositories.user_repository import UserRepository
+from app.repositories.voucher_repository import VoucherRepository
 from app.schemas.user import UserCreate
 
 pwd_context = CryptContext(schemes=["argon2"], deprecated="auto")
@@ -14,6 +15,7 @@ pwd_context = CryptContext(schemes=["argon2"], deprecated="auto")
 class UserService:
     def __init__(self, db_session: AsyncSession):
         self.repo = UserRepository(db_session)
+        self.voucher_repo = VoucherRepository(db_session)
 
     def get_password_hash(self, password: str) -> str:
         return pwd_context.hash(password)
@@ -36,7 +38,19 @@ class UserService:
             "extra_fields": user_in.extra_fields,
         }
 
-        return await self.repo.create(user_data)
+        new_user = await self.repo.create(user_data)
+
+        # Auto-assign voucher for Agent or Healthcare users
+        if user_type.name in ["Agent", "Healthcare"]:
+            default_voucher = await self.voucher_repo.get_default_voucher_for_user_type(
+                user_type.id
+            )
+            if default_voucher:
+                await self.voucher_repo.assign_voucher_to_user(
+                    new_user.id, default_voucher.id
+                )
+
+        return new_user
 
     async def authenticate(self, email: str, password: str) -> Optional[User]:
         user = await self.get_user_by_email(email)

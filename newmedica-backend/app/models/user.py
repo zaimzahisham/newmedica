@@ -7,6 +7,9 @@ from sqlalchemy import DateTime
 
 if TYPE_CHECKING:
     from .address import Address
+    from .voucher import Voucher, UserVoucher
+
+from .voucher import UserVoucher
 
 class User(SQLModel, table=True):
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True, index=True)
@@ -21,3 +24,4 @@ class User(SQLModel, table=True):
     )
 
     addresses: List["Address"] = Relationship(back_populates="user")
+    vouchers: List["Voucher"] = Relationship(back_populates="users", link_model=UserVoucher)

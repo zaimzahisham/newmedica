@@ -7,15 +7,15 @@ This document provides the definitive current state of the NewMedica e-commerce 
 ## Overall Status
 
 **PHASE**: MVP Feature Implementation
-**OVERALL ADHERENCE TO GEMINI.md / Warp.md**: 75%
-**MVP READINESS**: 72%
-**IMMEDIATE PRIORITY**: Implement Automatic Voucher Assignment (Task 3.6)
+**OVERALL ADHERENCE TO GEMINI.md / Warp.md**: 78%
+**MVP READINESS**: 75%
+**IMMEDIATE PRIORITY**: Implement Order History (Frontend) (Task 3.3)
 
 All critical blockers have been resolved. The project is in a stable state to proceed with the next high-priority tasks.
 
 ---
 
-## Backend (`newmedica-backend`) - COMPLIANCE: 85%
+## Backend (`newmedica-backend`) - COMPLIANCE: 88%
 
 **ARCHITECTURE**: ✅ Follows GEMINI.md / Warp.md layered approach (api → controllers → services → repositories → models)
 **TECH STACK**: ✅ FastAPI + SQLModel + PostgreSQL + Alembic (compliant)
@@ -53,7 +53,6 @@ All critical blockers have been resolved. The project is in a stable state to pr
 ### 🟠 MEDIUM PRIORITY IMPROVEMENTS
 
 *   **Admin Endpoints**: No APIs for managing user approvals, vouchers (CRUD), or updating shipping configuration.
-*   **Voucher Lifecycle**: No automatic voucher assignment for new Agent/Healthcare users upon registration.
 *   **Validation**: `extra_fields` not validated against UserType schemas
 *   **Linting/Formatting**: ✅ Ruff, Black, mypy configured and baseline established.
 
@@ -154,8 +153,8 @@ All critical blockers have been resolved. The project is in a stable state to pr
 ## NEXT ACTIONS FOR GEMINI CLI
 
 **WHEN GEMINI STARTS**: Focus immediately on the next high-priority task:
-1.  **Task 3.6: Implement Automatic Voucher Assignment (TDD)**
-    *   **Action**: Begin implementation by creating the necessary database models and relationships for user-voucher assignments.
-    *   **Details**: This involves creating a `UserVoucher` link model in `app/models/voucher.py`, adding the corresponding relationship to the `User` model, and then generating a new database migration with Alembic.
-    *   **This is the prerequisite for the rest of Task 3.6.**
+1.  **Task 3.7: Implement Admin Management APIs (Vouchers & Shipping)**
+    *   **Action**: Begin implementation by creating the necessary CRUD endpoints for vouchers and shipping configuration.
+    *   **Details**: This involves creating the API endpoints, services, and repositories for managing vouchers and shipping settings.
+    *   **This is the prerequisite for the admin frontend.**
 

@@ -58,14 +58,22 @@ class OrderService:
                         item.snapshot_media_url = None
             line_subtotal = (item.unit_price or (product.price if product else 0.0)) * item.quantity
             item.line_subtotal = line_subtotal
-            # For now, line_total equals line_subtotal (discount aggregated at order level)
-            item.discount_amount = 0.0
-            item.line_total = line_subtotal
             subtotal += line_subtotal
+
+        total_discount = float(totals.get("discount", 0.0))
+        if subtotal > 0:
+            for item in order_items:
+                item_discount = (item.line_subtotal / subtotal) * total_discount
+                item.discount_amount = item_discount
+                item.line_total = item.line_subtotal - item_discount
+        else:
+            for item in order_items:
+                item.discount_amount = 0.0
+                item.line_total = item.line_subtotal
 
         order.subtotal_amount = subtotal
         order.shipping_amount = float(totals.get("shipping", 0.0))
-        order.discount_amount = max(0.0, subtotal + order.shipping_amount - order.total_amount)
+        order.discount_amount = total_discount
         order.currency = order.currency or "MYR"
         self.session.add(order)
         for it in order_items:

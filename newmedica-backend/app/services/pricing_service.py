@@ -71,6 +71,16 @@ class PricingService:
             # gather products linked to voucher
             result = await self.session.execute(select(VoucherProductLink).where(VoucherProductLink.voucher_id == v.id))
             links = result.scalars().all()
+            
+            # If voucher is user_type and has no specific products, it applies to the whole cart
+            if v.scope == 'user_type' and not links:
+                if subtotal >= (v.min_quantity or 0):
+                    if v.discount_type == "fixed":
+                        discount += v.amount
+                    elif v.discount_type == "percent":
+                        discount += (v.amount / 100.0) * subtotal
+                continue
+
             matched_qty = 0
             for ln in links:
                 matched_qty += product_qty.get(ln.product_id, 0)

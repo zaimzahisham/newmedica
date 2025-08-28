@@ -28,10 +28,21 @@ async def test_create_order_from_cart(
 
     order_data = response.json()
     assert "id" in order_data
-    assert order_data["total_amount"] == product.price * 2
+    assert order_data["total_amount"] == pytest.approx(product.price * 2)
+    # Assert the new detailed fields
+    assert "subtotal_amount" in order_data
+    assert "discount_amount" in order_data
+    assert "shipping_amount" in order_data
+    assert order_data["currency"] == "MYR"
+    assert order_data["subtotal_amount"] == pytest.approx(product.price * 2)
+
     assert len(order_data["items"]) == 1
-    assert order_data["items"][0]["product"]["id"] == str(product.id)
-    assert order_data["items"][0]["quantity"] == 2
+    item_data = order_data["items"][0]
+    assert item_data["product_id"] == str(product.id)
+    assert item_data["quantity"] == 2
+    # Assert the new snapshot fields
+    assert item_data["snapshot_name"] == product.name
+    assert item_data["snapshot_price"] == product.price
 
     # Verify the cart is now empty
     response = await async_client.get("/api/v1/cart/", headers=basic_user_token_headers)

@@ -425,8 +425,7 @@ This document outlines tasks to complete the MVP for NewMedica, **prioritized by
 - [ ] Invalid `extra_fields` data results in appropriate error responses.
 - [ ] All existing tests pass.
 
-### Task 3.6: Implement Automatic Voucher Assignment (TDD)
-**Status**: 🟢 **CURRENT PRIORITY**
+### Task 3.6: Implement Automatic Voucher Assignment (TDD) - ✅ COMPLETED
 **Priority**: 🟡 High - Core business logic
 **Dependencies**: None
 **Estimated Time**: 3-4 hours
