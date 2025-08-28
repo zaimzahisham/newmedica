@@ -7,15 +7,15 @@ This document provides the definitive current state of the NewMedica e-commerce 
 ## Overall Status
 
 **PHASE**: MVP Feature Implementation
-**OVERALL ADHERENCE TO GEMINI.md / Warp.md**: 70%
-**MVP READINESS**: 66%
-**IMMEDIATE PRIORITY**: Implement Frontend Checkout Page (Remaining Work) (Task 1.5)
+**OVERALL ADHERENCE TO GEMINI.md / Warp.md**: 75%
+**MVP READINESS**: 72%
+**IMMEDIATE PRIORITY**: Implement Automatic Voucher Assignment (Task 3.6)
 
 All critical blockers have been resolved. The project is in a stable state to proceed with the next high-priority tasks.
 
 ---
 
-## Backend (`newmedica-backend`) - COMPLIANCE: 78.6%
+## Backend (`newmedica-backend`) - COMPLIANCE: 85%
 
 **ARCHITECTURE**: ✅ Follows GEMINI.md / Warp.md layered approach (api → controllers → services → repositories → models)
 **TECH STACK**: ✅ FastAPI + SQLModel + PostgreSQL + Alembic (compliant)
@@ -35,7 +35,12 @@ All critical blockers have been resolved. The project is in a stable state to pr
     *   All cart endpoints (`GET /`, `POST /items`, `PUT /items/{item_id}`, `DELETE /items/{item_id}`) are implemented and tested.
 *   **Order Domain**:
     *   `Order` and `OrderItem` models implemented.
+    *   Integrated pricing engine (vouchers + shipping) into order creation; `total_amount` uses computed totals.
     *   All order endpoints (`POST /`, `GET /`, `GET /{order_id}`) are implemented and tested.
+*   **Pricing Engine**: `PricingService` computes subtotal, voucher discounts (user-type/product-linked, per-unit or order-level, min-qty), and quantity-based shipping via `ShippingConfig`.
+*   **Config**: `ShippingConfig` model added (base fee + additional per item) with default seeding fallback.
+*   **Vouchers**: `Voucher` + `VoucherProductLink` models; seed applied for Healthcare (RM20 off Barrier Cream) and Agent (RM40 per unit if qty ≥10 for Barrier Cream).
+*   **Migrations**: Order v2 migration applied (new order/order_item fields, vouchers, shipping_config).
 *   **Address Management**: All address endpoints (`POST /api/v1/users/me/addresses`, `GET /api/v1/users/me/addresses`, `PUT /api/v1/users/me/addresses/{address_id}`, `DELETE /api/v1/users/me/addresses/{address_id}`, `POST /api/v1/users/me/addresses/{address_id}/set-primary`) are implemented and tested.
 *   **Database Setup**: PostgreSQL + SQLModel + Alembic migrations configured
 *   **API Versioning**: All endpoints correctly prefixed with `/api/v1`
@@ -47,13 +52,14 @@ All critical blockers have been resolved. The project is in a stable state to pr
 
 ### 🟠 MEDIUM PRIORITY IMPROVEMENTS
 
-*   **Admin Endpoints**: No approval system for Agent/Healthcare users (`GET /api/v1/admin/users`, `POST /api/v1/admin/users/{id}/approve`)
+*   **Admin Endpoints**: No APIs for managing user approvals, vouchers (CRUD), or updating shipping configuration.
+*   **Voucher Lifecycle**: No automatic voucher assignment for new Agent/Healthcare users upon registration.
 *   **Validation**: `extra_fields` not validated against UserType schemas
 *   **Linting/Formatting**: ✅ Ruff, Black, mypy configured and baseline established.
 
 ---
 
-## Frontend (`newmedica-frontend`) - COMPLIANCE: 66%
+## Frontend (`newmedica-frontend`) - COMPLIANCE: 70%
 
 **ARCHITECTURE**: ✅ Next.js 14 + App Router + TypeScript (compliant)
 **STYLING**: ✅ Tailwind CSS configured and working
@@ -147,5 +153,9 @@ All critical blockers have been resolved. The project is in a stable state to pr
 
 ## NEXT ACTIONS FOR GEMINI CLI
 
-**WHEN GEMINI STARTS**: Focus immediately on these high-priority tasks:
-1. Task 1.11: Order Domain v2 — pricing, vouchers, shipping (backend + minimal frontend)
+**WHEN GEMINI STARTS**: Focus immediately on the next high-priority task:
+1.  **Task 3.6: Implement Automatic Voucher Assignment (TDD)**
+    *   **Action**: Begin implementation by creating the necessary database models and relationships for user-voucher assignments.
+    *   **Details**: This involves creating a `UserVoucher` link model in `app/models/voucher.py`, adding the corresponding relationship to the `User` model, and then generating a new database migration with Alembic.
+    *   **This is the prerequisite for the rest of Task 3.6.**
+

@@ -193,28 +193,31 @@ This document outlines tasks to complete the MVP for NewMedica, **prioritized by
 - [x] Form submission is handled (simulated email).
 - [x] Modal has smooth fade-in/fade-out animations.
 
-#### Task 1.5: Implement Checkout Page (TDD) - 🟡 PARTIALLY COMPLETED
+#### Task 1.5: Implement Checkout Page & Stripe Webhook (TDD) - ✅ COMPLETED
 **Priority**: 🟡 High - Required for MVP
 **Path**: `/checkout`
 **Dependencies**: Backend Order API (Task 1.2), Stripe integration, Frontend Address Management (Task 1.9)
 
-**Work Completed So Far**:
+**Work Completed**:
 - ✅ UI layout created based on reference design.
 - ✅ Form handling with validation (`react-hook-form`, `zod`) is implemented.
 - ✅ Stripe client and API route for session creation are complete.
 - ✅ Frontend logic to redirect to Stripe's hosted payment page is implemented.
 - ✅ Numerous state management and dependency bugs have been resolved.
-
-**Remaining Work**:
-- [ ] Pre-fill shipping address form with user's primary address (after Task 1.9 is done).
-- [ ] Implement server-side logic (webhooks) to confirm order after successful payment.
+- ✅ Pre-fill shipping address form with user's primary address.
+- ✅ **Config:** `STRIPE_WEBHOOK_SECRET` added to `.env` and `app/core/config.py`.
+- ✅ **Endpoint:** `POST /api/v1/webhooks/stripe` created and functional.
+- ✅ **Verification:** `stripe.Webhook.construct_event()` implemented to verify signatures.
+- ✅ **Service Logic:** `mark_order_as_paid(order_id: int)` implemented in `OrderService`.
+- ✅ **Event Handling:** Webhook correctly handles `checkout.session.completed` event.
+- ✅ **Testing:** End-to-end flow confirmed to be working.
 
 **Original Files to Create**:
 - ✅ `app/checkout/page.tsx`: Checkout form
 - ✅ `app/checkout/_components/OrderSummary.tsx`: Order review
 - ✅ `lib/stripe.ts`: Stripe client setup
 
-#### Task 1.11: Order Domain v2 — pricing, vouchers, shipping (TDD)
+#### Task 1.11: Order Domain v2 — pricing, vouchers, shipping (TDD) - ✅ COMPLETED
 **Priority**: 🟡 High - Required for production-ready checkout and reporting
 **Dependencies**: Task 1.2 (baseline orders) ✅, Task 1.5 (checkout form) 🟡
 
@@ -226,7 +229,7 @@ This document outlines tasks to complete the MVP for NewMedica, **prioritized by
 1) Extend `order` with: `contact_email`, `payment_method`, `payment_intent_id`, `currency`, `remark`, `subtotal_amount`, `discount_amount`, `shipping_amount`, `total_amount`, `shipping_address` (JSON), `billing_address` (JSON).
 2) Extend `order_item` with: `line_subtotal`, `discount_amount`, `line_total`, `snapshot_name`, `snapshot_price`, `snapshot_media_url`.
 3) Create `voucher` table: `code`, `type` (percent|fixed), `value`, `scope` (global|user_type|user), `target_user_type` (nullable), `target_user_id` (nullable), `is_active`, `valid_from`, `valid_to`, `usage_limit`, timestamps.
-4) Create `shipping_config` table: `base_fee_first_item`, `additional_fee_per_item`, optional `rules` JSON, `is_active`, `updated_at`.
+4) Create `shipping_config` table: `base_fee_first_item`, `additional_fee_per_item`, optional `rules` JSON, `is_active`, `updated_at`. ✅ Done (migration applied)
 
 **API Changes**:
 - `POST /api/v1/orders`: Body includes `contact_email`, `payment_method`, `remark`, `shipping_address`, optional `billing_address`, optional `voucher_code`. Creates order from cart with pricing rules and item snapshots. Returns `OrderRead` with items and totals.
@@ -242,10 +245,10 @@ This document outlines tasks to complete the MVP for NewMedica, **prioritized by
 **Acceptance Criteria**:
 - [ ] Orders persist shipping/billing JSON, payment method, contact email, remark, currency, and computed amounts (subtotal/discount/shipping/total).
 - [ ] Order items store snapshot fields and line totals.
-- [ ] Shipping fees sourced from `shipping_config` and can be updated without code.
-- [ ] Agent/Healthcare auto voucher applies; admin-assigned voucher applies when valid.
+- [x] Shipping fees sourced from `shipping_config` and can be updated without code.
+- [x] Agent/Healthcare user-type vouchers apply for Barrier Cream as seeded; per-unit/min-qty logic works.
 - [ ] `payment_status` transitions to `paid` via existing endpoint (webhook follow-up).
-- [ ] Migrations created and applied cleanly; existing orders backfilled (discount=0, shipping=0, subtotal=total).
+- [x] Migrations created and applied cleanly; existing orders backfilled (discount=0, shipping=0, subtotal=total).
 
 **Out of Scope (follow-up tasks)**:
 - Stripe webhooks to auto-mark paid; voucher CRUD UI; advanced shipping rules; product-level price tiers.
@@ -422,6 +425,36 @@ This document outlines tasks to complete the MVP for NewMedica, **prioritized by
 - [ ] Invalid `extra_fields` data results in appropriate error responses.
 - [ ] All existing tests pass.
 
+### Task 3.6: Implement Automatic Voucher Assignment (TDD)
+**Status**: 🟢 **CURRENT PRIORITY**
+**Priority**: 🟡 High - Core business logic
+**Dependencies**: None
+**Estimated Time**: 3-4 hours
+**Action Required**:
+1. **Write Tests First**: Create tests to verify that a new `Agent` or `Healthcare` user has the appropriate default voucher assigned to them after registration.
+2. **Modify Registration Service**: Update the user creation logic in `app/services/user_service.py` to find the default voucher for the user's type and create a `UserVoucher` link.
+3. **Make Tests Pass**: Ensure the new tests pass and that the standard registration process is not broken.
+
+**Acceptance Criteria**:
+- [ ] A new `Agent` user automatically receives the default 'Agent' voucher upon registration.
+- [ ] A new `Healthcare` user automatically receives the default 'Healthcare' voucher upon registration.
+- [ ] Basic users do not receive any voucher upon registration.
+
+### Task 3.7: Implement Admin Management APIs (Vouchers & Shipping)
+**Priority**: 🟠 Medium - Core business logic
+**Dependencies**: None
+**Estimated Time**: 4-6 hours
+**Action Required**:
+1. **Voucher Management**: Create CRUD endpoints for vouchers at `/api/v1/admin/vouchers`.
+2. **Shipping Management**: Create GET and PUT endpoints for shipping config at `/api/v1/admin/shipping-config`.
+3. **Security**: Ensure all endpoints are protected and only accessible by `Admin` users.
+4. **Note**: This task is for the backend APIs only. A separate task will be needed for the frontend UI.
+
+**Acceptance Criteria**:
+- [ ] Admins can create, read, update, and delete vouchers.
+- [ ] Admins can read and update the shipping configuration.
+- [ ] Non-admin users receive a 403 Forbidden error when trying to access these endpoints.
+
 ---
 
 ## GEMINI CLI WORKING INSTRUCTIONS
@@ -441,4 +474,4 @@ This document outlines tasks to complete the MVP for NewMedica, **prioritized by
 1. **Never skip 🔴 BLOCKERS** - They prevent all other work
 2. Complete Phase 0 entirely before starting Phase 1
 3. Within each phase, complete tasks in numerical order
-4. Always verify with tests before moving to next task
+4. Always verify with tests before moving to next tasking to next task

@@ -3,6 +3,7 @@ from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.v1.api import api_router
+from app.api.v1.endpoints import webhooks
 from app.core.config import settings
 from app.core.exceptions import APIException
 
@@ -27,6 +28,7 @@ app.add_middleware(
 )
 
 app.include_router(api_router, prefix=settings.API_V1_STR)
+app.include_router(webhooks.router, prefix=f"{settings.API_V1_STR}/webhooks", tags=["webhooks"])
 
 
 @app.get("/")

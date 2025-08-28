@@ -20,6 +20,10 @@ os.environ["PROJECT_NAME"] = "Newmedica API Test"
 os.environ["API_V1_STR"] = "/api/v1"
 os.environ["BACKEND_CORS_ORIGINS"] = "[\"http://localhost:3000\", \"http://localhost:3001\"]"
 
+os.environ["STRIPE_PUBLISHABLE_KEY"] = "pk_test_dummy"
+os.environ["STRIPE_SECRET_KEY"] = "sk_test_dummy"
+os.environ["STRIPE_WEBHOOK_SECRET"] = "whsec_test_dummy"
+
 from app.db.init_db import seed_user_types
 from app.db.session import get_session
 from app.main import app

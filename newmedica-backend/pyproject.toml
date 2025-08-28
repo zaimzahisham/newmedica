@@ -23,6 +23,7 @@ dependencies = [
     "pluggy>=1.6.0",
     "python-multipart>=0.0.20",
     "aiosqlite>=0.20.0",
+    "stripe>=9.19.0",
 ]
 
 [project.optional-dependencies]
