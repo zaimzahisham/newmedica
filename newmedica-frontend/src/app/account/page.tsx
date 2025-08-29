@@ -1,21 +1,59 @@
-
 "use client";
 
 import { useAuthStore } from '@/store/authStore';
 import { Mail, MapPin, Phone, User as UserIcon, Briefcase, Building, FileText, AtSign, Info } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react'; // Import useState
+import { getOrders } from '@/lib/api/orders'; // Import getOrders
+import { Order } from '@/types'; // Import Order
+import OrderDetailsModal from '@/components/OrderDetailsModal'; // Import OrderDetailsModal
+import { AnimatePresence } from 'framer-motion'; // New import
 
 const AccountPage = () => {
-  const { user, loading, logout } = useAuthStore();
+  const { user, loading, logout, token } = useAuthStore();
   const router = useRouter();
+
+  // Move useState declarations here
+  const [recentOrders, setRecentOrders] = useState<Order[]>([]);
+  const [ordersLoading, setOrdersLoading] = useState(true);
+  const [ordersError, setOrdersError] = useState<string | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false); // New state for modal
+  const [selectedOrder, setSelectedOrder] = useState<Order | null>(null); // New state for selected order
 
   useEffect(() => {
     if (!loading && !user) {
       router.push('/login');
+      return;
     }
-  }, [user, loading, router]);
+
+    const fetchRecentOrders = async () => {
+      if (!user || !token) return; // Ensure user and token are available
+      try {
+        setOrdersLoading(true);
+        const fetchedOrders = await getOrders();
+        // Take the first 3 orders for "Recent Orders"
+        setRecentOrders(fetchedOrders.slice(0, 2));
+      } catch (err) {
+        setOrdersError((err as Error).message);
+      } finally {
+        setOrdersLoading(false);
+      }
+    };
+
+    fetchRecentOrders();
+  }, [user, token, loading, router]);
+
+  // New functions for modal
+  const handleViewDetails = (order: Order) => {
+    setSelectedOrder(order);
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setSelectedOrder(null);
+  };
 
   if (loading || !user) {
     return <div>Loading...</div>; // or a loading spinner
@@ -63,10 +101,10 @@ const AccountPage = () => {
               <MapPin className="w-8 h-8 mb-2" />
               <span>Address Book</span>
             </Link>
-            <div className="flex flex-col items-center justify-center p-4 border rounded-lg shadow-sm">
+            <Link href="/account/orders" className="flex flex-col items-center justify-center p-4 border rounded-lg shadow-sm hover:shadow-md transition-shadow">
               <Briefcase className="w-8 h-8 mb-2" />
               <span>Order History</span>
-            </div>
+            </Link>
             <div className="flex flex-col items-center justify-center p-4 border rounded-lg shadow-sm">
               <FileText className="w-8 h-8 mb-2" />
               <span>Vouchers</span>
@@ -74,13 +112,48 @@ const AccountPage = () => {
           </div>
           <div>
             <h2 className="text-xl font-semibold mb-4">Recent Orders</h2>
-            <div className="border rounded-lg p-8 text-center">
-              <div className="flex justify-center mb-4">
-                <div className="w-16 h-16 bg-gray-200 rounded-full"></div>
+            {ordersLoading ? (
+              <div className="border rounded-lg p-8 text-center">Loading recent orders...</div>
+            ) : ordersError ? (
+              <div className="border rounded-lg p-8 text-center text-red-500">Error loading orders: {ordersError}</div>
+            ) : recentOrders.length === 0 ? (
+              <div className="text-center py-8">
+                <div className="flex justify-center mb-4">
+                  <div className="w-16 h-16 bg-gray-200 rounded-full"></div>
+                </div>
+                <p className="text-gray-500 mb-4">You haven't placed any orders recently.</p>
+                <Link href="/products" className="bg-black text-white px-4 py-2 rounded-full">Continue shopping</Link>
               </div>
-              <p className="text-gray-500 mb-4">You haven't placed any orders recently.</p>
-              <button className="bg-black text-white px-4 py-2 rounded-full">Continue shopping</button>
-            </div>
+            ) : (
+              <div className="space-y-4">
+                {recentOrders.map((order) => (
+                  <div key={order.id} className="py-4 border-b last:border-b-0">
+                    <div className="flex justify-between items-center mb-2">
+                      <h3 className="font-semibold text-lg">Order #{order.id.substring(0, 8).toUpperCase()}</h3>
+                      <span className={`px-3 py-1 rounded-full text-xs font-medium ${
+                        order.payment_status === 'paid' ? 'bg-green-100 text-green-800' :
+                        order.payment_status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
+                        'bg-gray-100 text-gray-800'
+                      }`}>
+                        {order.payment_status.charAt(0).toUpperCase() + order.payment_status.slice(1)}
+                      </span>
+                    </div>
+                    <p className="text-gray-600 text-sm mb-1">Date: {new Date(order.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
+                    <p className="font-bold text-md">Total: {order.currency} {order.total_amount.toFixed(2)}</p>
+                    <div className="mt-3 text-right">
+                      <button onClick={() => handleViewDetails(order)} className="text-blue-600 hover:underline text-sm">
+                        View Details
+                      </button>
+                    </div>
+                  </div>
+                ))}
+                <div className="text-center mt-4">
+                  <Link href="/account/orders" className="text-blue-600 hover:underline">
+                    View All Orders
+                  </Link>
+                </div>
+              </div>
+            )}
           </div>
         </div>
         <div>
@@ -119,6 +192,15 @@ const AccountPage = () => {
           </div>
         </div>
       </div>
+      <AnimatePresence>
+        {selectedOrder && (
+          <OrderDetailsModal 
+            order={selectedOrder}
+            isOpen={isModalOpen}
+            onClose={handleCloseModal}
+          />
+        )}
+      </AnimatePresence>
     </div>
   );
 };

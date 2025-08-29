@@ -1,4 +1,3 @@
-
 export interface Category {
   id: string;
   name: string;
@@ -83,4 +82,32 @@ export interface CartItemCreate {
 
 export interface CartItemUpdate {
   quantity: number;
+}
+
+export interface OrderItem {
+  id: string;
+  product_id: string;
+  quantity: number;
+  unit_price: number;
+  snapshot_name?: string;
+  snapshot_price?: number;
+  snapshot_media_url?: string;
+  line_subtotal: number;
+  discount_amount: number;
+  line_total: number;
+}
+
+export interface Order {
+  id: string;
+  payment_status: string;
+  created_at: string;
+  subtotal_amount: number;
+  discount_amount: number;
+  shipping_amount: number;
+  total_amount: number;
+  currency: string;
+  shipping_address?: any;
+  billing_address?: any;
+  remark?: string;
+  items: OrderItem[];
 }
