@@ -19,6 +19,7 @@ async def test_auto_assign_voucher_on_registration(
         session,
         code="WELCOME_HC",
         scope="user_type",
+        amount=10.0, # Added amount
         target_user_type_id=healthcare_user_type.id,
     )
 

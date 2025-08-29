@@ -31,10 +31,9 @@ class CartRead(BaseModel):
     id: uuid.UUID
     user_id: uuid.UUID
     items: List[CartItemRead] = []
-
-    @computed_field
-    @property
-    def total_price(self) -> float:
-        return sum(item.price * item.quantity for item in self.items)
+    subtotal: float = 0.0
+    discount: float = 0.0
+    shipping: float = 0.0
+    total: float = 0.0
 
     model_config = ConfigDict(from_attributes=True)

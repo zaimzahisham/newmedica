@@ -4,7 +4,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.models.user import User
 from app.models.order import Order
 from app.schemas.order import OrderCreate
-from tests.utils import create_test_user, create_test_product_and_category, add_item_to_cart
+from tests.utils import create_test_product_and_category, add_item_to_cart, register_user
+from app.models.user import User
 from sqlmodel import select
 import uuid
 
@@ -15,7 +16,14 @@ async def test_retrying_checkout_reuses_pending_order(async_client: AsyncClient,
     without completing the first, the system reuses the existing pending order instead of creating a new one.
     """
     # 1. Setup: Create a user, a product, and add it to the user's cart
-    user, headers = await create_test_user(async_client, session, "testreuse@example.com", "password123")
+    register_res = await register_user(async_client, "testreuse@example.com", "password123", "Basic")
+    login_res = await async_client.post("/api/v1/auth/login", data={"username": "testreuse@example.com", "password": "password123"})
+    token = login_res.json()["access_token"]
+    headers = {"Authorization": f"Bearer {token}"}
+
+    # Fetch the user object from the database using the email
+    result = await session.execute(select(User).where(User.email == "testreuse@example.com"))
+    user = result.scalar_one()
     product, _ = await create_test_product_and_category(session, "Reusable Product", 99.99)
     await add_item_to_cart(async_client, headers, product.id, 1)
 
@@ -47,7 +55,14 @@ async def test_create_order_with_same_billing_address_as_shipping(async_client: 
     the billing address is automatically populated from the shipping address.
     """
     # 1. Setup
-    user, headers = await create_test_user(async_client, session, "testbilling@example.com", "password123")
+    register_res = await register_user(async_client, "testbilling@example.com", "password123", "Basic")
+    login_res = await async_client.post("/api/v1/auth/login", data={"username": "testbilling@example.com", "password": "password123"})
+    token = login_res.json()["access_token"]
+    headers = {"Authorization": f"Bearer {token}"}
+
+    # Fetch the user object from the database using the email
+    result = await session.execute(select(User).where(User.email == "testbilling@example.com"))
+    user = result.scalar_one()
     product, _ = await create_test_product_and_category(session, "Billing Test Product", 10.00)
     await add_item_to_cart(async_client, headers, product.id, 1)
 

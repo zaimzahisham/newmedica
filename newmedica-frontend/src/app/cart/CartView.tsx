@@ -8,7 +8,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import Link from 'next/link';
 
 export default function CartView() {
-  const { items, total, isLoading } = useCartStore();
+  const { items, subtotal, isLoading } = useCartStore();
   const { user, loading: authLoading } = useAuthStore();
 
   if (authLoading || isLoading) {
@@ -75,7 +75,7 @@ export default function CartView() {
       <div className="flex flex-col items-end mt-6">
         <div className="text-lg font-semibold">
           <span>Subtotal</span>
-          <span className="ml-4">RM{total.toFixed(2)}</span>
+          <span className="ml-4">RM{subtotal.toFixed(2)}</span>
         </div>
         <p className="text-sm text-muted-foreground mt-2">
           Shipping, taxes, and discounts will be calculated at checkout.

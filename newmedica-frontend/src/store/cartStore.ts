@@ -5,6 +5,9 @@ import { getCart, addToCart, updateCartItemQuantity, removeCartItem } from '@/li
 interface CartState {
   cartId: string | null;
   items: ICartItem[];
+  subtotal: number;
+  discount: number;
+  shipping: number;
   total: number;
   isLoading: boolean;
   error: string | null;
@@ -15,13 +18,12 @@ interface CartState {
   clearCart: () => void;
 }
 
-const calculateTotal = (items: ICartItem[]) => {
-  return items.reduce((acc, item) => acc + item.product.price * item.quantity, 0);
-};
-
 export const useCartStore = create<CartState>((set, get) => ({
   cartId: null,
   items: [],
+  subtotal: 0,
+  discount: 0,
+  shipping: 0,
   total: 0,
   isLoading: true,
   error: null,
@@ -32,7 +34,10 @@ export const useCartStore = create<CartState>((set, get) => ({
       set({
         cartId: cart.id,
         items: cart.items,
-        total: calculateTotal(cart.items),
+        subtotal: cart.subtotal,
+        discount: cart.discount,
+        shipping: cart.shipping,
+        total: cart.total,
         isLoading: false
       });
     } catch (error) {
@@ -63,5 +68,5 @@ export const useCartStore = create<CartState>((set, get) => ({
       set({ error: (error as Error).message });
     }
   },
-  clearCart: () => set({ items: [], total: 0, cartId: null }),
+  clearCart: () => set({ items: [], subtotal: 0, discount: 0, shipping: 0, total: 0, cartId: null }),
 }));

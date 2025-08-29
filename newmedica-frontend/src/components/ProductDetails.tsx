@@ -12,6 +12,15 @@ import RequestQuotationModal from './RequestQuotationModal';
 import { AnimatePresence } from 'framer-motion';
 import { showWarningAlert } from './CustomAlert'; // Import CustomAlert
 
+interface VoucherResponse {
+  id: string;
+  code: string;
+  discount_type: string;
+  amount: number;
+  min_quantity: number;
+  per_unit: boolean;
+}
+
 interface ProductDetailsProps {
   product: Product;
 }
@@ -21,8 +30,10 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [showQuotationModal, setShowQuotationModal] = useState(false);
   const [sanitizedDescription, setSanitizedDescription] = useState('');
+  const [vouchers, setVouchers] = useState<VoucherResponse[]>([]);
+  const [vouchersLoading, setVouchersLoading] = useState(true);
 
-  const { user, loading: authLoading } = useAuthStore(); // Get user and authLoading state
+  const { user, loading: authLoading, token } = useAuthStore(); // Get user, authLoading, and token state
   const addItemToCart = useCartStore((state) => state.addItem);
   const isLoading = useCartStore((state) => state.isLoading);
 
@@ -30,7 +41,39 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
     if (typeof window !== 'undefined') {
       setSanitizedDescription(DOMPurify.sanitize(product.description));
     }
-  }, [product.description]);
+
+    const fetchVouchers = async () => {
+      console.log("Fetching vouchers for:", { productId: product?.id, userId: user?.id, token: token ? "present" : "absent" });
+      if (!product?.id || !user?.id || !token) {
+        setVouchers([]);
+        setVouchersLoading(false);
+        return;
+      }
+
+      setVouchersLoading(true);
+      try {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/products/${product.id}/vouchers`, {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+          },
+        });
+        if (response.ok) {
+          const data: VoucherResponse[] = await response.json();
+          setVouchers(data);
+        } else {
+          console.error('Failed to fetch vouchers', response.statusText);
+          setVouchers([]);
+        }
+      } catch (error) {
+        console.error('Error fetching vouchers:', error);
+        setVouchers([]);
+      } finally {
+        setVouchersLoading(false);
+      }
+    };
+
+    fetchVouchers();
+  }, [product.id, user?.id, token, product.description]);
 
   const handleAddToCart = async () => {
     if (authLoading) return; // Do nothing if auth state is still loading
@@ -50,6 +93,28 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
   };
 
   const isSpecialUser = user && (user.userType === 'Agent' || user.userType === 'Healthcare');
+
+  const getVoucherDetails = (voucher: VoucherResponse): string => {
+    let discountDescription = '';
+
+    if (voucher.discount_type === 'fixed') {
+      discountDescription = `RM${voucher.amount.toFixed(2)} OFF`; // Uppercase OFF
+      if (voucher.per_unit) {
+        discountDescription += ` PER UNIT`; // Uppercase PER UNIT
+      }
+    } else if (voucher.discount_type === 'percent') {
+      discountDescription = `${voucher.amount}% OFF`; // Uppercase OFF
+    }
+
+    if (voucher.min_quantity > 0 && !voucher.per_unit) {
+      if (voucher.min_quantity === 1) {
+        discountDescription += ` PER QTY`; // Specific for quantity 1
+      } else {
+        discountDescription += ` FOR QTY >= ${voucher.min_quantity}`; // For other quantities
+      }
+    }
+    return discountDescription;
+  };
 
   return (
     <>
@@ -88,10 +153,22 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
           </div>
         </div>
 
-        {isSpecialUser && (
+        {(isSpecialUser || (vouchers.length > 0 && !vouchersLoading)) && (
           <div className="p-4 bg-secondary/50 rounded-lg">
-            <h3 className="font-semibold mb-2">Promotions</h3>
-            <p className="text-sm text-muted-foreground">{user.userType.toUpperCase()} PRICE</p>
+            <h3 className="font-semibold mb-2">Promotions For You, Our {user?.userType == "Healthcare" ? user.userType + " Professionals" : "Agents"}</h3>
+            {vouchersLoading ? (
+              <p className="text-sm text-muted-foreground">Loading promotions...</p>
+            ) : vouchers.length > 0 ? (
+              <ul className="list-disc list-inside text-sm text-muted-foreground">
+                {vouchers.map((voucher) => (
+                  <li key={voucher.id}>
+                    <span className="font-medium">{getVoucherDetails(voucher)}</span>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="text-sm text-muted-foreground">No special promotions available.</p>
+            )}
           </div>
         )}
 

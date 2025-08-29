@@ -70,7 +70,10 @@ export interface Cart {
   id: string;
   user_id: string;
   items: CartItem[];
-  total_price: number;
+  subtotal: number;
+  discount: number;
+  shipping: number;
+  total: number;
 }
 
 export interface CartItemCreate {

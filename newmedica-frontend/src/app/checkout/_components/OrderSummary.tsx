@@ -3,7 +3,7 @@
 import { useCartStore } from '@/store/cartStore';
 
 const OrderSummary = () => {
-  const { items, total, isLoading } = useCartStore();
+  const { items, subtotal, discount, shipping, total, isLoading } = useCartStore();
 
   if (isLoading) {
     return <div>Loading...</div>;
@@ -43,11 +43,17 @@ const OrderSummary = () => {
       <div className="space-y-2">
         <div className="flex justify-between">
           <p>Subtotal</p>
-          <p>RM{total.toFixed(2)}</p>
+          <p>RM{subtotal.toFixed(2)}</p>
         </div>
+        {discount > 0 && (
+          <div className="flex justify-between text-red-600">
+            <p>Discount</p>
+            <p>-RM{discount.toFixed(2)}</p>
+          </div>
+        )}
         <div className="flex justify-between">
           <p>Shipping</p>
-          <p className="text-sm text-gray-500">Calculated at next step</p>
+          <p>RM{shipping.toFixed(2)}</p>
         </div>
       </div>
       <div className="border-t my-4"></div>
