@@ -48,7 +48,7 @@ class OrderRepository:
             select(Order).where(Order.user_id == user_id).options(
                 selectinload(Order.items).selectinload(OrderItem.product).selectinload(Product.category),
                 selectinload(Order.items).selectinload(OrderItem.product).selectinload(Product.media)
-            )
+            ).order_by(Order.created_at.desc())
         )
         return result.scalars().all()
 

@@ -9,7 +9,7 @@ This document provides the definitive current state of the NewMedica e-commerce 
 **PHASE**: MVP Feature Implementation
 **OVERALL ADHERENCE TO GEMINI.md / Warp.md**: 80%
 **MVP READINESS**: 78%
-**IMMEDIATE PRIORITY**: Implement Order History (Frontend) (Task 3.3)
+**IMMEDIATE PRIORITY**: Implement Admin Management APIs (Vouchers & Shipping) (Task 3.7)
 
 All critical blockers have been resolved. The project is in a stable state to proceed with the next high-priority tasks.
 
@@ -58,7 +58,7 @@ All critical blockers have been resolved. The project is in a stable state to pr
 
 ---
 
-## Frontend (`newmedica-frontend`) - COMPLIANCE: 75%
+## Frontend (`newmedica-frontend`) - COMPLIANCE: 78%
 
 **ARCHITECTURE**: ✅ Next.js 14 + App Router + TypeScript (compliant)
 **STYLING**: ✅ Tailwind CSS configured and working
@@ -95,6 +95,7 @@ All critical blockers have been resolved. The project is in a stable state to pr
 - ✅ `/account/address` (Address management: list/add/edit/delete/set-primary with animations and alerts)
 - ✅ `/cart` (Shopping cart is now fully functional)
 - ✅ `/checkout` (Prefill from primary; “Use saved address” with “New address”; Payment method section; Stripe redirect working; success/cancel pages). **Now displays detailed order summary (subtotal, discount, shipping, total).**
+- ✅ `/orders` - Order history page
 
 **COMPONENTS IMPLEMENTED**:
 - Navigation: `Navbar` (with dynamic cart count), `Footer`, `ThemeToggleButton`
@@ -106,7 +107,6 @@ All critical blockers have been resolved. The project is in a stable state to pr
 ### 🟡 HIGH PRIORITY GAPS (Required for MVP)
 
 1.  **MISSING CORE MVP PAGES**:
-    *   ❌ `/orders` - Order history page
     *   ❌ `/admin` - Admin user management
 2.  **INCOMPLETE FUNCTIONALITY**:
     *   `/checkout` - Pre-fill shipping address form with user's primary address (after Task 1.9 is done).

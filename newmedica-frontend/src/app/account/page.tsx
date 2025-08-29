@@ -33,7 +33,7 @@ const AccountPage = () => {
         setOrdersLoading(true);
         const fetchedOrders = await getOrders();
         // Take the first 3 orders for "Recent Orders"
-        setRecentOrders(fetchedOrders.slice(0, 2));
+        setRecentOrders(fetchedOrders.slice(0, 3));
       } catch (err) {
         setOrdersError((err as Error).message);
       } finally {

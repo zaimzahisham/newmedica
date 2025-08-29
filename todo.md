@@ -397,7 +397,7 @@ This document outlines tasks to complete the MVP for NewMedica, **prioritized by
 - [ ] Changes are successfully persisted to the backend.
 - [ ] Form displays appropriate success/error messages.
 
-### Task 3.3: Order History (Frontend)
+### Task 3.3: Order History (Frontend) - ✅ COMPLETED
 **Priority**: 🔵 Low - User-facing feature
 **Dependencies**: Backend Order API (Task 1.2) - ✅ COMPLETED
 **Path**: `/orders`
@@ -408,9 +408,9 @@ This document outlines tasks to complete the MVP for NewMedica, **prioritized by
 3. Display order details (e.g., order ID, total amount, payment status, items).
 
 **Acceptance Criteria**:
-- [ ] User can view a list of their past orders on the `/orders` page.
-- [ ] Each order displays relevant details.
-- [ ] Navigation to individual order details is possible (if applicable).
+- [x] User can view a list of their past orders on the `/orders` page.
+- [x] Each order displays relevant details.
+- [x] Navigation to individual order details is possible (if applicable).
 
 ### Task 3.5: Implement Backend `extra_fields` Validation (TDD)
 **Priority**: 🔵 Low - Data integrity
