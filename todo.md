@@ -243,12 +243,14 @@ This document outlines tasks to complete the MVP for NewMedica, **prioritized by
 - Checkout submit should include payment method, shipping/billing addresses, contact email, remark, optional voucher code; use server totals for display after order creation. Stripe flow may create order pre-redirect, then mark-paid on success (current helper) — webhook later.
 
 **Acceptance Criteria**:
-- [ ] Orders persist shipping/billing JSON, payment method, contact email, remark, currency, and computed amounts (subtotal/discount/shipping/total).
+- [x] Orders persist shipping/billing JSON, payment method, contact email, remark, currency, and computed amounts (subtotal/discount/shipping/total).
 - [ ] Order items store snapshot fields and line totals.
 - [x] Shipping fees sourced from `shipping_config` and can be updated without code.
 - [x] Agent/Healthcare user-type vouchers apply for Barrier Cream as seeded; per-unit/min-qty logic works.
 - [ ] `payment_status` transitions to `paid` via existing endpoint (webhook follow-up).
 - [x] Migrations created and applied cleanly; existing orders backfilled (discount=0, shipping=0, subtotal=total).
+- [x] Frontend: Product details page displays applicable vouchers in "Promotions" section.
+- [x] Frontend: Order summary displays subtotal, discount, shipping, and total.
 
 **Out of Scope (follow-up tasks)**:
 - Stripe webhooks to auto-mark paid; voucher CRUD UI; advanced shipping rules; product-level price tiers.

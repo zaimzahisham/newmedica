@@ -7,15 +7,15 @@ This document provides the definitive current state of the NewMedica e-commerce 
 ## Overall Status
 
 **PHASE**: MVP Feature Implementation
-**OVERALL ADHERENCE TO GEMINI.md / Warp.md**: 78%
-**MVP READINESS**: 75%
+**OVERALL ADHERENCE TO GEMINI.md / Warp.md**: 80%
+**MVP READINESS**: 78%
 **IMMEDIATE PRIORITY**: Implement Order History (Frontend) (Task 3.3)
 
 All critical blockers have been resolved. The project is in a stable state to proceed with the next high-priority tasks.
 
 ---
 
-## Backend (`newmedica-backend`) - COMPLIANCE: 88%
+## Backend (`newmedica-backend`) - COMPLIANCE: 90%
 
 **ARCHITECTURE**: ✅ Follows GEMINI.md / Warp.md layered approach (api → controllers → services → repositories → models)
 **TECH STACK**: ✅ FastAPI + SQLModel + PostgreSQL + Alembic (compliant)
@@ -31,11 +31,11 @@ All critical blockers have been resolved. The project is in a stable state to pr
     *   Current user endpoint (`/api/v1/users/me`)
 *   **Product Domain**: Complete CRUD operations, category filtering, search functionality, media management
 *   **Cart Domain**:
-    *   `Cart` and `CartItem` models implemented with dynamic price calculation.
+    *   `Cart` and `CartItem` models implemented with dynamic price calculation. **Now includes subtotal, discount, shipping, and total in `CartRead` schema.**
     *   All cart endpoints (`GET /`, `POST /items`, `PUT /items/{item_id}`, `DELETE /items/{item_id}`) are implemented and tested.
 *   **Order Domain**:
     *   `Order` and `OrderItem` models implemented.
-    *   Integrated pricing engine (vouchers + shipping) into order creation; `total_amount` uses computed totals.
+    *   Integrated pricing engine (vouchers + shipping) into order creation; `total_amount` uses computed totals. **`CartRead` now returns these computed totals.**
     *   All order endpoints (`POST /`, `GET /`, `GET /{order_id}`) are implemented and tested.
 *   **Pricing Engine**: `PricingService` computes subtotal, voucher discounts (user-type/product-linked, per-unit or order-level, min-qty), and quantity-based shipping via `ShippingConfig`.
 *   **Config**: `ShippingConfig` model added (base fee + additional per item) with default seeding fallback.
@@ -58,7 +58,7 @@ All critical blockers have been resolved. The project is in a stable state to pr
 
 ---
 
-## Frontend (`newmedica-frontend`) - COMPLIANCE: 70%
+## Frontend (`newmedica-frontend`) - COMPLIANCE: 75%
 
 **ARCHITECTURE**: ✅ Next.js 14 + App Router + TypeScript (compliant)
 **STYLING**: ✅ Tailwind CSS configured and working
@@ -70,7 +70,7 @@ All critical blockers have been resolved. The project is in a stable state to pr
 *   **State Management**: Migrated authentication and cart state to Zustand, resolving inconsistencies in the account page, cart view, and product details components.
 *   **Cart Functionality**: The entire cart flow has been refactored and is now fully functional. State is managed globally with Zustand and synchronized with the backend.
 *   **UI Refinements**: Replaced standard browser alerts with a consistent, custom alert system for better user experience.
-*   **Product Detail Page**: Fixed a runtime error (`params should be awaited`) that occurred when navigating to the product detail page (`/products/[id]`).
+*   **Product Detail Page**: Fixed a runtime error (`params should be awaited`) that occurred when navigating to the product detail page (`/products/[id]`). **Now also displays applicable vouchers in the "Promotions" section.**
 
 ### ✅ COMPLIANT Features (Working as per GEMINI.md / Warp.md)
 
@@ -94,7 +94,7 @@ All critical blockers have been resolved. The project is in a stable state to pr
 - ✅ `/account/details` (Profile viewing)
 - ✅ `/account/address` (Address management: list/add/edit/delete/set-primary with animations and alerts)
 - ✅ `/cart` (Shopping cart is now fully functional)
-- ✅ `/checkout` (Prefill from primary; “Use saved address” with “New address”; Payment method section; Stripe redirect working; success/cancel pages)
+- ✅ `/checkout` (Prefill from primary; “Use saved address” with “New address”; Payment method section; Stripe redirect working; success/cancel pages). **Now displays detailed order summary (subtotal, discount, shipping, total).**
 
 **COMPONENTS IMPLEMENTED**:
 - Navigation: `Navbar` (with dynamic cart count), `Footer`, `ThemeToggleButton`
