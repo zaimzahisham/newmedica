@@ -11,3 +11,10 @@ export const getAuthToken = (): string | null => {
   }
   return localStorage.getItem('token');
 };
+
+export function formatVoucherCode(code: string | null | undefined): string | null {
+  if (!code) {
+    return null;
+  }
+  return code.replace(/_/g, ' ');
+}

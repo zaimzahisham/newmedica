@@ -73,6 +73,7 @@ export interface Cart {
   discount: number;
   shipping: number;
   total: number;
+  applied_voucher_code?: string | null;
 }
 
 export interface CartItemCreate {
@@ -109,5 +110,6 @@ export interface Order {
   shipping_address?: any;
   billing_address?: any;
   remark?: string;
+  applied_voucher_code?: string | null;
   items: OrderItem[];
 }

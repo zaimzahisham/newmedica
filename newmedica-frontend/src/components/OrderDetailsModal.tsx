@@ -4,6 +4,7 @@ import React from 'react';
 import { Order, OrderItem } from '@/types';
 import { X } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { formatVoucherCode } from '@/lib/utils';
 
 interface OrderDetailsModalProps {
   order: Order;
@@ -83,10 +84,12 @@ const OrderDetailsModal: React.FC<OrderDetailsModalProps> = ({ order, isOpen, on
               <span>Subtotal:</span>
               <span>{order.currency} {order.subtotal_amount.toFixed(2)}</span>
             </div>
-            <div className="flex justify-between">
-              <span>Discount:</span>
-              <span>- {order.currency} {order.discount_amount.toFixed(2)}</span>
-            </div>
+            {order.discount_amount > 0 && (
+              <div className="flex justify-between">
+                <span>Discount {order.applied_voucher_code && `(${formatVoucherCode(order.applied_voucher_code)})`}:</span>
+                <span>- {order.currency} {order.discount_amount.toFixed(2)}</span>
+              </div>
+            )}
             <div className="flex justify-between">
               <span>Shipping:</span>
               <span>{order.currency} {order.shipping_amount.toFixed(2)}</span>

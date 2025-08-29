@@ -35,5 +35,6 @@ class CartRead(BaseModel):
     discount: float = 0.0
     shipping: float = 0.0
     total: float = 0.0
+    applied_voucher_code: str | None = None
 
     model_config = ConfigDict(from_attributes=True)

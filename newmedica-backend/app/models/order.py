@@ -23,6 +23,7 @@ class Order(SQLModel, table=True):
     shipping_address: dict | None = Field(default=None, sa_column=Column(JSON))
     billing_address: dict | None = Field(default=None, sa_column=Column(JSON))
     remark: str | None = None
+    applied_voucher_code: str | None = Field(default=None)
     created_at: datetime = Field(sa_column=SAColumn(DateTime(timezone=True), nullable=False), default_factory=lambda: datetime.now(timezone.utc))
     updated_at: datetime = Field(
         default_factory=lambda: datetime.now(timezone.utc),

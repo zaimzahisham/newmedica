@@ -9,6 +9,7 @@ interface CartState {
   discount: number;
   shipping: number;
   total: number;
+  applied_voucher_code: string | null;
   isLoading: boolean;
   error: string | null;
   fetchCart: () => Promise<void>;
@@ -25,6 +26,7 @@ export const useCartStore = create<CartState>((set, get) => ({
   discount: 0,
   shipping: 0,
   total: 0,
+  applied_voucher_code: null,
   isLoading: true,
   error: null,
   fetchCart: async () => {
@@ -38,6 +40,7 @@ export const useCartStore = create<CartState>((set, get) => ({
         discount: cart.discount,
         shipping: cart.shipping,
         total: cart.total,
+        applied_voucher_code: cart.applied_voucher_code,
         isLoading: false
       });
     } catch (error) {
@@ -70,3 +73,4 @@ export const useCartStore = create<CartState>((set, get) => ({
   },
   clearCart: () => set({ items: [], subtotal: 0, discount: 0, shipping: 0, total: 0, cartId: null }),
 }));
+

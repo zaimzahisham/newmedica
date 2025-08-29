@@ -48,11 +48,11 @@ class PricingService:
         # Load user, cart, vouchers, shipping config
         user = await self.session.get(User, user_id)
         if not user:
-            return {"subtotal": 0.0, "discount": 0.0, "shipping": 0.0, "total": 0.0}
+            return {"subtotal": 0.0, "discount": 0.0, "shipping": 0.0, "total": 0.0, "applied_voucher_code": None}
 
         items = await self._get_cart_items(user_id)
         if not items:
-            return {"subtotal": 0.0, "discount": 0.0, "shipping": 0.0, "total": 0.0}
+            return {"subtotal": 0.0, "discount": 0.0, "shipping": 0.0, "total": 0.0, "applied_voucher_code": None}
 
         subtotal = 0.0
         product_qty: Dict[uuid.UUID, int] = {}
@@ -66,6 +66,7 @@ class PricingService:
 
         # vouchers
         discount = 0.0
+        applied_voucher_code = None
         applicable = await self._get_applicable_vouchers(user)
         for v in applicable:
             # gather products linked to voucher
@@ -77,8 +78,10 @@ class PricingService:
                 if subtotal >= (v.min_quantity or 0):
                     if v.discount_type == "fixed":
                         discount += v.amount
+                        applied_voucher_code = v.code
                     elif v.discount_type == "percent":
                         discount += (v.amount / 100.0) * subtotal
+                        applied_voucher_code = v.code
                 continue
 
             matched_qty = 0
@@ -91,12 +94,15 @@ class PricingService:
             if v.discount_type == "fixed":
                 if v.per_unit:
                     discount += v.amount * matched_qty
+                    applied_voucher_code = v.code
                 else:
                     discount += v.amount
+                    applied_voucher_code = v.code
             elif v.discount_type == "percent":
                 # percent applies on subtotal of matched items; approximate by subtotal proportionally
                 # For simplicity now, apply percent on overall subtotal; can refine later
                 discount += (v.amount / 100.0) * subtotal
+                applied_voucher_code = v.code
 
         # shipping
         cfg = await self._get_active_shipping_config()
@@ -107,6 +113,6 @@ class PricingService:
             shipping = cfg.base_fee_first_item + max(0, total_qty - 1) * cfg.additional_fee_per_item
 
         total = max(0.0, subtotal - discount + shipping)
-        return {"subtotal": subtotal, "discount": discount, "shipping": shipping, "total": total}
+        return {"subtotal": subtotal, "discount": discount, "shipping": shipping, "total": total, "applied_voucher_code": applied_voucher_code}
 
 

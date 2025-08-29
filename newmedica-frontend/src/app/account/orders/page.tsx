@@ -8,6 +8,7 @@ import { ArrowLeft, Briefcase } from 'lucide-react';
 import OrderDetailsModal from '@/components/OrderDetailsModal';
 import { AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
+import { formatVoucherCode } from '@/lib/utils';
 
 const OrdersPage = () => {
   const { user, token } = useAuthStore();
@@ -121,6 +122,9 @@ const OrdersPage = () => {
                   <div>
                     <h2 className="text-xl font-semibold">Order #{order.id.toUpperCase()}</h2>
                     <p className="text-gray-600 text-sm">{new Date(order.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
+                    {order.applied_voucher_code && (
+                      <p className="text-gray-600 text-sm">Voucher: {formatVoucherCode(order.applied_voucher_code)}</p>
+                    )}
                   </div>
                   <span className={`px-3 py-1 rounded-full text-xs font-medium ${
                     order.payment_status === 'paid' ? 'bg-green-100 text-green-800' :

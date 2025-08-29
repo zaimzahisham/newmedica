@@ -26,11 +26,28 @@ if (stripePublishableKey) {
 const CheckoutPage = () => {
   const router = useRouter(); // Initialize useRouter
   const { user } = useAuthStore();
-  const { items: cartItems } = useCartStore();
+  const { items: cartItems, subtotal, discount, shipping, total, applied_voucher_code } = useCartStore();
   const [isLoading, setIsLoading] = useState(false);
   const [useDifferentBilling, setUseDifferentBilling] = useState(false);
   const [addresses, setAddresses] = useState<AddressDto[] | null>(null);
   const [selectedAddressId, setSelectedAddressId] = useState<string | null>(null);
+  const [orderSummaryData, setOrderSummaryData] = useState<{
+    subtotal: number;
+    discount: number;
+    shipping: number;
+    total: number;
+    applied_voucher_code: string | null;
+  } | null>(null);
+
+  useEffect(() => {
+    setOrderSummaryData({
+      subtotal: subtotal,
+      discount: discount,
+      shipping: shipping,
+      total: total,
+      applied_voucher_code: applied_voucher_code,
+    });
+  }, [subtotal, discount, shipping, total, applied_voucher_code]);
 
   const {
     register,
@@ -155,6 +172,13 @@ const CheckoutPage = () => {
           throw new Error('Failed to create order');
         }
         const createdOrder = await createRes.json();
+        setOrderSummaryData({
+          subtotal: createdOrder.subtotal_amount,
+          discount: createdOrder.discount_amount,
+          shipping: createdOrder.shipping_amount,
+          total: createdOrder.total_amount,
+          applied_voucher_code: createdOrder.applied_voucher_code,
+        });
 
         const response = await fetch('/api/checkout_sessions', {
           method: 'POST',
@@ -229,6 +253,13 @@ const CheckoutPage = () => {
           throw new Error('Failed to create order');
         }
         const created = await res.json();
+        setOrderSummaryData({
+          subtotal: created.subtotal_amount,
+          discount: created.discount_amount,
+          shipping: created.shipping_amount,
+          total: created.total_amount,
+          applied_voucher_code: created.applied_voucher_code,
+        });
         window.location.href = `/orders/success?order_id=${created.id}`;
       }
 
@@ -320,25 +351,25 @@ const CheckoutPage = () => {
                         {errors.address1 && <p className="text-red-500 text-xs mt-1">{errors.address1.message}</p>}
                     </div>
                     <div>
-                        <input type="text" placeholder="Address line 2 (optional)" {...register('address2')} className={inputClasses(!!errors.address2)} />
+                        <input type="text" placeholder="Address line 2 (optional)" {...register('address2')} className={inputClasses(false)} />
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <div>
-                            <input type="text" placeholder="City" {...register('city')} className={inputClasses(!!errors.city)} />
+                            <input type="text" placeholder="City" {...register('city')} className={inputClasses(false)} />
                             {errors.city && <p className="text-red-500 text-xs mt-1">{errors.city.message}</p>}
                         </div>
                         <div>
-                            <input type="text" placeholder="State" {...register('state')} className={inputClasses(!!errors.state)} />
+                            <input type="text" placeholder="State" {...register('state')} className={inputClasses(false)} />
                             {errors.state && <p className="text-red-500 text-xs mt-1">{errors.state.message}</p>}
                         </div>
                         <div>
-                            <input type="text" placeholder="Postcode" {...register('postcode')} className={inputClasses(!!errors.postcode)} />
+                            <input type="text" placeholder="Postcode" {...register('postcode')} className={inputClasses(false)} />
                             {errors.postcode && <p className="text-red-500 text-xs mt-1">{errors.postcode.message}</p>}
                         </div>
                     </div>
                     <div>
-                        <input type="text" placeholder="Country" {...register('country')} className={inputClasses(!!errors.country)} />
+                        <input type="text" placeholder="Country" {...register('country')} className={inputClasses(false)} />
                         {errors.country && <p className="text-red-500 text-xs mt-1">{errors.country.message}</p>}
                     </div>
 
@@ -435,7 +466,7 @@ const CheckoutPage = () => {
 
                 {/* Right Column: Order Summary */}
                 <div>
-                <OrderSummary />
+                <OrderSummary orderSummaryData={orderSummaryData} />
                 </div>
             </div>
         </form>

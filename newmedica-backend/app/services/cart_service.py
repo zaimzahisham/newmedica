@@ -2,13 +2,24 @@ from uuid import UUID
 from sqlmodel.ext.asyncio.session import AsyncSession
 from app.repositories.cart_repository import CartRepository
 from app.schemas.cart import CartItemCreate
+from app.services.pricing_service import PricingService
 
 class CartService:
     def __init__(self, session: AsyncSession):
+        self.session = session
         self.repository = CartRepository(session)
 
     async def get_cart_by_user_id(self, user_id: UUID):
-        return await self.repository.get_cart_by_user_id(user_id)
+        cart = await self.repository.get_cart_by_user_id(user_id)
+        if cart:
+            pricing_service = PricingService(self.session)
+            totals = await pricing_service.compute_totals(user_id)
+            cart.subtotal = totals["subtotal"]
+            cart.discount = totals["discount"]
+            cart.shipping = totals["shipping"]
+            cart.total = totals["total"]
+            cart.applied_voucher_code = totals["applied_voucher_code"]
+        return cart
 
     async def get_or_create_cart_by_user_id(self, user_id: UUID):
         return await self.repository.get_or_create_cart_by_user_id(user_id)

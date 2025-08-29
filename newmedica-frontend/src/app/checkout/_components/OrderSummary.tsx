@@ -1,12 +1,34 @@
 'use client';
 
+import { formatVoucherCode } from '@/lib/utils';
 import { useCartStore } from '@/store/cartStore';
 
-const OrderSummary = () => {
-  const { items, subtotal, discount, shipping, total, isLoading } = useCartStore();
+interface OrderSummaryProps {
+  orderSummaryData: {
+    subtotal: number;
+    discount: number;
+    shipping: number;
+    total: number;
+    applied_voucher_code: string | null;
+  } | null;
+}
 
-  if (isLoading) {
-    return <div>Loading...</div>;
+const OrderSummary = ({ orderSummaryData }: OrderSummaryProps) => {
+  const { items, isLoading } = useCartStore();
+
+  const subtotal = orderSummaryData?.subtotal ?? 0;
+  const discount = orderSummaryData?.discount ?? 0;
+  const shipping = orderSummaryData?.shipping ?? 0;
+  const total = orderSummaryData?.total ?? 0;
+  const appliedVoucherCode = orderSummaryData?.applied_voucher_code ?? null;
+
+  if (!orderSummaryData) {
+    return (
+        <div className="bg-gray-50 p-6 rounded-lg">
+            <h2 className="text-lg font-semibold mb-4">Order Summary</h2>
+            <p>Loading order summary...</p>
+        </div>
+    );
   }
 
   if (items.length === 0) {
@@ -47,7 +69,7 @@ const OrderSummary = () => {
         </div>
         {discount > 0 && (
           <div className="flex justify-between text-red-600">
-            <p>Discount</p>
+            <p>Discount {appliedVoucherCode && `(${formatVoucherCode(appliedVoucherCode)})`}</p>
             <p>-RM{discount.toFixed(2)}</p>
           </div>
         )}

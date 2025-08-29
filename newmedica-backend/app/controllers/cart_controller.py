@@ -32,6 +32,7 @@ class CartController:
             discount=totals["discount"],
             shipping=totals["shipping"],
             total=totals["total"],
+            applied_voucher_code=totals["applied_voucher_code"],
         )
         return cart_read
 

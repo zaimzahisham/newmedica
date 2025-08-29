@@ -31,6 +31,7 @@ class OrderRead(BaseModel):
     shipping_address: dict | None
     billing_address: dict | None
     remark: str | None
+    applied_voucher_code: str | None
     items: List[OrderItemRead]
 
     model_config = ConfigDict(from_attributes=True)

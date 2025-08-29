@@ -34,6 +34,7 @@ class OrderService:
 
         # Overwrite total_amount with computed total (backward compatible)
         order.total_amount = float(totals.get("total", order.total_amount))
+        order.applied_voucher_code = totals.get("applied_voucher_code") # Assign applied voucher code
         self.session.add(order)
         await self.session.commit()
         await self.session.refresh(order)
