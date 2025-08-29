@@ -2,7 +2,7 @@ import uuid
 from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlmodel import select
-from app.models import User, Product, Category, UserType, Voucher
+from app.models import User, Product, Category, UserType, Voucher, VoucherScope, DiscountType
 from typing import Optional
 from app.services.user_service import pwd_context # Import the password context
 
@@ -45,9 +45,9 @@ async def create_test_user_type(session: AsyncSession, name: str) -> UserType:
 async def create_test_voucher(
     session: AsyncSession, 
     code: str, 
-    scope: str, 
+    scope: VoucherScope, 
     amount: float,
-    discount_type: str = "fixed", 
+    discount_type: DiscountType = DiscountType.FIXED, 
     target_user_type_id: Optional[uuid.UUID] = None, 
     target_user_id: Optional[uuid.UUID] = None,
     min_quantity: int = 0, 

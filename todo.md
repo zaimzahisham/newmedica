@@ -441,7 +441,7 @@ This document outlines tasks to complete the MVP for NewMedica, **prioritized by
 - [ ] A new `Healthcare` user automatically receives the default 'Healthcare' voucher upon registration.
 - [ ] Basic users do not receive any voucher upon registration.
 
-### Task 3.7: Implement Admin Management APIs (Vouchers & Shipping)
+### Task 3.7: Implement Admin Management APIs (Vouchers & Shipping) - ✅ COMPLETED
 **Priority**: 🟠 Medium - Core business logic
 **Dependencies**: None
 **Estimated Time**: 4-6 hours

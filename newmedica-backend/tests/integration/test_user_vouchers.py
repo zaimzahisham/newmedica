@@ -2,7 +2,7 @@
 from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession
 import pytest
-from app.models import User, Voucher, UserVoucher
+from app.models import User, Voucher, UserVoucher, VoucherScope
 from tests.utils import create_test_user, create_test_voucher, create_test_user_type
 
 @pytest.mark.asyncio
@@ -15,7 +15,7 @@ async def test_get_my_vouchers_authenticated(async_client: AsyncClient, session:
     user = await create_test_user(session, email="voucheruser@example.com", user_type_id=user_type.id)
     
     # 3. Create a voucher
-    voucher = await create_test_voucher(session, code="GETMYVOUCHER", scope="user", amount=10.0)
+    voucher = await create_test_voucher(session, code="GETMYVOUCHER", scope=VoucherScope.USER, amount=10.0)
 
     # 4. Assign the voucher to the user
     user_voucher = UserVoucher(user_id=user.id, voucher_id=voucher.id)

@@ -11,6 +11,7 @@ from sqlmodel.ext.asyncio.session import AsyncSession
 from app.core.config import settings
 from app.db.session import get_session
 from app.models.user import User
+from app.models.user_type import UserType
 from app.schemas.token import TokenData
 
 pwd_context = CryptContext(schemes=["argon2"], deprecated="auto")
@@ -76,3 +77,23 @@ async def get_current_user(
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
     return user  # type: ignore
+
+
+async def get_current_admin_user(
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_session),
+) -> User:
+    """
+    Get current user and check if they are an admin.
+    """
+    user_type_result = await db.execute(
+        select(UserType).where(UserType.id == current_user.user_type_id)
+    )
+    user_type = user_type_result.scalar_one_or_none()
+
+    if not user_type or user_type.name != "Admin":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="User does not have admin privileges",
+        )
+    return current_user

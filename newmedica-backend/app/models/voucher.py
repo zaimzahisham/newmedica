@@ -1,4 +1,5 @@
 import uuid
+import enum
 from datetime import datetime, timezone
 from typing import TYPE_CHECKING, List, Optional
 
@@ -32,6 +33,16 @@ class VoucherProductLink(SQLModel, table=True):
     voucher_id: uuid.UUID = Field(foreign_key="voucher.id", primary_key=True)
     product_id: uuid.UUID = Field(foreign_key="product.id", primary_key=True)
 
+class VoucherScope(str, enum.Enum):
+    GLOBAL = "global"
+    USER_TYPE = "user_type"
+    USER = "user"
+    PRODUCT_LIST = "product_list"
+
+class DiscountType(str, enum.Enum):
+    FIXED = "fixed"
+    PERCENT = "percent"
+
 class Voucher(SQLModel, table=True):
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True, index=True)
     code: str = Field(
@@ -39,11 +50,11 @@ class Voucher(SQLModel, table=True):
     )
 
     # discount
-    discount_type: str = Field(default="fixed", description="fixed|percent")
+    discount_type: DiscountType = Field(default=DiscountType.FIXED, description="fixed|percent")
     amount: float
 
     # scope: global|user_type|user|product_list
-    scope: str = Field(default="product_list")
+    scope: VoucherScope = Field(default=VoucherScope.PRODUCT_LIST)
     target_user_type_id: Optional[uuid.UUID] = Field(
         default=None, foreign_key="usertype.id"
     )
