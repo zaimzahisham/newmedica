@@ -49,13 +49,16 @@ export interface User {
 }
 
 export interface Address {
-  id: string;
-  street: string;
+  phone: string;
+  firstName: string;
+  lastName: string;
+  address1: string;
+  address2?: string;
   city: string;
   state: string;
-  zipCode: string;
+  postcode: string;
   country: string;
-  isDefault: boolean;
+  remark?: string;
 }
 
 export interface CartItem {
@@ -107,8 +110,8 @@ export interface Order {
   shipping_amount: number;
   total_amount: number;
   currency: string;
-  shipping_address?: any;
-  billing_address?: any;
+  shipping_address?: Address;
+  billing_address?: Address;
   remark?: string;
   applied_voucher_code?: string | null;
   items: OrderItem[];

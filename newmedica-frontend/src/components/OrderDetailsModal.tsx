@@ -3,6 +3,7 @@
 import React from 'react';
 import { Order, OrderItem } from '@/types';
 import { X } from 'lucide-react';
+import Image from 'next/image';
 import { motion } from 'framer-motion';
 import { formatVoucherCode } from '@/lib/utils';
 
@@ -64,9 +65,11 @@ const OrderDetailsModal: React.FC<OrderDetailsModalProps> = ({ order, isOpen, on
           <div className="space-y-4 mb-4">
             {order.items.map((item: OrderItem) => (
               <div key={item.id} className="flex items-center border-b pb-4 last:border-b-0 last:pb-0">
-                <img 
+                <Image 
                   src={item.snapshot_media_url || '/placeholder-product.png'}
                   alt={item.snapshot_name || 'Product Image'}
+                  width={80}
+                  height={80}
                   className="w-20 h-20 object-cover rounded-md mr-4"
                 />
                 <div>
@@ -103,7 +106,7 @@ const OrderDetailsModal: React.FC<OrderDetailsModalProps> = ({ order, isOpen, on
           {order.shipping_address && (
             <div className="mt-6">
               <h3 className="text-xl font-semibold mb-3">Shipping Address:</h3>
-              <p>{order.shipping_address.first_name} {order.shipping_address.last_name}</p>
+              <p>{order.shipping_address.firstName} {order.shipping_address.lastName}</p>
               <p>{order.shipping_address.address1}</p>
               {order.shipping_address.address2 && <p>{order.shipping_address.address2}</p>}
               <p>{order.shipping_address.city}, {order.shipping_address.state} {order.shipping_address.postcode}</p>
@@ -115,7 +118,7 @@ const OrderDetailsModal: React.FC<OrderDetailsModalProps> = ({ order, isOpen, on
           {order.billing_address && (
             <div className="mt-6">
               <h3 className="text-xl font-semibold mb-3">Billing Address:</h3>
-              <p>{order.billing_address.first_name} {order.billing_address.last_name}</p>
+              <p>{order.billing_address.firstName} {order.billing_address.lastName}</p>
               <p>{order.billing_address.address1}</p>
               {order.billing_address.address2 && <p>{order.billing_address.address2}</p>}
               <p>{order.billing_address.city}, {order.billing_address.state} {order.billing_address.postcode}</p>

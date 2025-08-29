@@ -2,6 +2,7 @@
 
 import { Product } from '@/types';
 import Link from 'next/link';
+import Image from 'next/image';
 import React, { useState } from 'react';
 import { Plus } from 'lucide-react';
 import { useAuthStore } from '@/store/authStore';
@@ -47,11 +48,13 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
       onMouseLeave={() => setIsHovered(false)}
     >
       <div className="overflow-hidden rounded-lg">
-        <img 
+        <Image 
           src={isHovered ? secondaryImage : primaryImage} 
           alt={product.name} 
+          width={300}
+          height={300}
           className="w-full h-auto object-cover aspect-[1/1] group-hover:scale-105 transition-transform duration-300" 
-        />
+        /> 
       </div>
       <div className="mt-5 text-center">
         <h3 className="text-xl font-semibold text-foreground">{product.name}</h3>

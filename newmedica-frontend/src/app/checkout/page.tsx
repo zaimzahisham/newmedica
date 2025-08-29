@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -62,7 +62,7 @@ const CheckoutPage = () => {
     }
   });
 
-  const applyAddressToForm = (addr: AddressDto) => {
+  const applyAddressToForm = useCallback((addr: AddressDto) => {
     reset({
       phone: addr.phone || '',
       firstName: addr.first_name || '',
@@ -75,8 +75,7 @@ const CheckoutPage = () => {
       country: addr.country || 'Malaysia',
       remark: '',
     });
-  };
-
+  }, [reset]);
   const clearAddressForm = () => {
     reset({
       phone: '',
@@ -107,7 +106,7 @@ const CheckoutPage = () => {
       }
     };
     loadAddresses();
-  }, [reset]);
+  }, [reset, applyAddressToForm]);
 
   const [paymentMethod, setPaymentMethod] = useState<'stripe' | 'bank_transfer' | 'duitnow_qr' | 'fpx' | 'visa_master'>('stripe');
 
@@ -137,14 +136,14 @@ const CheckoutPage = () => {
             phone: data.phone,
           },
           billing_address: useDifferentBilling ? {
-            first_name: (data as any).billingFirstName,
-            last_name: (data as any).billingLastName,
-            address1: (data as any).billingAddress1,
-            address2: (data as any).billingAddress2 || undefined,
-            city: (data as any).billingCity,
-            state: (data as any).billingState,
-            postcode: (data as any).billingPostcode,
-            country: (data as any).billingCountry,
+            first_name: data.billingFirstName,
+            last_name: data.billingLastName,
+            address1: data.billingAddress1,
+            address2: data.billingAddress2 || undefined,
+            city: data.billingCity,
+            state: data.billingState,
+            postcode: data.billingPostcode,
+            country: data.billingCountry,
           } : {
             first_name: data.firstName,
             last_name: data.lastName,
@@ -219,14 +218,14 @@ const CheckoutPage = () => {
             phone: data.phone,
           },
           billing_address: useDifferentBilling ? {
-            first_name: (data as any).billingFirstName,
-            last_name: (data as any).billingLastName,
-            address1: (data as any).billingAddress1,
-            address2: (data as any).billingAddress2 || undefined,
-            city: (data as any).billingCity,
-            state: (data as any).billingState,
-            postcode: (data as any).billingPostcode,
-            country: (data as any).billingCountry,
+            first_name: data.billingFirstName,
+            last_name: data.billingLastName,
+            address1: data.billingAddress1,
+            address2: data.billingAddress2 || undefined,
+            city: data.billingCity,
+            state: data.billingState,
+            postcode: data.billingPostcode,
+            country: data.billingCountry,
           } : {
             first_name: data.firstName,
             last_name: data.lastName,

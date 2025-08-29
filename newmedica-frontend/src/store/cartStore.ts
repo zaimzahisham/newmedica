@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { Product, Cart, CartItem as ICartItem, CartItemCreate, CartItemUpdate } from '@/types';
+import { CartItem as ICartItem, CartItemCreate, CartItemUpdate } from '@/types';
 import { getCart, addToCart, updateCartItemQuantity, removeCartItem } from '@/lib/api/cart';
 
 interface CartState {

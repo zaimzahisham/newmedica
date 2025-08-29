@@ -1,7 +1,7 @@
 "use client";
 
 import { useAuthStore } from '@/store/authStore';
-import { Mail, MapPin, Phone, User as UserIcon, Briefcase, Building, FileText, AtSign, Info } from 'lucide-react';
+import { MapPin, User as UserIcon, Briefcase, FileText } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react'; // Import useState
@@ -121,7 +121,7 @@ const AccountPage = () => {
                 <div className="flex justify-center mb-4">
                   <div className="w-16 h-16 bg-gray-200 rounded-full"></div>
                 </div>
-                <p className="text-gray-500 mb-4">You haven't placed any orders recently.</p>
+                <p className="text-gray-500 mb-4">You haven&apos;t placed any orders recently.</p>
                 <Link href="/products" className="bg-black text-white px-4 py-2 rounded-full">Continue shopping</Link>
               </div>
             ) : (

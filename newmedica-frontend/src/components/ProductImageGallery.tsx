@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { ProductMedia } from '@/types';
+import Image from 'next/image';
 
 interface ProductImageGalleryProps {
   media: ProductMedia[];
@@ -23,9 +24,11 @@ export default function ProductImageGallery({ media }: ProductImageGalleryProps)
   return (
     <div className="flex flex-col gap-4">
       <div className="w-full h-[450px] overflow-hidden rounded-lg border">
-        <img 
+        <Image 
           src={selectedImage} 
           alt="Selected product image" 
+          width={450}
+          height={450}
           className="w-full h-full object-cover" 
         />
       </div>
@@ -38,9 +41,11 @@ export default function ProductImageGallery({ media }: ProductImageGalleryProps)
               selectedImage === item.url ? 'border-primary' : 'border-transparent'
             }`}
           >
-            <img 
+            <Image 
               src={item.url} 
               alt="Product thumbnail" 
+              width={80}
+              height={80}
               className="w-full h-full object-cover" 
             />
           </button>

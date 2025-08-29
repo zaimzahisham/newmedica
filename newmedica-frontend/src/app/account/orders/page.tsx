@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { getOrders } from '@/lib/api/orders';
 import { Order } from '@/types';
 import { useAuthStore } from '@/store/authStore';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { ArrowLeft, Briefcase } from 'lucide-react';
 import OrderDetailsModal from '@/components/OrderDetailsModal';
@@ -149,9 +150,11 @@ const OrdersPage = () => {
                 <div className="mt-2">
                   {order.items.map((item) => (
                     <div key={item.id} className="flex items-center mb-2 last:mb-0">
-                      <img 
-                        src={item.snapshot_media_url || `/placeholder-product.png`} // Use placeholder if no image
+                      <Image 
+                        src={item.snapshot_media_url || `/placeholder-product.png`}
                         alt={item.snapshot_name || 'Product Image'}
+                        width={64}
+                        height={64}
                         className="w-16 h-16 object-cover rounded-md mr-4"
                       />
                       <div>

@@ -244,10 +244,10 @@ This document outlines tasks to complete the MVP for NewMedica, **prioritized by
 
 **Acceptance Criteria**:
 - [x] Orders persist shipping/billing JSON, payment method, contact email, remark, currency, and computed amounts (subtotal/discount/shipping/total).
-- [ ] Order items store snapshot fields and line totals.
+- [x] Order items store snapshot fields and line totals.
 - [x] Shipping fees sourced from `shipping_config` and can be updated without code.
 - [x] Agent/Healthcare user-type vouchers apply for Barrier Cream as seeded; per-unit/min-qty logic works.
-- [ ] `payment_status` transitions to `paid` via existing endpoint (webhook follow-up).
+- [x] `payment_status` transitions to `paid` via existing endpoint (webhook follow-up).
 - [x] Migrations created and applied cleanly; existing orders backfilled (discount=0, shipping=0, subtotal=total).
 - [x] Frontend: Product details page displays applicable vouchers in "Promotions" section.
 - [x] Frontend: Order summary displays subtotal, discount, shipping, and total.
@@ -315,7 +315,7 @@ This document outlines tasks to complete the MVP for NewMedica, **prioritized by
 
 *Goal: Production readiness and development efficiency*
 
-### Task 2.1: Setup Linting & Formatting (Backend ✅ COMPLETED, Frontend 🟡 PENDING)
+### Task 2.1: Setup Linting & Formatting (Backend ✅ COMPLETED, Frontend ✅ COMPLETED)
 **Priority**: 🟠 Medium - Code quality
 
 **Backend**: Configure Ruff, Black, mypy.
@@ -365,23 +365,6 @@ This document outlines tasks to complete the MVP for NewMedica, **prioritized by
 ## 🔵 PHASE 3: REMAINING MVP FEATURES
 
 *Goal: Complete MVP feature set*
-
-### Task 3.1: Admin User Management (Backend & Frontend)
-**Priority**: 🔵 Low - Admin functionality
-**Dependencies**: None
-**Estimated Time**: 6-8 hours
-
-**Backend Action Required**:
-1. Implement `GET /api/v1/admin/users` to list pending Agent/Healthcare users.
-2. Implement `POST /api/v1/admin/users/{id}/approve` to approve a user.
-
-**Frontend Action Required**:
-1. Create `/admin` page with a UI to list and approve/reject Agent/Healthcare users.
-
-**Acceptance Criteria**:
-- [ ] Admin users can view a list of pending Agent/Healthcare registrations.
-- [ ] Admin users can approve or reject pending registrations.
-- [ ] Backend endpoints are secured for admin access only.
 
 ### Task 3.2: Profile Management (Frontend)
 **Priority**: 🔵 Low - User-facing feature
@@ -495,6 +478,23 @@ This document outlines tasks to complete the MVP for NewMedica, **prioritized by
 - [x] Vouchers are sorted by date.
 - [x] Page handles loading, error, and empty states gracefully.
 - [x] Link to "Vouchers" page is present on the `/account` dashboard.
+
+### Task 3.1: Admin User Management (Backend & Frontend)
+**Priority**: ⚪ Lowest - Post-MVP Consideration
+**Dependencies**: None
+**Estimated Time**: 6-8 hours
+
+**Backend Action Required**:
+1. Implement `GET /api/v1/admin/users` to list pending Agent/Healthcare users.
+2. Implement `POST /api/v1/admin/users/{id}/approve` to approve a user.
+
+**Frontend Action Required**:
+1. Create `/admin` page with a UI to list and approve/reject Agent/Healthcare users.
+
+**Acceptance Criteria**:
+- [ ] Admin users can view a list of pending Agent/Healthcare registrations.
+- [ ] Admin users can approve or reject pending registrations.
+- [ ] Backend endpoints are secured for admin access only.
 
 ---
 

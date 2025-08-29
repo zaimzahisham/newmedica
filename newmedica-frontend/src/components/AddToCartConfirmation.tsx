@@ -3,6 +3,7 @@
 import { Product } from '@/types';
 import { Check, X } from 'lucide-react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { motion } from 'framer-motion';
 import { useCartStore } from '@/store/cartStore';
 
@@ -42,11 +43,13 @@ export default function AddToCartConfirmation({ product, quantity, onClose }: Ad
       </div>
       <div className="p-4">
         <div className="flex items-center gap-4 mb-4">
-          <img 
+          <Image 
             src={product.media[0]?.url} 
             alt={product.name} 
+            width={64}
+            height={64}
             className="w-16 h-16 rounded-md object-cover border" 
-          />
+          /> 
           <div>
             <p className="font-medium text-foreground">{product.name}</p>
             <p className="text-sm text-muted-foreground">Quantity: {quantity}</p>

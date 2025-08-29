@@ -2,6 +2,7 @@
 
 import { formatVoucherCode } from '@/lib/utils';
 import { useCartStore } from '@/store/cartStore';
+import Image from 'next/image';
 
 interface OrderSummaryProps {
   orderSummaryData: {
@@ -14,7 +15,7 @@ interface OrderSummaryProps {
 }
 
 const OrderSummary = ({ orderSummaryData }: OrderSummaryProps) => {
-  const { items, isLoading } = useCartStore();
+  const { items } = useCartStore();
 
   const subtotal = orderSummaryData?.subtotal ?? 0;
   const discount = orderSummaryData?.discount ?? 0;
@@ -47,9 +48,11 @@ const OrderSummary = ({ orderSummaryData }: OrderSummaryProps) => {
         {items.map(item => (
           <div key={item.id} className="flex items-center justify-between">
             <div className="flex items-center">
-              <img 
+              <Image 
                 src={item.product.media?.[0]?.url || `https://picsum.photos/seed/${item.product.id}/100`}
                 alt={item.product.name}
+                width={64}
+                height={64}
                 className="w-16 h-16 object-cover rounded-md mr-4"
               />
               <div>

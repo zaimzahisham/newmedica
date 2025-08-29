@@ -19,7 +19,7 @@ const Footer = () => {
           <div className="w-1/3">
             <h3 className="font-semibold text-lg mb-4">Our mission</h3>
             <p className="text-foreground/80">
-              Our mission is to enhance patient's quality of life and healthcare professional's quality of service. At Newmedica, we are always based in providing the most advanced and safe technology medical and wellness products, specializing in interventional patients hygiene, infection control, pain management and wellness.
+              Our mission is to enhance patient&apos;s quality of life and healthcare professional&apos;s quality of service. At Newmedica, we are always based in providing the most advanced and safe technology medical and wellness products, specializing in interventional patients hygiene, infection control, pain management and wellness.
             </p>
           </div>
         </div>

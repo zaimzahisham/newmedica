@@ -18,7 +18,6 @@ export default function OrderSuccessPage() {
   const clearCart = useCartStore((s) => s.clearCart);
 
   useEffect(() => {
-    const sessionId = searchParams.get('session_id');
     const passedOrderId = searchParams.get('order_id');
     if (hasAttemptedRef.current) return;
     hasAttemptedRef.current = true;
@@ -54,7 +53,7 @@ export default function OrderSuccessPage() {
         } catch {}
         setStatus('success');
         clearCart();
-      } catch (e) {
+      } catch {
         setStatus('error');
         setMessage('We could not confirm your order. Please contact support if you were charged.');
       }
@@ -78,7 +77,7 @@ export default function OrderSuccessPage() {
           setOrderId(passedOrderId);
           setStatus('success');
           clearCart();
-        } catch (e) {
+        } catch {
           setStatus('error');
           setMessage('We could not confirm your order payment. Please contact support if you were charged.');
         }

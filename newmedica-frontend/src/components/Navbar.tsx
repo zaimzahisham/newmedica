@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Search, User, ShoppingCart, ChevronDown } from 'lucide-react';
+import { User, ShoppingCart, ChevronDown } from 'lucide-react';
 import { useAuthStore } from '@/store/authStore';
 import { useCartStore } from '@/store/cartStore';
 import { useState, useRef, useEffect } from 'react';

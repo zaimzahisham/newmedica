@@ -49,7 +49,7 @@ const LoginPage = () => {
 
   const onSignUp: SubmitHandler<RegisterFormData> = async (data) => {
     setApiError(null);
-    const { confirmPassword, ...rest } = data;
+    const { ...rest } = data;
     const payload = {
       email: rest.email,
       password: rest.password,
@@ -86,8 +86,8 @@ const LoginPage = () => {
 
       showSuccessToast('Registration successful! Please log in.');
       setIsSignUp(false);
-    } catch (error: any) {
-      setApiError(`Registration failed: ${error.message}`);
+    } catch (error: unknown) {
+      setApiError(`Registration failed: ${error instanceof Error ? error.message : 'An unknown error occurred'}`);
     }
   };
 

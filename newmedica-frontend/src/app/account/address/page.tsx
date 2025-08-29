@@ -3,7 +3,7 @@
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useAuthStore } from '@/store/authStore';
 import { createAddress, deleteAddress, getAddresses, setPrimaryAddress, updateAddress } from '@/lib/api/address';
 import AddressForm from './AddressForm';
@@ -77,7 +77,7 @@ const AddressPage = () => {
       try {
         const data = await getAddresses();
         setAddresses(sortAddresses(data));
-      } catch (e) {
+      } catch {
         setError('Failed to load addresses');
       } finally {
         setLoading(false);
@@ -86,7 +86,6 @@ const AddressPage = () => {
     load();
   }, [user, loadingAuth]);
 
-  const primaryId = useMemo(() => addresses?.find(a => a.is_primary)?.id ?? null, [addresses]);
 
   if (loadingAuth) return null;
   if (!user) return null;

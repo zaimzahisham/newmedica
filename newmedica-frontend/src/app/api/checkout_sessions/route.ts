@@ -10,11 +10,12 @@ export async function POST(request: Request) {
       return new NextResponse('No items in cart', { status: 400 });
     }
 
-    const origin = request.headers.get('origin') || '';
+    
     const line_items = items.map(item => {
       const rawImages = item.product.media?.map(m => m.url) || [];
       const validImages = rawImages.filter((u) => /^https?:\/\//i.test(u));
-      const product_data: any = { name: item.product.name };
+      interface StripeProductData { name: string; images?: string[]; }
+      const product_data: StripeProductData = { name: item.product.name };
       if (validImages.length > 0) {
         product_data.images = validImages.slice(0, 8);
       }
