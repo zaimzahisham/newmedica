@@ -113,3 +113,18 @@ export interface Order {
   applied_voucher_code?: string | null;
   items: OrderItem[];
 }
+
+export interface Voucher {
+  id: string;
+  code: string;
+  description?: string;
+  discount_type: string;
+  amount: number;
+  scope: string;
+  min_quantity?: number;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+  valid_to?: string;
+  valid_from?: string;
+}

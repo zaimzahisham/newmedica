@@ -456,6 +456,46 @@ This document outlines tasks to complete the MVP for NewMedica, **prioritized by
 - [ ] Admins can read and update the shipping configuration.
 - [ ] Non-admin users receive a 403 Forbidden error when trying to access these endpoints.
 
+### Backend Priority 3 - User Vouchers
+#### Task 3.8: Implement Backend User Vouchers API (TDD) - ✅ COMPLETED
+**Priority**: 🟠 Medium - Required for user-facing voucher page
+**Dependencies**: None
+**Estimated Time**: 3-5 hours
+
+**TDD Steps**:
+1. Write tests for `GET /api/v1/users/me/vouchers` to retrieve active and past vouchers for the authenticated user.
+2. Implement repository, service, and controller to fetch vouchers associated with the user, considering `is_active` status and `valid_from`/`valid_to` dates.
+3. Ensure proper authentication and authorization.
+4. Make tests pass.
+
+**Acceptance Criteria**:
+- [x] Authenticated users can retrieve their active and past vouchers.
+- [x] Vouchers are filtered by `is_active` status and `valid_from`/`valid_to` dates.
+- [x] API response includes necessary voucher details (code, value, type, description, expiry).
+- [x] Non-authenticated users cannot access the endpoint.
+
+### Frontend Priority 3 - User Vouchers
+#### Task 3.9: Implement Frontend User Vouchers Page - ✅ COMPLETED
+**Priority**: 🟠 Medium - User-facing feature
+**Dependencies**: Task 3.8 (Backend User Vouchers API)
+**Path**: `/account/vouchers`
+
+**Action Required**:
+1. Create `src/app/account/vouchers/page.tsx`.
+2. Implement UI with two tabs: "Active Vouchers" and "Past Vouchers".
+3. Fetch data from `GET /api/v1/users/me/vouchers`.
+4. Display vouchers, sorted by date (newest first).
+5. Handle loading and empty states.
+6. Add a link to this page in the `/account` dashboard.
+
+**Acceptance Criteria**:
+- [x] User can navigate to `/account/vouchers`.
+- [x] Page displays "Active Vouchers" and "Past Vouchers" in separate tabs.
+- [x] Vouchers are displayed with relevant details (code, value, expiry).
+- [x] Vouchers are sorted by date.
+- [x] Page handles loading, error, and empty states gracefully.
+- [x] Link to "Vouchers" page is present on the `/account` dashboard.
+
 ---
 
 ## GEMINI CLI WORKING INSTRUCTIONS
@@ -475,4 +515,4 @@ This document outlines tasks to complete the MVP for NewMedica, **prioritized by
 1. **Never skip 🔴 BLOCKERS** - They prevent all other work
 2. Complete Phase 0 entirely before starting Phase 1
 3. Within each phase, complete tasks in numerical order
-4. Always verify with tests before moving to next tasking to next task
+4. Always verify with tests before moving to next task

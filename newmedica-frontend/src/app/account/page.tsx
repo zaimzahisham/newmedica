@@ -105,10 +105,10 @@ const AccountPage = () => {
               <Briefcase className="w-8 h-8 mb-2" />
               <span>Order History</span>
             </Link>
-            <div className="flex flex-col items-center justify-center p-4 border rounded-lg shadow-sm">
+            <Link href="/account/vouchers" className="flex flex-col items-center justify-center p-4 border rounded-lg shadow-sm hover:shadow-md transition-shadow">
               <FileText className="w-8 h-8 mb-2" />
               <span>Vouchers</span>
-            </div>
+            </Link>
           </div>
           <div>
             <h2 className="text-xl font-semibold mb-4">Recent Orders</h2>

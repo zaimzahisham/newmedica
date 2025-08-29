@@ -4,17 +4,15 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlmodel import select
 from app.models import User, Product, Category, UserType, Voucher
 from typing import Optional
+from app.services.user_service import pwd_context # Import the password context
 
-async def create_test_user(session: AsyncSession, email: str, user_type_id: uuid.UUID) -> User:
-    """Creates a user directly in the database for testing purposes."""
-    # This is a simplified user creation for tests, bypassing registration flow
-    # In real tests, you might want to use the actual registration endpoint
-    user = User(email=email, password_hash="hashed_password", user_type_id=user_type_id)
+async def create_test_user(session: AsyncSession, email: str, user_type_id: uuid.UUID, password: str = "password") -> User:
+    """Creates a user directly in the database for testing purposes with a valid password hash."""
+    hashed_password = pwd_context.hash(password)
+    user = User(email=email, password_hash=hashed_password, user_type_id=user_type_id)
     session.add(user)
     await session.commit()
     await session.refresh(user)
-    # For integration tests, we'll need to simulate login to get a token
-    # This part will be handled in the test itself or a separate login helper if needed
     return user
 
 async def create_test_product(session: AsyncSession, name: str, price: float, category_id: Optional[uuid.UUID] = None) -> Product:
@@ -60,7 +58,7 @@ async def create_test_voucher(
         code=code, 
         scope=scope, 
         discount_type=discount_type, 
-        amount=amount,
+        amount=amount, # Corrected field name
         target_user_type_id=target_user_type_id,
         target_user_id=target_user_id,
         min_quantity=min_quantity,
