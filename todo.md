@@ -325,25 +325,30 @@ This document outlines tasks to complete the MVP for NewMedica, **prioritized by
 - [x] Mypy baseline established.
 
 **Frontend**: Configure ESLint, Prettier.
-- [ ] ESLint and Prettier installed and configured.
-- [ ] Codebase formatted with Prettier.
-- [ ] Linter errors fixed with ESLint.
+- [x] ESLint and Prettier installed and configured.
+- [x] Codebase formatted with Prettier.
+- [x] Linter errors fixed with ESLint.
 
 ### Task 2.4: Frontend Architecture Refactoring (Feature-first)
 **Priority**: 🟠 Medium - Code quality and maintainability
 **Dependencies**: None
 **Estimated Time**: 8-12 hours
 **Action Required**:
-1. Refactor frontend file structure to align with GEMINI.md / Warp.md's feature-first architecture (e.g., `/app/(dashboard)/profile/_components/`).
-2. Co-locate components, hooks, and schemas by feature.
-3. Ensure all imports are updated correctly.
-4. Verify application functionality after refactoring.
+1. **Incremental Refactoring**: Refactor the frontend file structure incrementally, one component or small, related group of components/hooks/schemas at a time.
+2. **Co-locate**: Move components, hooks, and schemas to their respective feature directories (e.g., `/app/(dashboard)/profile/_components/`).
+3. **Update Imports**: Ensure all imports are updated correctly after each move.
+4. **Document Checklist**: Detailed functionalities, dependencies, refactoring steps, and manual verification checklists for each component/feature will be documented in `frontend-refactor-checklist.md`. This will serve as a shared checklist for manual verification.
+5. **Verify Incrementally**: After each small refactoring step (e.g., moving one component), verify application functionality.
+    - **Automated Checks (by Gemini):** I will run `npm run dev` to ensure the application compiles and starts without errors. I will monitor server logs for any runtime errors or warnings. (Note: Your manual `npm run dev` instance will not be affected by my checks.)
+    - **Manual Verification (by User):** The user will manually test the affected UI and interactions to confirm visual correctness and expected behavior. This is crucial for each step.
 
 **Acceptance Criteria**:
 - [ ] Frontend project structure adheres to the feature-first layout specified in GEMINI.md / Warp.md.
 - [ ] All components, hooks, and schemas are logically grouped within their respective feature directories.
 - [ ] The application builds and runs without errors.
 - [ ] All existing frontend functionality remains intact.
+- [ ] Each refactored component/feature is manually verified by the user before proceeding to the next.
+- [ ] Functionalities and dependencies for each refactored component/feature are documented in `frontend-refactor-checklist.md`.
 
 ### Task 2.2: Add Dockerization
 **Priority**: 🟠 Medium - Deployment readiness

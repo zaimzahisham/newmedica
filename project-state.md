@@ -9,7 +9,7 @@ This document provides the definitive current state of the NewMedica e-commerce 
 **PHASE**: MVP Feature Implementation
 **OVERALL ADHERENCE TO GEMINI.md / Warp.md**: 80%
 **MVP READINESS**: 77%
-**IMMEDIATE PRIORITY**: Frontend Linting Setup (Task 2.1)
+**IMMEDIATE PRIORITY**: Frontend Architecture Refactoring (Task 2.4)
 
 All critical blockers have been resolved. The project is in a stable state to proceed with the next high-priority tasks.
 
@@ -106,10 +106,10 @@ All critical blockers have been resolved. The project is in a stable state to pr
 
 ### 🟡 HIGH PRIORITY GAPS (Required for MVP)
 
-1.  **MISSING CORE MVP PAGES**:
-    *   ❌ `/admin` - Admin user management
+1.  **INCOMPLETE CORE MVP PAGES**:
+    *   🟠 `/admin` - Admin user management (placeholder directory exists)
 2.  **INCOMPLETE FUNCTIONALITY**:
-    *   `/checkout` - Pre-fill shipping address form with user's primary address (after Task 1.9 is done).
+    
     *   `/profile` - Editable profile page (frontend for Task 3.2)
     *   No admin UI components
 
