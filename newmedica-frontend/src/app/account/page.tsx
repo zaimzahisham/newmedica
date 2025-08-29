@@ -129,7 +129,7 @@ const AccountPage = () => {
                 {recentOrders.map((order) => (
                   <div key={order.id} className="py-4 border-b last:border-b-0">
                     <div className="flex justify-between items-center mb-2">
-                      <h3 className="font-semibold text-lg">Order #{order.id.substring(0, 8).toUpperCase()}</h3>
+                      <h3 className="font-semibold text-lg">Order #{order.id.substring(0, 8).toUpperCase()} ...</h3>
                       <span className={`px-3 py-1 rounded-full text-xs font-medium ${
                         order.payment_status === 'paid' ? 'bg-green-100 text-green-800' :
                         order.payment_status === 'pending' ? 'bg-yellow-100 text-yellow-800' :

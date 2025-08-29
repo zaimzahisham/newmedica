@@ -149,7 +149,7 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
           </div>
         </div>
 
-        {(isSpecialUser || (vouchers.length > 0 && !vouchersLoading)) && (
+        {(vouchers.length > 0 || (isSpecialUser && !vouchersLoading)) && (
           <div className="p-4 bg-secondary/50 rounded-lg">
             <h3 className="font-semibold mb-2">Promotions For You, Our {user?.userType == "Healthcare" ? user.userType + " Professionals" : "Agents"}</h3>
             {vouchersLoading ? (

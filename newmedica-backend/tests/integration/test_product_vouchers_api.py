@@ -99,3 +99,48 @@ async def test_get_product_vouchers_authenticated_user(async_client: AsyncClient
     assert "P1_PER_UNIT_2" not in codes # Product 1 specific voucher
     assert "P2_FIXED_10" not in codes # Product 2 specific voucher
     assert len(vouchers_data) == 2 # GLOBAL_10 and AGENT_20
+
+@pytest.mark.asyncio
+async def test_user_type_voucher_with_product_link_filtering(async_client: AsyncClient, session: AsyncSession):
+    # Setup: Create user types, user, products
+    agent_type = await tu.create_test_user_type(session, name="Agent")
+    register_res_agent = await tu.register_user(async_client, "agent_linked@example.com", "password", "Agent")
+    login_res_agent = await async_client.post("/api/v1/auth/login", data={"username": "agent_linked@example.com", "password": "password"})
+    token_agent = login_res_agent.json()["access_token"]
+
+    product_linked = await tu.create_test_product(session, name="Linked Product", price=100.0)
+    product_unlinked = await tu.create_test_product(session, name="Unlinked Product", price=50.0)
+
+    # Create a user-type voucher that is also linked to a specific product
+    voucher_agent_linked_product = await tu.create_test_voucher(
+        session,
+        code="AGENT_LINKED_TO_PRODUCT",
+        discount_type="fixed",
+        amount=15.0,
+        scope="user_type",
+        target_user_type_id=agent_type.id
+    )
+    session.add(VoucherProductLink(voucher_id=voucher_agent_linked_product.id, product_id=product_linked.id))
+    await session.commit()
+
+    # Test 1: Fetch vouchers for the LINKED product
+    # Expected: AGENT_LINKED_TO_PRODUCT should be present
+    response_linked = await async_client.get(
+        f"/api/v1/products/{product_linked.id}/vouchers",
+        headers={"Authorization": f"Bearer {token_agent}"}
+    )
+    assert response_linked.status_code == 200
+    vouchers_data_linked = response_linked.json()
+    codes_linked = {v["code"] for v in vouchers_data_linked}
+    assert "AGENT_LINKED_TO_PRODUCT" in codes_linked, "Voucher should be present for the linked product"
+
+    # Test 2: Fetch vouchers for an UNLINKED product
+    # Expected: AGENT_LINKED_TO_PRODUCT should NOT be present
+    response_unlinked = await async_client.get(
+        f"/api/v1/products/{product_unlinked.id}/vouchers",
+        headers={"Authorization": f"Bearer {token_agent}"}
+    )
+    assert response_unlinked.status_code == 200
+    vouchers_data_unlinked = response_unlinked.json()
+    codes_unlinked = {v["code"] for v in vouchers_data_unlinked}
+    assert "AGENT_LINKED_TO_PRODUCT" not in codes_unlinked, "Voucher should NOT be present for an unlinked product"
