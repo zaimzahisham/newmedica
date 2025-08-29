@@ -106,12 +106,8 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
       discountDescription = `${voucher.amount}% OFF`; // Uppercase OFF
     }
 
-    if (voucher.min_quantity > 0 && !voucher.per_unit) {
-      if (voucher.min_quantity === 1) {
-        discountDescription += ` PER QTY`; // Specific for quantity 1
-      } else {
-        discountDescription += ` FOR QTY >= ${voucher.min_quantity}`; // For other quantities
-      }
+    if (voucher.min_quantity > 0) {
+        discountDescription += ` FOR PURCHASE OF AT LEAST ${voucher.min_quantity} UNIT${voucher.min_quantity > 1 ? 'S' : ''}`; 
     }
     return discountDescription;
   };

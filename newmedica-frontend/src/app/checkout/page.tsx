@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { shippingAddressSchema, ShippingAddressFormData } from '@/lib/validations/checkout';
@@ -10,6 +11,8 @@ import { useCartStore } from '@/store/cartStore';
 import { loadStripe, type Stripe } from '@stripe/stripe-js';
 import { getAddresses, getPrimaryAddress, type AddressDto } from '@/lib/api/address';
 import { getAuthToken } from '@/lib/utils';
+
+import { ArrowLeft } from 'lucide-react'; // Import ArrowLeft
 
 // Make sure to put your publishable key in .env.local
 const stripePublishableKey = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY;
@@ -21,6 +24,7 @@ if (stripePublishableKey) {
 }
 
 const CheckoutPage = () => {
+  const router = useRouter(); // Initialize useRouter
   const { user } = useAuthStore();
   const { items: cartItems } = useCartStore();
   const [isLoading, setIsLoading] = useState(false);
@@ -245,11 +249,17 @@ const CheckoutPage = () => {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
                 {/* Left Column: Shipping Details */}
                 <div className="font-sans">
-                <div className="mb-6">
-                    <h2 className="text-xl font-semibold mb-2">Contact information</h2>
+                <div className="mb-2">
+                  <button
+                      type="button"
+                      onClick={() => router.back()}
+                      className="text-sm text-blue-600 hover:underline flex items-center gap-1 mb-4"
+                  >
+                      <ArrowLeft size={16} /> Back
+                  </button>
                     <div className="flex items-center justify-between">
+                        <h2 className="text-xl font-semibold">Contact information</h2>
                         <p className="text-gray-700">{user?.email}</p>
-                        <a href="/login" className="text-sm text-blue-600 hover:underline">Log out</a>
                     </div>
                 </div>
 
