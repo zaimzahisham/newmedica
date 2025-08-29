@@ -10,18 +10,20 @@ import { getPrimaryAddress } from '@/lib/api/address';
 
 const AccountDetailsPage = () => {
   const user = useAuthStore((state) => state.user);
+  const loadingAuth = useAuthStore((state) => state.loading);
+  const checkAuth = useAuthStore((state) => state.checkAuth);
   const router = useRouter();
   const [dobType, setDobType] = useState(user?.dateOfBirth ? 'date' : 'text');
 
   useEffect(() => {
-    if (!user) {
+    checkAuth();
+  }, [checkAuth]);
+
+  useEffect(() => {
+    if (!loadingAuth && !user) {
       router.push('/login');
     }
-  }, [user, router]);
-
-  if (!user) {
-    return null; // Or a loading spinner
-  }
+  }, [user, loadingAuth, router]);
 
   const [primaryAddress, setPrimaryAddress] = useState<{
     first_name: string;
@@ -38,7 +40,7 @@ const AccountDetailsPage = () => {
 
   useEffect(() => {
     const loadPrimary = async () => {
-      if (!user) return;
+      if (!user || loadingAuth) return;
       try {
         const addr = await getPrimaryAddress();
         setPrimaryAddress(addr);
@@ -47,7 +49,10 @@ const AccountDetailsPage = () => {
       }
     };
     loadPrimary();
-  }, [user]);
+  }, [user, loadingAuth]);
+
+  if (loadingAuth) return null;
+  if (!user) return null;
 
   return (
     <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">

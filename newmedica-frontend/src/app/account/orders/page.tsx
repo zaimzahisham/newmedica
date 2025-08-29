@@ -11,7 +11,7 @@ import Link from 'next/link';
 import { formatVoucherCode } from '@/lib/utils';
 
 const OrdersPage = () => {
-  const { user, token } = useAuthStore();
+  const { user, token, loading: loadingAuth, checkAuth } = useAuthStore();
   const router = useRouter();
   const [orders, setOrders] = useState<Order[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -21,12 +21,17 @@ const OrdersPage = () => {
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
 
   useEffect(() => {
-    if (!token) {
+    checkAuth();
+  }, [checkAuth]);
+
+  useEffect(() => {
+    if (!loadingAuth && !user) {
       router.push('/login');
       return;
     }
 
     const fetchOrders = async () => {
+      if (!user || !token) return; // Ensure user and token are available before fetching
       try {
         const fetchedOrders = await getOrders();
         setOrders(fetchedOrders);
@@ -37,8 +42,10 @@ const OrdersPage = () => {
       }
     };
 
-    fetchOrders();
-  }, [token, router]);
+    if (!loadingAuth && user && token) {
+      fetchOrders();
+    }
+  }, [user, token, loadingAuth, router]);
 
   const filteredOrders = orders.filter(order => {
     if (selectedTab === 'all') return true;
@@ -55,7 +62,7 @@ const OrdersPage = () => {
     setSelectedOrder(null);
   };
 
-  if (isLoading) {
+  if (loadingAuth || isLoading) {
     return (
       <div className="container mx-auto px-4 py-8">
         <h1 className="text-3xl font-bold mb-6">Your Orders</h1>
@@ -71,6 +78,10 @@ const OrdersPage = () => {
         <p className="text-red-500">Error: {error}</p>
       </div>
     );
+  }
+
+  if (!user) {
+    return null; // Should be handled by the redirect useEffect, but as a fallback
   }
 
   return (
