@@ -5,7 +5,7 @@ import { useForm, SubmitHandler } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useAuthStore } from '@/store/authStore';
 import { useRouter } from 'next/navigation';
-import { loginSchema, registerSchema, LoginFormData, RegisterFormData } from '@/lib/validations/auth';
+import { loginSchema, registerSchema, LoginFormData, RegisterFormData } from '../_lib/auth';
 import { showSuccessToast } from '@/components/CustomAlert';
 
 const LoginPage = () => {

@@ -17,7 +17,7 @@ export async function getCart(): Promise<Cart> {
   if (!response.ok) {
     if (response.status === 404) {
       // If the cart is not found, return an empty cart structure
-      return { id: '', user_id: '', items: [], total_price: 0 };
+      return { id: '', user_id: '', items: [], total: 0, subtotal: 0, discount: 0, shipping: 0};
     }
     throw new Error('Failed to fetch cart');
   }

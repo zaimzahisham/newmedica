@@ -13,6 +13,17 @@ export const addressSchema = z.object({
   is_primary: z.boolean().optional().default(false),
 });
 
-export type AddressFormValues = z.infer<typeof addressSchema>;
+export type AddressFormValues = {
+  first_name: string;
+  last_name: string;
+  phone: string;
+  address1: string;
+  address2?: string | undefined;
+  city: string;
+  state: string;
+  postcode: string;
+  country: string;
+  is_primary?: boolean | undefined;
+};
 
 

@@ -1,6 +1,6 @@
 'use client';
 
-import { useForm, UseFormRegister, FieldErrors, FieldValues } from 'react-hook-form';
+import { useForm, UseFormRegister, FieldErrors } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { Product, User } from '@/types';
@@ -20,7 +20,16 @@ const quotationSchema = z.object({
   address: z.string().min(1, 'Address is required'),
 });
 
-type QuotationFormData = z.infer<typeof quotationSchema>;
+type QuotationFormData = {
+  fullName: string;
+  department: string;
+  companyName: string;
+  coRegNo?: string;
+  tinNo?: string;
+  email: string;
+  telNo: string;
+  address: string;
+};
 
 interface RequestQuotationModalProps {
   product: Product;
@@ -40,40 +49,54 @@ const modalVariants = {
   exit: { opacity: 0, scale: 0.95 },
 };
 
+// ---------- InputField ----------
+interface InputFieldProps extends React.InputHTMLAttributes<HTMLInputElement> {
+  label: string;
+  name: keyof QuotationFormData;
+  register: UseFormRegister<QuotationFormData>;
+  errors: FieldErrors<QuotationFormData>;
+}
+
 const InputField = ({ label, name, register, errors, ...props }: InputFieldProps) => (
   <div>
     <label htmlFor={name} className="block text-xs font-serif text-gray-600">{label}</label>
-    <input {...register(name)} id={name} className="mt-1 block w-full bg-transparent border-b border-gray-300 focus:outline-none focus:border-black sm:text-sm py-2" {...props} />
+    <input
+      {...register(name)}
+      id={name}
+      className="mt-1 block w-full bg-transparent border-b border-gray-300 focus:outline-none focus:border-black sm:text-sm py-2"
+      {...props}
+    />
     {errors[name] && (
       <p className="mt-1 text-xs text-red-600">{errors[name]?.message as string}</p>
     )}
   </div>
 );
 
-interface InputFieldProps extends React.InputHTMLAttributes<HTMLInputElement> {
+// ---------- TextareaField ----------
+interface TextareaFieldProps extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {
   label: string;
-  name: string;
-  register: UseFormRegister<FieldValues>;
-  errors: FieldErrors<FieldValues>;
+  name: keyof QuotationFormData;
+  register: UseFormRegister<QuotationFormData>;
+  errors: FieldErrors<QuotationFormData>;
 }
 
 const TextareaField = ({ label, name, register, errors, ...props }: TextareaFieldProps) => (
   <div>
     <label htmlFor={name} className="block text-xs font-serif text-gray-600">{label}</label>
-    <textarea {...register(name)} id={name} rows={4} className="mt-1 block w-full bg-transparent border-b border-gray-300 focus:outline-none focus:border-black sm:text-sm py-2" {...props} />
+    <textarea
+      {...register(name)}
+      id={name}
+      rows={4}
+      className="mt-1 block w-full bg-transparent border-b border-gray-300 focus:outline-none focus:border-black sm:text-sm py-2"
+      {...props}
+    />
     {errors[name] && (
       <p className="mt-1 text-xs text-red-600">{errors[name]?.message as string}</p>
     )}
   </div>
 );
 
-interface TextareaFieldProps extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {
-  label: string;
-  name: string;
-  register: UseFormRegister<FieldValues>;
-  errors: FieldErrors<FieldValues>;
-}
-
+// ---------- Main Modal ----------
 export default function RequestQuotationModal({ product, user, onClose }: RequestQuotationModalProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submissionError, setSubmissionError] = useState<string | null>(null);

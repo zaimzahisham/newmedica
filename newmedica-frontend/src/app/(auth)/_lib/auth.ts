@@ -27,6 +27,8 @@ const baseRegisterSchema = z.object({
   picEinvoice: z.string().optional(),
   picEinvoiceEmail: z.string().optional(),
   picEinvoiceTelNo: z.string().optional(),
+  _agentError: z.string().optional(),
+  _healthcareError: z.string().optional(),
 });
 
 export const registerSchema = baseRegisterSchema

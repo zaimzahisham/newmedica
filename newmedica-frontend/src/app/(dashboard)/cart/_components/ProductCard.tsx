@@ -7,7 +7,7 @@ import React, { useState } from 'react';
 import { Plus } from 'lucide-react';
 import { useAuthStore } from '@/store/authStore';
 import { useCartStore } from '@/store/cartStore';
-import { showWarningAlert, showSuccessToast } from './CustomAlert'; // Import CustomAlert functions
+import { showWarningAlert, showSuccessToast } from '@/components/CustomAlert'; // Import CustomAlert functions
 
 type ProductCardProps = {
   product: Product;

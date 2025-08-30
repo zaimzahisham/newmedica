@@ -1,4 +1,4 @@
-import FeaturedProducts from "@/components/FeaturedProducts";
+import FeaturedProducts from "./_components/FeaturedProducts";
 import CartView from "./CartView";
 
 export default function CartPage() {

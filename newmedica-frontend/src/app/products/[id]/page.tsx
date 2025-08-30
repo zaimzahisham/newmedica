@@ -3,14 +3,14 @@ import { notFound } from 'next/navigation';
 import React from 'react';
 import ProductImageGallery from '@/components/ProductImageGallery';
 import ProductDetails from '@/components/ProductDetails';
-import ProductGrid from '@/components/ProductGrid';
+import ProductGrid from '@/app/(dashboard)/cart/_components/ProductGrid';
 
 export default async function ProductDetailPage({
   params,
 }: {
   params: { id: string };
 }) {
-  const { id } = await params;
+  const { id } = params;
   const product = await getProductById(id).catch(() => null);
 
   if (!product) {

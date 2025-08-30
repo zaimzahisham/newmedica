@@ -4,57 +4,50 @@ This document outlines the detailed functionalities, dependencies, refactoring s
 
 ---
 
-### Refactoring Target: `/login` page
+### Phase 1: Authentication (`/login`)
 
-**Component: `LoginPage` (`newmedica-frontend/src/app/login/page.tsx`)**
-
-**Functionalities:**
-*   Displays a combined Login/Sign Up form.
-*   Allows switching between Login and Sign Up modes.
-*   Handles user login: authentication via `useAuthStore().login`, redirection to `/account`, API error display.
-*   Handles user registration (Sign Up): common fields + conditional fields based on `userType` (Healthcare Professional or Agent), sends data to backend API, displays success toast, switches to Login mode on success, API error display.
-*   Form validation using `react-hook-form` and `zodResolver`, displays validation errors.
-
-**Dependencies:**
-*   **React Hooks:** `useState`, `useRouter`, `useForm`, `SubmitHandler`, `watch`.
-*   **External Libraries/Utilities:** `@hookform/resolvers/zod`, `@/store/authStore`, `@/lib/validations/auth` (schemas), `@/components/CustomAlert` (`showSuccessToast`).
-*   **Backend API Endpoint:** `http://127.0.0.1:8000/api/v1/auth/register`.
-*   **Styling:** Tailwind CSS classes.
+**Status**: ✅ **COMPLETED**
 
 **Refactoring Steps for `LoginPage`:**
-1.  **Create `newmedica-frontend/src/app/login/_lib/`:** This directory will house the `auth` validation schemas.
-2.  **Move `auth.ts` from `src/lib/validations/` to `src/app/login/_lib/validations/`:** This co-locates the validation logic with the login feature.
-3.  **Update imports in `page.tsx`:** Adjust the import path for `auth` schemas.
+1.  **Create Directory:** Created `newmedica-frontend/src/app/(auth)/` route group and subdirectories (`_lib`, `_components`).
+2.  **Move Page:** Moved `login/page.tsx` to `src/app/(auth)/login/page.tsx`.
+3.  **Move Validation File:** Moved `auth.ts` from `src/lib/validations/` to `src/app/(auth)/_lib/`.
+4.  **Update Imports:** Updated import paths in `page.tsx`.
+5.  **Verification:** `npm run build` completed successfully.
 
-**Manual Verification Checklist for `LoginPage` (after refactoring):**
-*   **Initial Load:**
-    *   Navigate to `/login`.
-    *   Verify the page loads without console errors.
-    *   Confirm "Sign up" and "Login" tabs are visible.
-*   **Tab Switching:**
-    *   Click "Sign up" tab: Verify form switches to registration fields.
-    *   Click "Login" tab: Verify form switches back to login fields.
-*   **Login Functionality:**
-    *   Attempt successful login with valid credentials. Verify redirection to `/account`.
-    *   Attempt failed login with invalid credentials. Verify "Login failed" error message appears.
-    *   Attempt login with empty fields. Verify validation errors appear.
-*   **Registration Functionality (Basic User):**
-    *   Switch to "Sign up" tab.
-    *   Fill in valid basic user details.
-    *   Submit form. Verify "Registration successful!" toast appears and form switches to Login.
-    *   Attempt to log in with the newly registered basic user.
-*   **Registration Functionality (Healthcare Professional):**
-    *   Switch to "Sign up" tab.
-    *   Select "Healthcare Professional" from user type dropdown.
-    *   Verify conditional fields appear.
-    *   Fill in valid details and submit. Verify success.
-*   **Registration Functionality (Agent):**
-    *   Switch to "Sign up" tab.
-    *   Select "Agent" from user type dropdown.
-    *   Verify conditional fields appear.
-    *   Fill in valid details and submit. Verify success.
-*   **Registration Validation:**
-    *   Attempt registration with empty/invalid fields for various user types. Verify appropriate validation error messages appear.
-    *   Verify password and confirm password mismatch shows error.
-*   **Error Display:**
-    *   Verify `apiError` messages are displayed correctly for both login and registration.
+---
+
+### Phase 2: Cart & Account (`/cart`, `/account`)
+
+**Status**: ✅ **COMPLETED**
+
+**Refactoring Steps:**
+1.  **Create Directory Structure**: Created `newmedica-frontend/src/app/(dashboard)/` route group for `cart` and `account` pages.
+2.  **Move Pages**: Moved all pages and components for cart and account into the new directory structure.
+3.  **Update Imports**: Updated all import paths in the moved files.
+4.  **Verification**: `npm run build` completed successfully.
+
+---
+
+### Phase 3: Checkout (`/checkout`)
+
+**Status**: 🟡 **PENDING**
+
+**Component: `CheckoutPage` (`newmedica-frontend/src/app/checkout/page.tsx`)**
+
+**Functionalities:**
+*   Displays a summary of the order.
+*   Provides a form for shipping and billing information.
+*   Integrates with Stripe for payment processing.
+
+**Dependencies:**
+*   **State Management:** `zustand` (`@/store/cartStore`).
+*   **Components:** `OrderSummary` (likely in `/components`).
+*   **API:** Backend order and checkout API endpoints.
+
+**Refactoring Steps for `CheckoutPage`:**
+1.  **Create Directory Structure**: Create `newmedica-frontend/src/app/(dashboard)/checkout/` and subdirectories (`_components`, `_hooks`, `_lib`).
+2.  **Move Page**: Move `src/app/checkout/page.tsx` to `src/app/(dashboard)/checkout/page.tsx`.
+3.  **Identify & Move Components**: Move `OrderSummary.tsx` and any other checkout-specific components from `src/components/` to `src/app/(dashboard)/checkout/_components/`.
+4.  **Update Imports**: Update import paths in all moved files.
+5.  **Verify**: Run `npm run build`.

@@ -337,9 +337,9 @@ This document outlines tasks to complete the MVP for NewMedica, **prioritized by
 1. **Incremental Refactoring**: Refactor the frontend file structure incrementally, one component or small, related group of components/hooks/schemas at a time.
 2. **Co-locate**: Move components, hooks, and schemas to their respective feature directories (e.g., `/app/(dashboard)/profile/_components/`).
 3. **Update Imports**: Ensure all imports are updated correctly after each move.
-4. **Document Checklist**: Detailed functionalities, dependencies, refactoring steps, and manual verification checklists for each component/feature will be documented in `frontend-refactor-checklist.md`. This will serve as a shared checklist for manual verification.
+4. **Document Checklist**: Detailed functionalities, dependencies, refactoring steps, and manual verification checklists for each component/feature will be documented in `frontend-refactor-checklist.md`. This will serve as a shared checklist for manual verification. Review this file first everytime before you start the task.
 5. **Verify Incrementally**: After each small refactoring step (e.g., moving one component), verify application functionality.
-    - **Automated Checks (by Gemini):** I will run `npm run dev` to ensure the application compiles and starts without errors. I will monitor server logs for any runtime errors or warnings. (Note: Your manual `npm run dev` instance will not be affected by my checks.)
+    - **Automated Checks (by Gemini):** I will run `cd newmedica-frontend && npm run dev` to ensure the application compiles and starts without errors. I will monitor server logs for any runtime errors or warnings. (Note: Your manual `npm run dev` instance will not be affected by my checks.)
     - **Manual Verification (by User):** The user will manually test the affected UI and interactions to confirm visual correctness and expected behavior. This is crucial for each step.
 
 **Acceptance Criteria**:
