@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import QuantitySelector from './QuantitySelector';
+import QuantitySelector from '@/components/QuantitySelector';
 import { Product } from '@/types';
 import { Globe, ShieldCheck, Gem, Share2, FileText } from 'lucide-react';
 import AddToCartConfirmation from './AddToCartConfirmation';
@@ -10,7 +10,7 @@ import { useAuthStore } from '@/store/authStore';
 import { useCartStore } from '@/store/cartStore';
 import RequestQuotationModal from './RequestQuotationModal';
 import { AnimatePresence } from 'framer-motion';
-import { showWarningAlert } from './CustomAlert'; // Import CustomAlert
+import { showWarningAlert } from '@/components/CustomAlert';
 
 interface VoucherResponse {
   id: string;

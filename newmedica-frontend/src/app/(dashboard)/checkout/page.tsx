@@ -4,7 +4,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { shippingAddressSchema, ShippingAddressFormData } from '@/lib/validations/checkout';
+import { shippingAddressSchema, ShippingAddressFormData } from './_lib/checkout';
 import OrderSummary from './_components/OrderSummary';
 import { useAuthStore } from '@/store/authStore';
 import { useCartStore } from '@/store/cartStore';

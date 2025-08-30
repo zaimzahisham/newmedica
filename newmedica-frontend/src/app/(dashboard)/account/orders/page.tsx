@@ -6,7 +6,7 @@ import { useAuthStore } from '@/store/authStore';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { ArrowLeft, Briefcase } from 'lucide-react';
-import OrderDetailsModal from '@/components/OrderDetailsModal';
+import OrderDetailsModal from '@/app/(dashboard)/orders/_components/OrderDetailsModal';
 import { AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 import { formatVoucherCode } from '@/lib/utils';

@@ -2,7 +2,7 @@
 
 import { Product } from '@/types';
 import React, { useState, useRef } from 'react';
-import ProductCard from '@/app/(dashboard)/cart/_components/ProductCard';
+import ProductCard from '@/components/ProductCard';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 type ProductCarouselProps = {

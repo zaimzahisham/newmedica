@@ -1,5 +1,5 @@
 import { getProducts } from '@/lib/api/products';
-import ProductGrid from './ProductGrid';
+import ProductGrid from '@/components/ProductGrid';
 
 export default async function FeaturedProducts() {
   const featuredProducts = await getProducts('Hot Selling')

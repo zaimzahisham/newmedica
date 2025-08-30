@@ -1,13 +1,14 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
-import ProductGrid from '@/app/(dashboard)/cart/_components/ProductGrid';
+import ProductGrid from '@/components/ProductGrid';
 import { getProducts } from '@/lib/api/products';
 import { Product } from '@/types';
+import ProductFilters from '../../_components/ProductFilters';
 import { Skeleton } from '@/components/ui/skeleton';
 
-export default function ProductList() {
+function ProductList({ category }: { category: string }) {
   const searchParams = useSearchParams();
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
@@ -18,18 +19,17 @@ export default function ProductList() {
       const search = searchParams.get('search') || undefined;
       const sortBy = searchParams.get('sort_by') || undefined;
       try {
-        const fetchedProducts = await getProducts(undefined, search, sortBy);
+        const fetchedProducts = await getProducts(category, search, sortBy);
         setProducts(fetchedProducts);
       } catch (error) {
         console.error("Failed to fetch products:", error);
-        // Optionally, set an error state to show in the UI
       } finally {
         setLoading(false);
       }
     };
 
     fetchProducts();
-  }, [searchParams]);
+  }, [searchParams, category]);
 
   if (loading) {
     return (
@@ -40,4 +40,22 @@ export default function ProductList() {
   }
 
   return <ProductGrid products={products} />;
+}
+
+export default function ProductCategoryPage({ category }: { category: string }) {
+  const pageTitle = category ? `${category.replace('-', ' ')}` : 'All Products';
+
+  return (
+    <div className="container mx-auto px-4 py-8">
+      <div className="flex justify-between items-center mb-4">
+        <h1 className="text-3xl font-bold text-foreground capitalize text-nowrap pr-4">
+          {pageTitle}
+        </h1>
+        <ProductFilters />
+      </div>
+      <Suspense fallback={<div>Loading...</div>}>
+        <ProductList category={category} />
+      </Suspense>
+    </div>
+  );
 }

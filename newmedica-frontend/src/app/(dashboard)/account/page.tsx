@@ -7,7 +7,7 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react'; // Import useState
 import { getOrders } from '@/lib/api/orders'; // Import getOrders
 import { Order } from '@/types'; // Import Order
-import OrderDetailsModal from '@/components/OrderDetailsModal'; // Import OrderDetailsModal
+import OrderDetailsModal from '@/app/(dashboard)/orders/_components/OrderDetailsModal'; // Import OrderDetailsModal
 import { AnimatePresence } from 'framer-motion'; // New import
 
 const AccountPage = () => {

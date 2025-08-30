@@ -329,7 +329,7 @@ This document outlines tasks to complete the MVP for NewMedica, **prioritized by
 - [x] Codebase formatted with Prettier.
 - [x] Linter errors fixed with ESLint.
 
-### Task 2.4: Frontend Architecture Refactoring (Feature-first)
+### Task 2.4: Frontend Architecture Refactoring (Feature-first) - ✅ COMPLETED
 **Priority**: 🟠 Medium - Code quality and maintainability
 **Dependencies**: None
 **Estimated Time**: 8-12 hours
@@ -343,12 +343,12 @@ This document outlines tasks to complete the MVP for NewMedica, **prioritized by
     - **Manual Verification (by User):** The user will manually test the affected UI and interactions to confirm visual correctness and expected behavior. This is crucial for each step.
 
 **Acceptance Criteria**:
-- [ ] Frontend project structure adheres to the feature-first layout specified in GEMINI.md / Warp.md.
-- [ ] All components, hooks, and schemas are logically grouped within their respective feature directories.
-- [ ] The application builds and runs without errors.
-- [ ] All existing frontend functionality remains intact.
-- [ ] Each refactored component/feature is manually verified by the user before proceeding to the next.
-- [ ] Functionalities and dependencies for each refactored component/feature are documented in `frontend-refactor-checklist.md`.
+- [x] Frontend project structure adheres to the feature-first layout specified in GEMINI.md / Warp.md.
+- [x] All components, hooks, and schemas are logically grouped within their respective feature directories.
+- [x] The application builds and runs without errors.
+- [x] All existing frontend functionality remains intact.
+- [x] Each refactored component/feature is manually verified by the user before proceeding to the next.
+- [x] Functionalities and dependencies for each refactored component/feature are documented in `frontend-refactor-checklist.md`.
 
 ### Task 2.2: Add Dockerization
 **Priority**: 🟠 Medium - Deployment readiness

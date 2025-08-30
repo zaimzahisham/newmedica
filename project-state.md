@@ -58,7 +58,7 @@ All critical blockers have been resolved. The project is in a stable state to pr
 
 ---
 
-## Frontend (`newmedica-frontend`) - COMPLIANCE: 80%
+## Frontend (`newmedica-frontend`) - COMPLIANCE: 95%
 
 **ARCHITECTURE**: ✅ Next.js 14 + App Router + TypeScript (compliant)
 **STYLING**: ✅ Tailwind CSS configured and working
@@ -115,10 +115,9 @@ All critical blockers have been resolved. The project is in a stable state to pr
 
 ### 🟠 MEDIUM PRIORITY IMPROVEMENTS
 
-1.  **ARCHITECTURE DEVIATION**: Not feature-first structure
-    *   All components in single `/components` directory
-    *   GEMINI.md / Warp.md specifies co-located components/hooks/schemas by feature
-    *   Should be: `/app/(dashboard)/profile/_components/`
+1.  **ARCHITECTURE ALIGNMENT**: ✅ Feature-first refactoring complete.
+    *   The frontend architecture now follows the feature-first model as specified in GEMINI.md / Warp.md.
+    *   Feature-specific components are co-located with their pages, and shared components remain in `src/components`.
 
 2.  **INCOMPLETE FUNCTIONALITY**:
     *   Account details form doesn't submit to backend

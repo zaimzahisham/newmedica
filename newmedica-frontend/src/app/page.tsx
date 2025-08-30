@@ -1,6 +1,6 @@
 import { Suspense } from 'react';
-import HomePageContent from '@/components/HomePageContent';
-import Banner from '@/components/Banner';
+import HomePageContent from './_components/HomePageContent';
+import Banner from './_components/Banner';
 
 export default function HomePage() {
   return (

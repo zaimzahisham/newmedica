@@ -31,7 +31,7 @@ This document outlines the detailed functionalities, dependencies, refactoring s
 
 ### Phase 3: Checkout (`/checkout`)
 
-**Status**: 🟡 **PENDING**
+**Status**: ✅ **COMPLETED**
 
 **Component: `CheckoutPage` (`newmedica-frontend/src/app/checkout/page.tsx`)**
 
@@ -51,3 +51,25 @@ This document outlines the detailed functionalities, dependencies, refactoring s
 3.  **Identify & Move Components**: Move `OrderSummary.tsx` and any other checkout-specific components from `src/components/` to `src/app/(dashboard)/checkout/_components/`.
 4.  **Update Imports**: Update import paths in all moved files.
 5.  **Verify**: Run `npm run build`.
+
+---
+
+### Phase 4: Products (`/products`)
+
+**Status**: ✅ **COMPLETED**
+
+**Refactoring Steps:**
+1.  **Move Directory**: Move `newmedica-frontend/src/app/products` to `newmedica-frontend/src/app/(dashboard)/products`.
+2.  **Update Imports**: Update any necessary import paths in the moved files.
+3.  **Verify**: Run `npm run build`.
+
+---
+
+### Phase 5: Orders (`/orders`)
+
+**Status**: ✅ **COMPLETED**
+
+**Refactoring Steps:**
+1.  **Move Directory**: Move `newmedica-frontend/src/app/orders` to `newmedica-frontend/src/app/(dashboard)/orders`.
+2.  **Update Imports**: Update any necessary import paths in the moved files.
+3.  **Verify**: Run `npm run build`.

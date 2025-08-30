@@ -1,5 +1,5 @@
 import React, { Suspense } from 'react';
-import ProductFilters from '@/components/ProductFilters';
+import ProductFilters from './_components/ProductFilters';
 import ProductList from './ProductList';
 
 export default function ProductsPage() {

@@ -7,7 +7,7 @@ import { useRouter } from 'next/navigation';
 import { ArrowLeft, Ticket } from 'lucide-react';
 import Link from 'next/link';
 
-import VoucherCard from '@/components/VoucherCard';
+import VoucherCard from './_components/VoucherCard';
 
 const VouchersPage = () => {
   const { user, token, loading: loadingAuth, checkAuth } = useAuthStore();
