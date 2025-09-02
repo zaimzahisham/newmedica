@@ -22,7 +22,9 @@ jobs:
         run: pip install uv
 
       - name: Install dependencies
-        run: uv pip install --system --no-cache -r newmedica-backend/pyproject.toml
+        working-directory: ./newmedica-backend
+        run: uv pip install .
 
       - name: Run tests
-        run: uv run pytest newmedica-backend/tests/ -v
+        working-directory: ./newmedica-backend
+        run: uv run pytest
