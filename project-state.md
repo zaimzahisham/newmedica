@@ -7,11 +7,48 @@ This document provides the definitive current state of the NewMedica e-commerce 
 ## Overall Status
 
 **PHASE**: MVP Feature Implementation
-**OVERALL ADHERENCE TO GEMINI.md / Warp.md**: 80%
-**MVP READINESS**: 83%
-**IMMEDIATE PRIORITY**: Frontend Architecture Refactoring (Task 2.4)
+**OVERALL ADHERENCE TO GEMINI.md / Warp.md**: 85%
+**MVP READINESS**: 90%
+**IMMEDIATE PRIORITY**: Task 2.3: Setup CI/CD Pipeline
 
 All critical blockers have been resolved. The project is in a stable state to proceed with the next high-priority tasks.
+
+---
+
+## Running the Project with Docker
+
+The entire NewMedica application stack (database, backend, frontend) is containerized using Docker and managed with Docker Compose. This provides a consistent and reproducible environment for both development and production.
+
+### Development Environment (with Hot-Reloading)
+
+This is the standard way to work on the project. It uses mounted volumes to sync your local code changes directly into the running containers, enabling instant hot-reloading.
+
+1.  **Navigate to the `newmedica-backend` directory.**
+2.  **Run the following command:**
+    ```bash
+    docker-compose up --build -d
+    ```
+
+*   This command automatically uses both `docker-compose.yml` and `docker-compose.override.yml`.
+*   The frontend will be available at `http://localhost:3000`.
+*   The backend API will be available at `http://localhost:8000`.
+
+### Production Environment
+
+This command simulates a production deployment. It does not use hot-reloading and serves the optimized, built version of the frontend.
+
+1.  **Navigate to the `newmedica-backend` directory.**
+2.  **Run the following command:**
+    ```bash
+    docker-compose -f docker-compose.yml -f docker-compose.production.yml up --build -d
+    ```
+
+### Stopping the Environment
+
+To stop all running containers, run the following command from the `newmedica-backend` directory:
+```bash
+docker-compose down
+```
 
 ---
 
@@ -134,9 +171,7 @@ All critical blockers have been resolved. The project is in a stable state to pr
 
 ### 🔴 CRITICAL MISSING INFRASTRUCTURE
 
-*   **NO DOCKERIZATION**: Missing Dockerfile for both backend/frontend
 *   **NO CI/CD**: No GitHub Actions workflows
-*   **Frontend Linting Setup**: ✅ COMPLETED
 *   **Frontend Test Coverage**: ❌ Missing
 
 ### 🟡 SECURITY & PRODUCTION READINESS

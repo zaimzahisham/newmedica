@@ -350,7 +350,7 @@ This document outlines tasks to complete the MVP for NewMedica, **prioritized by
 - [x] Each refactored component/feature is manually verified by the user before proceeding to the next.
 - [x] Functionalities and dependencies for each refactored component/feature are documented in `frontend-refactor-checklist.md`.
 
-### Task 2.2: Add Dockerization
+### Task 2.2: Add Dockerization - ✅ COMPLETED
 **Priority**: 🟠 Medium - Deployment readiness
 
 **Files to Create**:
@@ -371,7 +371,7 @@ This document outlines tasks to complete the MVP for NewMedica, **prioritized by
 
 *Goal: Complete MVP feature set*
 
-### Task 3.1: Profile Management (Backend - TDD)
+### Task 3.1: Profile Management (Backend - TDD) - ✅ COMPLETED
 **Priority**: 🟠 Medium - Prerequisite for frontend profile updates
 **Dependencies**: None
 **Estimated Time**: 4-5 hours
@@ -388,7 +388,7 @@ This document outlines tasks to complete the MVP for NewMedica, **prioritized by
 - [x] Fields not present as columns in the `User` model are correctly saved in the `extra_fields` JSONB object.
 - [x] All related tests pass.
 
-### Task 3.2: Profile Management (Frontend)
+### Task 3.2: Profile Management (Frontend)  - ✅ COMPLETED
 **Priority**: 🔵 Low - User-facing feature
 **Dependencies**: **Task 3.1: Profile Management (Backend - TDD)**
 **Path**: `/account/details`
