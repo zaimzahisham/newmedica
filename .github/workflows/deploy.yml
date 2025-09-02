@@ -38,18 +38,18 @@ jobs:
           push: true
           tags: ${{ secrets.DOCKER_USERNAME }}/newmedica-frontend:latest
 
-  deploy:
-    needs: build-and-push
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Deploy to production
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ secrets.PROD_HOST }}
-          username: ${{ secrets.PROD_USERNAME }}
-          key: ${{ secrets.PROD_SSH_KEY }}
-          script: |
-            cd /path/to/your/project
-            docker-compose -f docker-compose.yml -f docker-compose.production.yml pull
-            docker-compose -f docker-compose.yml -f docker-compose.production.yml up -d
+  #  deploy:
+#    needs: build-and-push
+#    runs-on: ubuntu-latest
+#
+#    steps:
+#      - name: Deploy to production
+#        uses: appleboy/ssh-action@master
+#        with:
+#          host: ${{ secrets.PROD_HOST }}
+#          username: ${{ secrets.PROD_USERNAME }}
+#          key: ${{ secrets.PROD_SSH_KEY }}
+#          script: |
+#            cd /path/to/your/project
+#            docker-compose -f docker-compose.yml -f docker-compose.production.yml pull
+#            docker-compose -f docker-compose.yml -f docker-compose.production.yml up -d
