@@ -53,3 +53,11 @@ newmedica-backend/*/__pycache__/
 newmedica-backend/*.pyc
 newmedica-backend/.pytest_cache/
 newmedica-backend/.ruff_cache/
+
+# Project management and Gemini-specific files
+# gemini-image-references/
+# WARP.md
+# frontend-refactor-checklist.md
+# project-state.md
+# sync_report.md
+# todo.md
