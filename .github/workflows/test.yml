@@ -9,6 +9,31 @@ jobs:
   test:
     runs-on: ubuntu-latest
 
+    env:
+      DATABASE_URL: postgresql+asyncpg://user:password@localhost:5432/testdb
+      SECRET_KEY: test_secret_key
+      ALGORITHM: HS256
+      ACCESS_TOKEN_EXPIRE_MINUTES: 30
+      REFRESH_TOKEN_EXPIRE_MINUTES: 10080
+      STRIPE_API_KEY: test_stripe_api_key
+      STRIPE_WEBHOOK_SECRET: test_stripe_webhook_secret
+      NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: test_stripe_publishable_key
+
+    services:
+      db:
+        image: postgres:15
+        env:
+          POSTGRES_USER: user
+          POSTGRES_PASSWORD: password
+          POSTGRES_DB: testdb
+        ports:
+          - 5432:5432
+        options: >- 
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
     steps:
       - name: Check out code
         uses: actions/checkout@v3
@@ -22,9 +47,12 @@ jobs:
         run: pip install uv
 
       - name: Install dependencies
-        working-directory: ./newmedica-backend
-        run: uv pip install .
+        run: uv pip install --system ./newmedica-backend
+
+      - name: Run migrations
+        run: |
+          cd newmedica-backend
+          alembic upgrade head
 
       - name: Run tests
-        working-directory: ./newmedica-backend
-        run: uv run pytest
+        run: uv run pytest newmedica-backend/tests/ -v
