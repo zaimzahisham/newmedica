@@ -60,21 +60,19 @@ class UserService:
 
     async def update_user(self, user: User, user_in: UserUpdate) -> User:
         update_data = user_in.model_dump(exclude_unset=True)
-        
-        # Separate extra_fields from other fields
-        extra_fields_update = {}
-        fields_to_move = ["firstName", "lastName", "gender", "dateOfBirth", "hpNo"]
-        
-        for field in fields_to_move:
-            if field in update_data:
-                extra_fields_update[field] = update_data.pop(field)
 
-        # Merge with existing extra_fields
-        if extra_fields_update:
+        # All fields in UserUpdate are intended for the extra_fields JSONB column.
+        # We merge them with the existing extra_fields.
+        if update_data:
             if user.extra_fields:
-                user.extra_fields.update(extra_fields_update)
+                # Update existing extra_fields with new data
+                merged_extra_fields = user.extra_fields.copy()
+                merged_extra_fields.update(update_data)
+                db_update_data = {"extra_fields": merged_extra_fields}
             else:
-                user.extra_fields = extra_fields_update
-            update_data['extra_fields'] = user.extra_fields
+                # If no extra_fields exist, create them
+                db_update_data = {"extra_fields": update_data}
+            
+            return await self.repo.update(user, db_update_data)
 
-        return await self.repo.update(user, update_data)
+        return user # Return the user as is if there's no data to update

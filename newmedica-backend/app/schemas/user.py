@@ -48,3 +48,15 @@ class UserUpdate(BaseModel):
     gender: Optional[str] = None
     dateOfBirth: Optional[str] = None
     hpNo: Optional[str] = None
+    icNo: Optional[str] = None
+    hospitalName: Optional[str] = None
+    department: Optional[str] = None
+    position: Optional[str] = None
+    companyName: Optional[str] = None
+    companyAddress: Optional[str] = None
+    coRegNo: Optional[str] = None
+    coEmailAddress: Optional[str] = None # Allow empty string
+    tinNo: Optional[str] = None
+    picEinvoice: Optional[str] = None
+    picEinvoiceEmail: Optional[str] = None # Allow empty string
+    picEinvoiceTelNo: Optional[str] = None
