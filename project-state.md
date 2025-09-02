@@ -1,4 +1,4 @@
-# Project State as of 2025-08-26 (COMPREHENSIVE ANALYSIS)
+# Project State as of 2025-09-03 (COMPREHENSIVE ANALYSIS)
 
 This document provides the definitive current state of the NewMedica e-commerce platform, separated by backend and frontend components. This analysis was conducted against GEMINI.md / Warp.md specifications.
 
@@ -7,9 +7,9 @@ This document provides the definitive current state of the NewMedica e-commerce 
 ## Overall Status
 
 **PHASE**: MVP Feature Implementation
-**OVERALL ADHERENCE TO GEMINI.md / Warp.md**: 85%
-**MVP READINESS**: 90%
-**IMMEDIATE PRIORITY**: Task 2.3: Setup CI/CD Pipeline
+**OVERALL ADHERENCE TO GEMINI.md / Warp.md**: 95%
+**MVP READINESS**: 95%
+**IMMEDIATE PRIORITY**: Task 3.5: Implement Backend extra_fields Validation (TDD)
 
 All critical blockers have been resolved. The project is in a stable state to proceed with the next high-priority tasks.
 
@@ -52,7 +52,16 @@ docker-compose down
 
 ---
 
-## Backend (`newmedica-backend`) - COMPLIANCE: 90%
+## CI/CD Pipeline
+
+The project uses GitHub Actions for Continuous Integration and Continuous Deployment (CI/CD). The workflow is defined in `.github/workflows/deploy.yml`.
+
+*   **`build-and-push` job**: This job is active. On every push to the `main` branch, it builds the backend and frontend Docker images and pushes them to Docker Hub.
+*   **`deploy` job**: This job is currently disabled (commented out). It is intended to deploy the Docker images to a production server, but has been disabled until a production server is available.
+
+---
+
+## Backend (`newmedica-backend`) - COMPLIANCE: 95%
 
 **ARCHITECTURE**: ✅ Follows GEMINI.md / Warp.md layered approach (api → controllers → services → repositories → models)
 **TECH STACK**: ✅ FastAPI + SQLModel + PostgreSQL + Alembic (compliant)
@@ -85,14 +94,15 @@ docker-compose down
 *   **Data Models**: All core models now include `created_at` and `updated_at` timestamps with timezone awareness.
 *   **Test Suite**: All backend tests are now passing with expected external library warnings. (Note: SQLAlchemy relationship warnings observed, but not critical blockers.)
 *   **Configuration**: Secrets are managed via `.env` file.
+*   **Admin Endpoints**: APIs for managing vouchers (CRUD) and updating shipping configuration are implemented.
 
 ### 🟡 HIGH PRIORITY GAPS (Required for MVP)
 
+*   **Validation**: `extra_fields` not validated against UserType schemas
+
 ### 🟠 MEDIUM PRIORITY IMPROVEMENTS
 
-*   **Admin Endpoints**: APIs for managing vouchers (CRUD) and updating shipping configuration are implemented. User approval APIs are now the lowest priority (Post-MVP).
-*   **Validation**: `extra_fields` not validated against UserType schemas
-*   **Linting/Formatting**: ✅ Ruff, Black, mypy configured and baseline established.
+*   **Admin Endpoints**: User approval APIs are now the lowest priority (Post-MVP).
 
 ---
 
@@ -171,7 +181,6 @@ docker-compose down
 
 ### 🔴 CRITICAL MISSING INFRASTRUCTURE
 
-*   **NO CI/CD**: No GitHub Actions workflows
 *   **Frontend Test Coverage**: ❌ Missing
 
 ### 🟡 SECURITY & PRODUCTION READINESS
@@ -187,3 +196,4 @@ docker-compose down
 
 **WHEN GEMINI STARTS**: Focus immediately on the next high-priority task:
 
+*   **Task 3.5: Implement Backend `extra_fields` Validation (TDD)**
