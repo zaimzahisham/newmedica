@@ -37,6 +37,8 @@ jobs:
           file: ./newmedica-frontend/Dockerfile
           push: true
           tags: ${{ secrets.DOCKER_USERNAME }}/newmedica-frontend:latest
+          build-args: |
+            STRIPE_SECRET_KEY=${{ secrets.STRIPE_SECRET_KEY }}
 
   #  deploy:
 #    needs: build-and-push
