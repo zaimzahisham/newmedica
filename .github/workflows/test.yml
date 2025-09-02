@@ -1,0 +1,28 @@
+name: Run Backend Tests
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.12'
+
+      - name: Install uv
+        run: pip install uv
+
+      - name: Install dependencies
+        run: uv pip install --system --no-cache -r newmedica-backend/pyproject.toml
+
+      - name: Run tests
+        run: uv run pytest newmedica-backend/tests/ -v
