@@ -371,19 +371,37 @@ This document outlines tasks to complete the MVP for NewMedica, **prioritized by
 
 *Goal: Complete MVP feature set*
 
-### Task 3.2: Profile Management (Frontend)
-**Priority**: 🔵 Low - User-facing feature
-**Dependencies**: Backend Profile Update (future task)
-**Path**: `/account/details`
+### Task 3.1: Profile Management (Backend - TDD)
+**Priority**: 🟠 Medium - Prerequisite for frontend profile updates
+**Dependencies**: None
+**Estimated Time**: 4-5 hours
 **Action Required**:
-1. Implement form submission logic to update user details on the backend.
-2. Ensure form fields are pre-filled with current user data.
-3. Add validation for input fields.
+1.  **Write Tests First**: Create tests for updating a user's profile.
+2.  **Create Schema**: Define a `UserUpdate` schema in `app/schemas/user.py` that allows for optional updates to all relevant fields.
+3.  **Implement Endpoint**: Create a `PATCH /api/v1/users/me` endpoint in `app/api/v1/endpoints/users.py`.
+4.  **Implement Service Logic**: The service layer must correctly handle mapping of fields like `firstName`, `lastName`, `gender`, `dateOfBirth`, `hpNo` into the `extra_fields` JSONB column, as per our saved instructions. Note: The frontend's form currently consists of email and extra_fields (double check this to confirm)
+5.  **Make Tests Pass**: Ensure tests for updating standard fields and `extra_fields` both pass.
 
 **Acceptance Criteria**:
-- [ ] User can update their profile information (e.g., name, email) via the `/account/details` page.
-- [ ] Changes are successfully persisted to the backend.
-- [ ] Form displays appropriate success/error messages.
+- [x] A `PATCH /api/v1/users/me` endpoint exists and is protected.
+- [x] Users can update their profile information.
+- [x] Fields not present as columns in the `User` model are correctly saved in the `extra_fields` JSONB object.
+- [x] All related tests pass.
+
+### Task 3.2: Profile Management (Frontend)
+**Priority**: 🔵 Low - User-facing feature
+**Dependencies**: **Task 3.1: Profile Management (Backend - TDD)**
+**Path**: `/account/details`
+**Action Required**:
+1. Implement form submission logic to send data to the `PATCH /api/v1/users/me` backend endpoint.
+2. Ensure form fields are pre-filled with current user data.
+3. Add validation for input fields.
+4. Display appropriate success/error messages upon submission.
+
+**Acceptance Criteria**:
+- [x] User can update their profile information (e.g., name, email) via the `/account/details` page.
+- [x] Changes are successfully persisted to the backend via the new endpoint.
+- [x] Form displays appropriate success/error messages.
 
 ### Task 3.3: Order History (Frontend) - ✅ COMPLETED
 **Priority**: 🔵 Low - User-facing feature
@@ -474,7 +492,7 @@ This document outlines tasks to complete the MVP for NewMedica, **prioritized by
 3. Fetch data from `GET /api/v1/users/me/vouchers`.
 4. Display vouchers, sorted by date (newest first).
 5. Handle loading and empty states.
-6. Add a link to this page in the `/account` dashboard.
+6. Add a new link to this page in the `/account` dashboard.
 
 **Acceptance Criteria**:
 - [x] User can navigate to `/account/vouchers`.
@@ -484,7 +502,7 @@ This document outlines tasks to complete the MVP for NewMedica, **prioritized by
 - [x] Page handles loading, error, and empty states gracefully.
 - [x] Link to "Vouchers" page is present on the `/account` dashboard.
 
-### Task 3.1: Admin User Management (Backend & Frontend)
+### Task 3.10: Admin User Management (Backend & Frontend)
 **Priority**: ⚪ Lowest - Post-MVP Consideration
 **Dependencies**: None
 **Estimated Time**: 6-8 hours

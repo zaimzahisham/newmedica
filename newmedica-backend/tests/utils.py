@@ -98,3 +98,23 @@ async def get_test_user_type_by_name(session: AsyncSession, name: str) -> UserTy
 async def register_user(client: AsyncClient, email: str, password: str, user_type_name: str):
     register_data = {"email": email, "password": password, "userType": user_type_name}
     return await client.post("/api/v1/auth/register", json=register_data)
+
+async def get_user_token(client: AsyncClient, session: AsyncSession, user_type: str = "Basic") -> tuple[User, str]:
+    """Creates a user, logs them in, and returns the user object and access token."""
+    unique_email = f"test_user_{uuid.uuid4()}@example.com"
+    password = "password"
+    
+    # Get or create the user type
+    user_type_obj = await create_test_user_type(session, user_type)
+    
+    # Create the user directly in the DB
+    user = await create_test_user(session, unique_email, user_type_obj.id, password)
+    
+    # Log in to get the token
+    login_response = await client.post(
+        "/api/v1/auth/login", data={"username": unique_email, "password": password}
+    )
+    assert login_response.status_code == 200, f"Login failed: {login_response.text}"
+    token_data = login_response.json()
+    
+    return user, token_data["access_token"]

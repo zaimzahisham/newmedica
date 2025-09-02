@@ -8,7 +8,7 @@ This document provides the definitive current state of the NewMedica e-commerce 
 
 **PHASE**: MVP Feature Implementation
 **OVERALL ADHERENCE TO GEMINI.md / Warp.md**: 80%
-**MVP READINESS**: 77%
+**MVP READINESS**: 83%
 **IMMEDIATE PRIORITY**: Frontend Architecture Refactoring (Task 2.4)
 
 All critical blockers have been resolved. The project is in a stable state to proceed with the next high-priority tasks.
@@ -42,6 +42,7 @@ All critical blockers have been resolved. The project is in a stable state to pr
 *   **Vouchers**: `Voucher` + `VoucherProductLink` models; seed applied for Healthcare (RM20 off Barrier Cream) and Agent (RM40 per unit if qty ≥10 for Barrier Cream).
 *   **Migrations**: Order v2 migration applied (new order/order_item fields, vouchers, shipping_config).
 *   **Address Management**: All address endpoints (`POST /api/v1/users/me/addresses`, `GET /api/v1/users/me/addresses`, `PUT /api/v1/users/me/addresses/{address_id}`, `DELETE /api/v1/users/me/addresses/{address_id}`, `POST /api/v1/users/me/addresses/{address_id}/set-primary`) are implemented and tested.
+*   **Profile Management**: Users can update their profile information via a `PATCH /api/v1/users/me` endpoint.
 *   **Database Setup**: PostgreSQL + SQLModel + Alembic migrations configured
 *   **API Versioning**: All endpoints correctly prefixed with `/api/v1`
 *   **Data Models**: All core models now include `created_at` and `updated_at` timestamps with timezone awareness.
@@ -110,7 +111,6 @@ All critical blockers have been resolved. The project is in a stable state to pr
     *   🟠 `/admin` - Admin user management (placeholder directory exists)
 2.  **INCOMPLETE FUNCTIONALITY**:
     
-    *   `/profile` - Editable profile page (frontend for Task 3.2)
     *   No admin UI components
 
 ### 🟠 MEDIUM PRIORITY IMPROVEMENTS
@@ -120,7 +120,6 @@ All critical blockers have been resolved. The project is in a stable state to pr
     *   Feature-specific components are co-located with their pages, and shared components remain in `src/components`.
 
 2.  **INCOMPLETE FUNCTIONALITY**:
-    *   Account details form doesn't submit to backend
     *   "Complete your profile" section non-functional
 
 ### 🔵 LOW PRIORITY ITEMS

@@ -7,6 +7,33 @@ import { Lock, Mail } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { getPrimaryAddress } from '@/lib/api/address';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
+import { updateUserProfile } from '@/lib/api/user';
+import { CustomAlert } from '@/components/CustomAlert';
+
+const profileSchema = z.object({
+  firstName: z.string().min(1, "First name is required"),
+  lastName: z.string().min(1, "Last name is required"),
+  gender: z.string().optional(),
+  dateOfBirth: z.string().optional(),
+  hpNo: z.string().optional(),
+  icNo: z.string().optional(),
+  hospitalName: z.string().optional(),
+  department: z.string().optional(),
+  position: z.string().optional(),
+  companyName: z.string().optional(),
+  companyAddress: z.string().optional(),
+  coRegNo: z.string().optional(),
+  coEmailAddress: z.string().email("Invalid email address").optional().or(z.literal('')),
+  tinNo: z.string().optional(),
+  picEinvoice: z.string().optional(),
+  picEinvoiceEmail: z.string().email("Invalid email address").optional().or(z.literal('')),
+  picEinvoiceTelNo: z.string().optional(),
+});
+
+type ProfileFormData = z.infer<typeof profileSchema>;
 
 const AccountDetailsPage = () => {
   const user = useAuthStore((state) => state.user);
@@ -14,6 +41,70 @@ const AccountDetailsPage = () => {
   const checkAuth = useAuthStore((state) => state.checkAuth);
   const router = useRouter();
   const [dobType, setDobType] = useState(user?.dateOfBirth ? 'date' : 'text');
+
+  const { register, handleSubmit, formState: { errors }, reset } = useForm<ProfileFormData>({
+    resolver: zodResolver(profileSchema),
+    defaultValues: {
+      firstName: user?.firstName || '',
+      lastName: user?.lastName || '',
+      gender: user?.gender || '',
+      dateOfBirth: user?.dateOfBirth || '',
+      hpNo: user?.hpNo || '',
+      icNo: user?.icNo || '',
+      hospitalName: user?.hospitalName || '',
+      department: user?.department || '',
+      position: user?.position || '',
+      companyName: user?.companyName || '',
+      companyAddress: user?.companyAddress || '',
+      coRegNo: user?.coRegNo || '',
+      coEmailAddress: user?.coEmailAddress || '',
+      tinNo: user?.tinNo || '',
+      picEinvoice: user?.picEinvoice || '',
+      picEinvoiceEmail: user?.picEinvoiceEmail || '',
+      picEinvoiceTelNo: user?.picEinvoiceTelNo || '',
+    }
+  });
+
+  useEffect(() => {
+    if (user) {
+      reset({
+        firstName: user.firstName || '',
+        lastName: user.lastName || '',
+        gender: user.gender || '',
+        dateOfBirth: user.dateOfBirth || '',
+        hpNo: user.hpNo || '',
+        icNo: user.icNo || '',
+        hospitalName: user.hospitalName || '',
+        department: user.department || '',
+        position: user.position || '',
+        companyName: user.companyName || '',
+        companyAddress: user.companyAddress || '',
+        coRegNo: user.coRegNo || '',
+        coEmailAddress: user.coEmailAddress || '',
+        tinNo: user.tinNo || '',
+        picEinvoice: user.picEinvoice || '',
+        picEinvoiceEmail: user.picEinvoiceEmail || '',
+        picEinvoiceTelNo: user.picEinvoiceTelNo || '',
+      });
+    }
+  }, [user, reset]);
+
+  const onSubmit = async (data: ProfileFormData) => {
+    try {
+      await updateUserProfile(data);
+      CustomAlert({
+        icon: 'success',
+        title: 'Profile Updated',
+        text: 'Your profile has been updated successfully.',
+      });
+    } catch {
+      CustomAlert({
+        icon: 'error',
+        title: 'Update Failed',
+        text: 'There was an error updating your profile. Please try again.',
+      });
+    }
+  };
 
   useEffect(() => {
     checkAuth();
@@ -63,22 +154,24 @@ const AccountDetailsPage = () => {
       </div>
       <h1 className="text-3xl font-bold text-gray-800 mb-8">My Account</h1>
 
-      <form onSubmit={(e) => e.preventDefault()}>
+      <form onSubmit={handleSubmit(onSubmit)}>
         {/* Account Details Section */}
         <div className="mb-10">
           <h2 className="text-xl font-semibold text-gray-700 mb-6 border-b pb-2">Account Details</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
             <div>
               <label htmlFor="firstName" className="block text-sm font-medium text-gray-600 mb-1">First Name</label>
-              <input type="text" id="firstName" defaultValue={user.firstName} className="w-full p-3 h-12 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" />
+              <input type="text" id="firstName" {...register("firstName")} className="w-full p-3 h-12 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" />
+              {errors.firstName && <p className="text-red-500 text-xs mt-1">{errors.firstName.message}</p>}
             </div>
             <div>
               <label htmlFor="lastName" className="block text-sm font-medium text-gray-600 mb-1">Last Name</label>
-              <input type="text" id="lastName" defaultValue={user.lastName || ''} className="w-full p-3 h-12 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" />
+              <input type="text" id="lastName" {...register("lastName")} className="w-full p-3 h-12 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" />
+              {errors.lastName && <p className="text-red-500 text-xs mt-1">{errors.lastName.message}</p>}
             </div>
             <div>
               <label htmlFor="gender" className="block text-sm font-medium text-gray-600 mb-1">Gender</label>
-              <select id="gender" defaultValue={user.gender || ''} className="w-full p-3 h-12 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
+              <select id="gender" {...register("gender")} className="w-full p-3 h-12 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
                 <option value="" disabled>Select Gender</option>
                 <option value="Male">Male</option>
                 <option value="Female">Female</option>
@@ -90,14 +183,15 @@ const AccountDetailsPage = () => {
               <input
                 type={dobType}
                 onFocus={() => setDobType('date')}
-                onBlur={(e) => {
-                  if (!e.target.value) {
-                    setDobType('text');
-                  }
-                }}
                 id="dob"
                 placeholder="DD/MM/YYYY"
-                defaultValue={user.dateOfBirth || ''}
+                {...register("dateOfBirth", { 
+                  onBlur: (e) => {
+                    if (!e.target.value) {
+                      setDobType('text');
+                    }
+                  }
+                })}
                 className="w-full p-3 h-12 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
               />
             </div>
@@ -107,7 +201,7 @@ const AccountDetailsPage = () => {
             </div>
             <div>
               <label htmlFor="phone" className="block text-sm font-medium text-gray-600 mb-1">Phone</label>
-              <input type="tel" id="phone" defaultValue={user.hpNo || ''} className="w-full p-3 h-12 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" />
+              <input type="tel" id="phone" {...register("hpNo")} className="w-full p-3 h-12 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" />
             </div>
 
             {/* UserType Specific Fields */}
@@ -115,19 +209,19 @@ const AccountDetailsPage = () => {
               <>
                 <div>
                   <label className="block text-sm font-medium text-gray-600 mb-1">IC No</label>
-                  <input type="text" defaultValue={user.icNo || ''} className="w-full p-3 border border-gray-300 rounded-md shadow-sm" />
+                  <input type="text" {...register("icNo")} className="w-full p-3 border border-gray-300 rounded-md shadow-sm" />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-600 mb-1">Hospital Name</label>
-                  <input type="text" defaultValue={user.hospitalName || ''} className="w-full p-3 border border-gray-300 rounded-md shadow-sm" />
+                  <input type="text" {...register("hospitalName")} className="w-full p-3 border border-gray-300 rounded-md shadow-sm" />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-600 mb-1">Department</label>
-                  <input type="text" defaultValue={user.department || ''} className="w-full p-3 border border-gray-300 rounded-md shadow-sm" />
+                  <input type="text" {...register("department")} className="w-full p-3 border border-gray-300 rounded-md shadow-sm" />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-600 mb-1">Position</label>
-                  <input type="text" defaultValue={user.position || ''} className="w-full p-3 border border-gray-300 rounded-md shadow-sm" />
+                  <input type="text" {...register("position")} className="w-full p-3 border border-gray-300 rounded-md shadow-sm" />
                 </div>
               </>
             )}
@@ -135,39 +229,41 @@ const AccountDetailsPage = () => {
               <>
                 <div>
                   <label className="block text-sm font-medium text-gray-600 mb-1">IC No</label>
-                  <input type="text" defaultValue={user.icNo || ''} className="w-full p-3 border border-gray-300 rounded-md shadow-sm" />
+                  <input type="text" {...register("icNo")} className="w-full p-3 border border-gray-300 rounded-md shadow-sm" />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-600 mb-1">Company Name</label>
-                  <input type="text" defaultValue={user.companyName || ''} className="w-full p-3 border border-gray-300 rounded-md shadow-sm" />
+                  <input type="text" {...register("companyName")} className="w-full p-3 border border-gray-300 rounded-md shadow-sm" />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-600 mb-1">Company Address</label>
-                  <input type="text" defaultValue={user.companyAddress || ''} className="w-full p-3 border border-gray-300 rounded-md shadow-sm" />
+                  <input type="text" {...register("companyAddress")} className="w-full p-3 border border-gray-300 rounded-md shadow-sm" />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-600 mb-1">Co Reg No</label>
-                  <input type="text" defaultValue={user.coRegNo || ''} className="w-full p-3 border border-gray-300 rounded-md shadow-sm" />
+                  <input type="text" {...register("coRegNo")} className="w-full p-3 border border-gray-300 rounded-md shadow-sm" />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-600 mb-1">Co Email Address</label>
-                  <input type="email" defaultValue={user.coEmailAddress || ''} className="w-full p-3 border border-gray-300 rounded-md shadow-sm" />
+                  <input type="email" {...register("coEmailAddress")} className="w-full p-3 border border-gray-300 rounded-md shadow-sm" />
+                  {errors.coEmailAddress && <p className="text-red-500 text-xs mt-1">{errors.coEmailAddress.message}</p>}
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-600 mb-1">TIN No</label>
-                  <input type="text" defaultValue={user.tinNo || ''} className="w-full p-3 border border-gray-300 rounded-md shadow-sm" />
+                  <input type="text" {...register("tinNo")} className="w-full p-3 border border-gray-300 rounded-md shadow-sm" />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-600 mb-1">PIC of E-invoice</label>
-                  <input type="text" defaultValue={user.picEinvoice || ''} className="w-full p-3 border border-gray-300 rounded-md shadow-sm" />
+                  <input type="text" {...register("picEinvoice")} className="w-full p-3 border border-gray-300 rounded-md shadow-sm" />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-600 mb-1">PIC of E-invoice Email</label>
-                  <input type="email" defaultValue={user.picEinvoiceEmail || ''} className="w-full p-3 border border-gray-300 rounded-md shadow-sm" />
+                  <input type="email" {...register("picEinvoiceEmail")} className="w-full p-3 border border-gray-300 rounded-md shadow-sm" />
+                  {errors.picEinvoiceEmail && <p className="text-red-500 text-xs mt-1">{errors.picEinvoiceEmail.message}</p>}
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-600 mb-1">PIC of E-invoice Tel No</label>
-                  <input type="tel" defaultValue={user.picEinvoiceTelNo || ''} className="w-full p-3 border border-gray-300 rounded-md shadow-sm" />
+                  <input type="tel" {...register("picEinvoiceTelNo")} className="w-full p-3 border border-gray-300 rounded-md shadow-sm" />
                 </div>
               </>
             )}
@@ -175,7 +271,7 @@ const AccountDetailsPage = () => {
         </div>
 
         <div className="flex justify-end gap-4 mb-10">
-            <button type="button" className="px-6 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50">Cancel</button>
+            <button type="button" onClick={() => reset()} className="px-6 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50">Cancel</button>
             <button type="submit" className="px-6 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-black hover:bg-gray-800">Submit</button>
         </div>
       </form>

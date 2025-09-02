@@ -1,6 +1,7 @@
 from typing import Optional
 import uuid
 
+from sqlalchemy.orm.attributes import flag_modified
 from sqlmodel import select
 from sqlmodel.ext.asyncio.session import AsyncSession
 
@@ -31,3 +32,13 @@ class UserRepository:
         await self.session.commit()
         await self.session.refresh(db_user)
         return db_user
+
+    async def update(self, user: User, update_data: dict) -> User:
+        for field, value in update_data.items():
+            setattr(user, field, value)
+        if 'extra_fields' in update_data:
+            flag_modified(user, "extra_fields")
+        self.session.add(user)
+        await self.session.commit()
+        await self.session.refresh(user)
+        return user

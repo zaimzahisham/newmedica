@@ -41,3 +41,10 @@ class UserReadWithDetails(UserRead):
     pic_einvoice: Optional[str] = None
     pic_einvoice_email: Optional[str] = None
     pic_einvoice_tel_no: Optional[str] = None
+
+class UserUpdate(BaseModel):
+    firstName: Optional[str] = None
+    lastName: Optional[str] = None
+    gender: Optional[str] = None
+    dateOfBirth: Optional[str] = None
+    hpNo: Optional[str] = None
