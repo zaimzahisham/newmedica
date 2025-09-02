@@ -14,6 +14,8 @@ CMD ["npm", "run", "dev"]
 # Production build stage
 FROM base AS build
 ENV NODE_ENV=production
+ARG STRIPE_SECRET_KEY
+ENV STRIPE_SECRET_KEY=$STRIPE_SECRET_KEY
 RUN npm install --production
 COPY . .
 RUN npm run build

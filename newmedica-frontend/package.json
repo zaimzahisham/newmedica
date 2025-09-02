@@ -30,9 +30,7 @@
     "zod": "^4.1.1",
     "zustand": "^5.0.8",
     "typescript": "^5",
-    "@tailwindcss/postcss": "^4.1.11"
-  },
-  "devDependencies": {
+    "@tailwindcss/postcss": "^4.1.11",
     "@eslint/eslintrc": "^3",
     "@types/node": "^20",
     "@types/react": "^19",
@@ -40,5 +38,6 @@
     "eslint": "^9",
     "eslint-config-next": "15.4.6",
     "tailwindcss": "^4.1.11"
-  }
+  },
+  "devDependencies": {}
 }
