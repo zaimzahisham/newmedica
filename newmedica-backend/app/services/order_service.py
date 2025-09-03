@@ -1,4 +1,5 @@
 import uuid
+import stripe
 from sqlmodel.ext.asyncio.session import AsyncSession
 from app.repositories.order_repository import OrderRepository
 from app.repositories.cart_repository import CartRepository
@@ -7,26 +8,23 @@ from app.models.product import Product
 from sqlmodel import select
 from sqlalchemy.orm import selectinload
 from app.services.pricing_service import PricingService
+from app.core.config import settings
+from fastapi import HTTPException, status
 
 class OrderService:
     def __init__(self, session: AsyncSession):
         self.session = session
         self.order_repository = OrderRepository(session)
         self.cart_repository = CartRepository(session)
+        stripe.api_key = settings.STRIPE_SECRET_KEY
 
     async def create_order_from_cart(self, user_id: uuid.UUID, clear_cart: bool = True) -> Order:
         cart = await self.cart_repository.get_cart_by_user_id(user_id)
-        # Check for an existing pending order first
-        existing_pending_order = await self.order_repository.get_pending_order_by_user_id(user_id)
-        if existing_pending_order:
-            # If a pending order exists, we'll work with that one instead of creating a new one.
-            # This prevents creating duplicate orders if the user abandons and retries checkout.
-            order = existing_pending_order
-        else:
-            # If no pending order, create a new one
-            if not cart or not cart.items:
-                raise ValueError("Cart is empty")
-            order = await self.order_repository.create_order_from_cart(user_id, cart)
+        
+        # Always create a new order from the cart
+        if not cart or not cart.items:
+            raise ValueError("Cart is empty")
+        order = await self.order_repository.create_order_from_cart(user_id, cart)
 
         # Compute totals using pricing service (includes vouchers + shipping)
         pricing = PricingService(self.session)
@@ -102,6 +100,105 @@ class OrderService:
 
     async def get_order_by_id(self, order_id: uuid.UUID) -> Order | None:
         return await self.order_repository.get_order_by_id(order_id)
+
+    def _create_stripe_session_for_order(self, order: Order) -> dict:
+        line_items = []
+        for item in order.items:
+            line_items.append(
+                {
+                    "price_data": {
+                        "currency": order.currency or "myr",
+                        "product_data": {
+                            "name": item.snapshot_name,
+                        },
+                        "unit_amount": int(item.unit_price * 100), # Stripe expects amount in cents
+                    },
+                    "quantity": item.quantity,
+                }
+            )
+        
+        # Add shipping as a line item
+        if order.shipping_amount > 0:
+            line_items.append(
+                {
+                    "price_data": {
+                        "currency": order.currency or "myr",
+                        "product_data": {
+                            "name": "Shipping",
+                        },
+                        "unit_amount": int(order.shipping_amount * 100),
+                    },
+                    "quantity": 1,
+                }
+            )
+
+        # Add discount as a coupon
+        if order.discount_amount > 0:
+            coupon = stripe.Coupon.create(
+                name=f"D-{order.id}",
+                amount_off=int(order.discount_amount * 100),
+                currency=order.currency or "myr",
+                duration="once",
+            )
+            discounts = [{"coupon": coupon.id}]
+        else:
+            discounts = []
+
+        checkout_session = stripe.checkout.Session.create(
+            payment_method_types=["card", "fpx"],
+            line_items=line_items,
+            discounts=discounts,
+            mode="payment",
+            success_url=f"{settings.server_host}/orders/success?session_id={{CHECKOUT_SESSION_ID}}",
+            cancel_url=f"{settings.server_host}/orders/cancel",
+            client_reference_id=str(order.id),
+        )
+        return checkout_session
+
+    async def verify_payment_status(self, stripe_session_id: str, user_id: uuid.UUID) -> Order:
+        try:
+            checkout_session = stripe.checkout.Session.retrieve(stripe_session_id)
+        except stripe.error.StripeError as e:
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"Stripe API Error: {e.user_message}")
+
+        if not checkout_session:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Stripe session not found.")
+
+        if checkout_session.payment_status != "paid":
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Payment not successful.")
+
+        client_reference_id = checkout_session.client_reference_id
+        if not client_reference_id:
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Client reference ID not found in Stripe session.")
+
+        order_id = uuid.UUID(client_reference_id)
+        order = await self.get_order_by_id(order_id)
+
+        if not order or order.user_id != user_id:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Order not found or does not belong to user.")
+
+        if order.payment_status == "paid":
+            return order # Already paid, no need to update
+
+        updated_order = await self.mark_order_paid(order_id)
+        if not updated_order:
+            raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Failed to update order status.")
+        return updated_order
+
+    async def retry_payment_for_order(self, order_id: uuid.UUID, user_id: uuid.UUID) -> dict:
+        order = await self.get_order_by_id(order_id)
+
+        if not order or order.user_id != user_id:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Order not found")
+
+        if order.payment_status != "pending":
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=f"Order has already been paid.",
+            )
+
+        session = self._create_stripe_session_for_order(order)
+        return session
 
     async def mark_order_paid(self, order_id: uuid.UUID) -> Order | None:
         # Update status first

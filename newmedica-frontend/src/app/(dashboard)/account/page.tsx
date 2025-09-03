@@ -4,22 +4,22 @@ import { useAuthStore } from '@/store/authStore';
 import { MapPin, User as UserIcon, Briefcase, FileText } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react'; // Import useState
-import { getOrders } from '@/lib/api/orders'; // Import getOrders
-import { Order } from '@/types'; // Import Order
-import OrderDetailsModal from '@/app/(dashboard)/orders/_components/OrderDetailsModal'; // Import OrderDetailsModal
-import { AnimatePresence } from 'framer-motion'; // New import
+import { useEffect, useState } from 'react';
+import { getOrders, retryPayment } from '@/lib/api/orders';
+import { Order } from '@/types';
+import OrderDetailsModal from '@/app/(dashboard)/orders/_components/OrderDetailsModal';
+import { AnimatePresence } from 'framer-motion';
 
 const AccountPage = () => {
   const { user, loading, logout, token } = useAuthStore();
   const router = useRouter();
 
-  // Move useState declarations here
   const [recentOrders, setRecentOrders] = useState<Order[]>([]);
   const [ordersLoading, setOrdersLoading] = useState(true);
   const [ordersError, setOrdersError] = useState<string | null>(null);
-  const [isModalOpen, setIsModalOpen] = useState(false); // New state for modal
-  const [selectedOrder, setSelectedOrder] = useState<Order | null>(null); // New state for selected order
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
+  const [retryingOrderId, setRetryingOrderId] = useState<string | null>(null);
 
   useEffect(() => {
     if (!loading && !user) {
@@ -28,11 +28,10 @@ const AccountPage = () => {
     }
 
     const fetchRecentOrders = async () => {
-      if (!user || !token) return; // Ensure user and token are available
+      if (!user || !token) return;
       try {
         setOrdersLoading(true);
         const fetchedOrders = await getOrders();
-        // Take the first 3 orders for "Recent Orders"
         setRecentOrders(fetchedOrders.slice(0, 3));
       } catch (err) {
         setOrdersError((err as Error).message);
@@ -44,7 +43,6 @@ const AccountPage = () => {
     fetchRecentOrders();
   }, [user, token, loading, router]);
 
-  // New functions for modal
   const handleViewDetails = (order: Order) => {
     setSelectedOrder(order);
     setIsModalOpen(true);
@@ -55,8 +53,23 @@ const AccountPage = () => {
     setSelectedOrder(null);
   };
 
+  const handleRetryPayment = async (orderId: string) => {
+    setRetryingOrderId(orderId);
+    try {
+      const response = await retryPayment(orderId);
+      if (response.payment_url) {
+        router.push(response.payment_url); // Use router.push for external redirects
+      }
+    } catch (error) {
+      console.error("Retry payment failed", error);
+      setOrdersError('Failed to retry payment. Please try again.');
+    } finally {
+      setRetryingOrderId(null);
+    }
+  };
+
   if (loading || !user) {
-    return <div>Loading...</div>; // or a loading spinner
+    return <div>Loading...</div>;
   }
 
   const incompleteFields = [];
@@ -140,10 +153,19 @@ const AccountPage = () => {
                     </div>
                     <p className="text-gray-600 text-sm mb-1">Date: {new Date(order.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
                     <p className="font-bold text-md">Total: {order.currency} {order.total_amount.toFixed(2)}</p>
-                    <div className="mt-3 text-right">
+                    <div className="mt-3 text-right flex justify-end items-center space-x-4">
                       <button onClick={() => handleViewDetails(order)} className="text-blue-600 hover:underline text-sm">
                         View Details
                       </button>
+                      {order.payment_status === 'pending' && (
+                        <button
+                          onClick={() => handleRetryPayment(order.id)}
+                          disabled={retryingOrderId === order.id}
+                          className="bg-black text-white px-2 py-1 rounded-md hover:bg-gray-800 disabled:bg-gray-400 font-semibold text-sm"
+                        >
+                          {retryingOrderId === order.id ? 'Processing...' : 'Retry Payment'}
+                        </button>
+                      )}
                     </div>
                   </div>
                 ))}

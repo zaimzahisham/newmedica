@@ -15,5 +15,11 @@ class OrderController:
     async def get_order_by_id(self, order_id: uuid.UUID):
         return await self.order_service.get_order_by_id(order_id)
 
+    async def verify_payment_status(self, stripe_session_id: str, user_id: uuid.UUID):
+        return await self.order_service.verify_payment_status(stripe_session_id=stripe_session_id, user_id=user_id)
+
+    async def retry_payment_for_order(self, order_id: uuid.UUID, user_id: uuid.UUID):
+        return await self.order_service.retry_payment_for_order(order_id=order_id, user_id=user_id)
+
     async def mark_order_paid(self, order_id: uuid.UUID):
         return await self.order_service.mark_order_paid(order_id)
