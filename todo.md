@@ -28,8 +28,8 @@ This document outlines tasks to complete the MVP for NewMedica, **prioritized by
 
 *Goal: Complete MVP feature set*
 
-### Task 3.5: Implement Backend `extra_fields` Validation (TDD)
-**Priority**: 🟡 High - Data integrity
+### ✅ Task 3.5: Implement Backend `extra_fields` Validation (TDD)
+**Priority**: 🟢 Completed
 **Dependencies**: None
 **Estimated Time**: 3-4 hours
 **Action Required**:
@@ -39,9 +39,9 @@ This document outlines tasks to complete the MVP for NewMedica, **prioritized by
 4. **Make Tests Pass**: Ensure all validation tests pass.
 
 **Acceptance Criteria**:
-- [ ] `extra_fields` are correctly validated based on `UserType` during registration and profile updates.
-- [ ] Invalid `extra_fields` data results in appropriate error responses.
-- [ ] All existing tests pass.
+- [x] `extra_fields` are correctly validated based on `UserType` during registration and profile updates.
+- [x] Invalid `extra_fields` data results in appropriate error responses.
+- [x] All existing tests pass.
 
 ### Task 3.10: Admin User Management (Backend & Frontend)
 **Priority**: ⚪ Lowest - Post-MVP Consideration
