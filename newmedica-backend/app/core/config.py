@@ -9,6 +9,7 @@ class Settings(BaseSettings):
     BACKEND_CORS_ORIGINS: List[str] = [
         "http://localhost:3000",
         "http://localhost:3001",
+        "http://frontend:3000",
     ]
     DATABASE_URL: str
     SECRET_KEY: str

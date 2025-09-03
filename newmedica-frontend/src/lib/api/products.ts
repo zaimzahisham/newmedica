@@ -1,6 +1,7 @@
 import { Category, Product } from '@/types';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+import { getApiUrl } from '../utils/api';
+const API_URL = getApiUrl();
 
 export async function getCategories(): Promise<Category[]> {
   const response = await fetch(`${API_URL}/api/v1/categories`);

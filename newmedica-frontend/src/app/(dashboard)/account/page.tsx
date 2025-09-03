@@ -87,7 +87,7 @@ const AccountPage = () => {
   return (
     <div className="container mx-auto p-4">
       <div className="flex justify-between items-center mb-4">
-        <h1 className="text-2xl font-bold">Hi, {user.firstName}</h1>
+        <h1 className="text-2xl font-bold">Hi, {user.firstName} !</h1>
         <button className="text-sm text-gray-500 hover:underline" onClick={() => logout()}>Log out</button>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">

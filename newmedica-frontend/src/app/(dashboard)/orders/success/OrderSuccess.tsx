@@ -5,8 +5,9 @@ import Link from 'next/link';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { getAuthToken } from '@/lib/utils';
 import { useCartStore } from '@/store/cartStore';
+import { getApiUrl } from '@/lib/utils/api';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+const API_URL = getApiUrl();
 
 function OrderSuccess() {
   const searchParams = useSearchParams();

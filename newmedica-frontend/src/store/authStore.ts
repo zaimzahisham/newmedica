@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { User } from '@/types';
 import { useCartStore } from './cartStore';
+import { getApiUrl } from '@/lib/utils/api';
 
 interface AuthState {
   user: User | null;
@@ -31,7 +32,7 @@ export const useAuthStore = create(
       fetchUserProfile: async (token) => {
         set({ loading: true, token }); // Set token when fetching profile
         try {
-          const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/users/me`, {
+          const response = await fetch(`${getApiUrl()}/api/v1/users/me`, {
             headers: {
               'Authorization': `Bearer ${token}`,
             },
@@ -52,7 +53,7 @@ export const useAuthStore = create(
       login: async (email, password) => {
         set({ loading: true });
         try {
-          const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/auth/login`, {
+          const response = await fetch(`${getApiUrl()}/api/v1/auth/login`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/x-www-form-urlencoded',

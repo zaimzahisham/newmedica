@@ -103,8 +103,8 @@ const Navbar = () => {
                   </div>
                   <Link href="/account" className="block px-4 py-2 text-sm text-foreground/80 hover:bg-gray-100">My Account</Link>
                   <Link href="/account/address" className="block px-4 py-2 text-sm text-foreground/80 hover:bg-gray-100">Address Book</Link>
-                  <Link href="#" className="block px-4 py-2 text-sm text-foreground/80 hover:bg-gray-100">Order History</Link>
-                  <Link href="#" className="block px-4 py-2 text-sm text-foreground/80 hover:bg-gray-100">Vouchers</Link>
+                  <Link href="/account/orders" className="block px-4 py-2 text-sm text-foreground/80 hover:bg-gray-100">Order History</Link>
+                  <Link href="/account/vouchers" className="block px-4 py-2 text-sm text-foreground/80 hover:bg-gray-100">Vouchers</Link>
                   <button onClick={logout} className="w-full text-left block px-4 py-2 text-sm text-foreground/80 hover:bg-gray-100">Log out</button>
                 </div>
               )}

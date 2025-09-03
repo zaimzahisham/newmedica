@@ -1,6 +1,7 @@
 import { getAuthToken } from '../utils';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+import { getApiUrl } from '../utils/api';
+const API_URL = getApiUrl();
 
 export type AddressDto = {
   id: string;

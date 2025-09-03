@@ -11,6 +11,7 @@ import { useCartStore } from '@/store/cartStore';
 import RequestQuotationModal from './RequestQuotationModal';
 import { AnimatePresence } from 'framer-motion';
 import { showWarningAlert } from '@/components/CustomAlert';
+import { getApiUrl } from '@/lib/utils/api';
 
 interface VoucherResponse {
   id: string;
@@ -52,7 +53,7 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
 
       setVouchersLoading(true);
       try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/products/${product.id}/vouchers`, {
+        const response = await fetch(`${getApiUrl()}/api/v1/products/${product.id}/vouchers`, {
           headers: {
             'Authorization': `Bearer ${token}`,
           },

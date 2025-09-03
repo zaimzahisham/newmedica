@@ -11,6 +11,7 @@ import { useCartStore } from '@/store/cartStore';
 import { loadStripe, type Stripe } from '@stripe/stripe-js';
 import { getAddresses, getPrimaryAddress, type AddressDto } from '@/lib/api/address';
 import { getAuthToken } from '@/lib/utils';
+import { getApiUrl } from '@/lib/utils/api';
 
 import { ArrowLeft } from 'lucide-react'; // Import ArrowLeft
 
@@ -157,7 +158,7 @@ const CheckoutPage = () => {
           clear_cart: false,
         };
 
-        const apiBase = process.env.NEXT_PUBLIC_API_BASE_URL || process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+        const apiBase = getApiUrl();
         const createRes = await fetch(`${apiBase}/api/v1/orders`, {
           method: 'POST',
           headers: {
@@ -238,7 +239,7 @@ const CheckoutPage = () => {
           },
         };
 
-        const apiBase = process.env.NEXT_PUBLIC_API_BASE_URL || process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+        const apiBase =  getApiUrl();
         const res = await fetch(`${apiBase}/api/v1/orders`, {
           method: 'POST',
           headers: {
