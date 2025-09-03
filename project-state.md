@@ -1,4 +1,4 @@
-# Project State as of 2025-09-03 (COMPREHENSIVE ANALYSIS)
+# Project State as of 2025-09-04 (COMPREHENSIVE ANALYSIS)
 
 This document provides the definitive current state of the NewMedica e-commerce platform, separated by backend and frontend components. This analysis was conducted against GEMINI.md / Warp.md specifications.
 
@@ -7,12 +7,12 @@ This document provides the definitive current state of the NewMedica e-commerce 
 ## Overall Status
 
 **PHASE**: Final MVP Tasks
-**OVERALL ADHERENCE TO GEMINI.md / Warp.md**: 98%
-**MVP READINESS**: 98%
-**IMMEDIATE PRIORITY**: Task 3.5: Implement Backend extra_fields Validation (TDD)
+**OVERALL ADHERENCE TO GEMINI.md / Warp.md**: 95%
+**MVP READINESS**: 95%
+**IMMEDIATE PRIORITY**: Task 0.1: Fix Incorrect Order Subtotal on Checkout Retry
 
-All critical blockers have been resolved. The project is in a stable state to proceed with the next high-priority tasks.
-
+### 🔴 CRITICAL BLOCKERS
+- **Critical Bug**: A critical bug (`Task 0.1`) exists where the order subtotal is not correctly updated on checkout retry.
 ---
 
 ## Running the Project with Docker
@@ -61,11 +61,11 @@ The project uses GitHub Actions for Continuous Integration and Continuous Deploy
 
 ---
 
-## Backend (`newmedica-backend`) - COMPLIANCE: 98%
+## Backend (`newmedica-backend`) - COMPLIANCE: 99%
 
 **ARCHITECTURE**: ✅ Follows GEMINI.md / Warp.md layered approach (api → controllers → services → repositories → models)
 **TECH STACK**: ✅ FastAPI + SQLModel + PostgreSQL + Alembic (compliant)
-**CRITICAL ISSUES**: ✅ All critical issues resolved.
+**CRITICAL ISSUES**: ❌ 1 critical bug identified (`Task 0.1`).
 
 ### ✅ COMPLIANT Features (Working as per GEMINI.md / Warp.md)
 
@@ -91,15 +91,15 @@ The project uses GitHub Actions for Continuous Integration and Continuous Deploy
 *   **Profile Management**: Users can update their profile information via a `PATCH /api/v1/users/me` endpoint.
 *   **Database Setup**: PostgreSQL + SQLModel + Alembic migrations configured
 *   **API Versioning**: All endpoints correctly prefixed with `/api/v1`
-*   **Data Models**: All core models now include `created_at` and `updated_at` timestamps with timezone awareness.
+*   **Data Models**: All core models now include `created_at` and `updated_at` timestamps with timezone awareness. (Note: `ShippingConfig` is missing `created_at`).
 *   **Test Suite**: All backend tests are now passing with expected external library warnings. (Note: SQLAlchemy relationship warnings observed, but not critical blockers.)
 *   **Configuration**: Secrets are managed via `.env` file.
-    *   **Validation**: `extra_fields` are now validated on registration for Agent and Healthcare users.
+*   **Validation**: `extra_fields` are now validated on registration for Agent and Healthcare users.
 *   **Admin Endpoints**: APIs for managing vouchers (CRUD) and updating shipping configuration are implemented.
 
 ### 🟡 HIGH PRIORITY GAPS (Required for MVP)
 
-*   **Validation**: `extra_fields` not validated against UserType schemas
+*   None.
 
 ### 🟠 MEDIUM PRIORITY IMPROVEMENTS
 
@@ -107,7 +107,7 @@ The project uses GitHub Actions for Continuous Integration and Continuous Deploy
 
 ---
 
-## Frontend (`newmedica-frontend`) - COMPLIANCE: 98%
+## Frontend (`newmedica-frontend`) - COMPLIANCE: 95%
 
 **ARCHITECTURE**: ✅ Next.js 14 + App Router + TypeScript (compliant)
 **STYLING**: ✅ Tailwind CSS configured and working
@@ -144,7 +144,7 @@ The project uses GitHub Actions for Continuous Integration and Continuous Deploy
 - ✅ `/account/address` (Address management: list/add/edit/delete/set-primary with animations and alerts)
 - ✅ `/cart` (Shopping cart is now fully functional)
 - ✅ `/checkout` (Prefill from primary; “Use saved address” with “New address”; Payment method section; Stripe redirect working; success/cancel pages). **Now displays detailed order summary (subtotal, discount, shipping, total).**
-- ✅ `/orders` - Order history page
+- ✅ `/account/orders` - Order history page
 
 **COMPONENTS IMPLEMENTED**:
 - Navigation: `Navbar` (with dynamic cart count), `Footer`, `ThemeToggleButton`
@@ -169,12 +169,15 @@ The project uses GitHub Actions for Continuous Integration and Continuous Deploy
 
 2.  **INCOMPLETE FUNCTIONALITY**:
     *   "Complete your profile" section non-functional
+    *   "Change password" functionality not implemented
+    *   "Verify email" functionality not implemented
 
 ### 🔵 LOW PRIORITY ITEMS
 
 *   **Accessibility**: No WCAG AA compliance validation
 *   **Server Components**: Could leverage more RSC for data fetching
 *   **Performance**: No image optimization beyond Next.js defaults
+*   **Static Pages**: TOS, Privacy, Refund pages not implemented
 
 ---
 
@@ -193,8 +196,14 @@ The project uses GitHub Actions for Continuous Integration and Continuous Deploy
 
 ---
 
+## POST-MVP FEATURES
+
+*   **Admin Content Management**: Allow admin to update homepage and static page content.
+
+---
+
 ## NEXT ACTIONS FOR GEMINI CLI
 
 **WHEN GEMINI STARTS**: Focus immediately on the next high-priority task:
 
-*   **Task 3.5: Implement Backend `extra_fields` Validation (TDD)**
+*   **Task 0.1: Fix Incorrect Order Subtotal on Checkout Retry**
