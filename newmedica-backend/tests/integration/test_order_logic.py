@@ -10,10 +10,10 @@ from sqlmodel import select
 import uuid
 
 @pytest.mark.asyncio
-async def test_retrying_checkout_reuses_pending_order(async_client: AsyncClient, session: AsyncSession):
+async def test_checkout_from_cart_always_creates_new_order(async_client: AsyncClient, session: AsyncSession):
     """
-    Tests that if a user creates a pending order and then attempts to create another one
-    without completing the first, the system reuses the existing pending order instead of creating a new one.
+    Tests that a checkout from the cart ALWAYS creates a new order,
+    even if a previous pending order exists for the user.
     """
     # 1. Setup: Create a user, a product, and add it to the user's cart
     register_res = await register_user(async_client, "testreuse@example.com", "password123", "Basic")
@@ -21,13 +21,13 @@ async def test_retrying_checkout_reuses_pending_order(async_client: AsyncClient,
     token = login_res.json()["access_token"]
     headers = {"Authorization": f"Bearer {token}"}
 
-    # Fetch the user object from the database using the email
+    # Fetch the user object from the database
     result = await session.execute(select(User).where(User.email == "testreuse@example.com"))
     user = result.scalar_one()
-    product, _ = await create_test_product_and_category(session, "Reusable Product", 99.99)
-    await add_item_to_cart(async_client, headers, product.id, 1)
+    product1, _ = await create_test_product_and_category(session, "Product One", 99.99)
+    await add_item_to_cart(async_client, headers, product1.id, 1)
 
-    # 2. First call to create an order
+    # 2. First checkout: Create Order A. This should also clear the cart.
     response1 = await async_client.post("/api/v1/orders", headers=headers, json={"payment_method": "stripe"})
     assert response1.status_code == 201
     order1_data = response1.json()
@@ -37,16 +37,20 @@ async def test_retrying_checkout_reuses_pending_order(async_client: AsyncClient,
     orders_in_db_after_1 = await session.execute(select(Order).where(Order.user_id == user.id))
     assert len(orders_in_db_after_1.scalars().all()) == 1
 
-    # 3. Second call to create an order, without completing the first one
-    response2 = await async_client.post("/api/v1/orders", headers=headers, json={})
+    # 3. Setup for second checkout: Add a new item to the now-empty cart
+    product2, _ = await create_test_product_and_category(session, "Product Two", 19.99)
+    await add_item_to_cart(async_client, headers, product2.id, 2)
+
+    # 4. Second checkout: Create Order B
+    response2 = await async_client.post("/api/v1/orders", headers=headers, json={"payment_method": "stripe"})
     assert response2.status_code == 201
     order2_data = response2.json()
     order2_id = order2_data["id"]
 
-    # 4. Assertions: Verify that no new order was created and the original order was reused
+    # 5. Assertions: Verify that a new, distinct order was created
     orders_in_db_after_2 = await session.execute(select(Order).where(Order.user_id == user.id))
-    assert len(orders_in_db_after_2.scalars().all()) == 1, "A new order should not have been created"
-    assert order1_id == order2_id, "The same order ID should be reused"
+    assert len(orders_in_db_after_2.scalars().all()) == 2, "A second order should have been created"
+    assert order1_id != order2_id, "A new, distinct order ID should be generated"
 
 @pytest.mark.asyncio
 async def test_create_order_with_same_billing_address_as_shipping(async_client: AsyncClient, session: AsyncSession):

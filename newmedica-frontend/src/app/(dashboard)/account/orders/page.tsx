@@ -1,6 +1,6 @@
 'use client';
 import React, { useEffect, useState } from 'react';
-import { getOrders } from '@/lib/api/orders';
+import { getOrders, retryPayment } from '@/lib/api/orders';
 import { Order } from '@/types';
 import { useAuthStore } from '@/store/authStore';
 import Image from 'next/image';
@@ -20,6 +20,7 @@ const OrdersPage = () => {
   const [selectedTab, setSelectedTab] = useState<'all' | 'pending' | 'paid'>('all');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
+  const [retryingOrderId, setRetryingOrderId] = useState<string | null>(null);
 
   useEffect(() => {
     checkAuth();
@@ -32,7 +33,7 @@ const OrdersPage = () => {
     }
 
     const fetchOrders = async () => {
-      if (!user || !token) return; // Ensure user and token are available before fetching
+      if (!user || !token) return;
       try {
         const fetchedOrders = await getOrders();
         setOrders(fetchedOrders);
@@ -63,6 +64,21 @@ const OrdersPage = () => {
     setSelectedOrder(null);
   };
 
+  const handleRetryPayment = async (orderId: string) => {
+    setRetryingOrderId(orderId);
+    try {
+      const response = await retryPayment(orderId);
+      if (response.payment_url) {
+        window.location.href = response.payment_url;
+      }
+    } catch (error) {
+      console.error("Retry payment failed", error);
+      setError('Failed to retry payment. Please try again.');
+    } finally {
+      setRetryingOrderId(null);
+    }
+  };
+
   if (loadingAuth || isLoading) {
     return (
       <div className="container mx-auto px-4 py-8">
@@ -82,7 +98,7 @@ const OrdersPage = () => {
   }
 
   if (!user) {
-    return null; // Should be handled by the redirect useEffect, but as a fallback
+    return null;
   }
 
   return (
@@ -171,10 +187,19 @@ const OrdersPage = () => {
                   <p className="text-xl font-bold">{order.currency} {order.total_amount.toFixed(2)}</p>
                 </div>
 
-                <div className="mt-4 text-right">
+                <div className="mt-4 flex justify-end items-center space-x-4">
                   <button onClick={() => handleViewDetails(order)} className="text-blue-600 hover:underline font-semibold">
                     View Details
                   </button>
+                  {order.payment_status === 'pending' && (
+                    <button
+                      onClick={() => handleRetryPayment(order.id)}
+                      disabled={retryingOrderId === order.id}
+                      className="bg-black text-white px-4 py-2 rounded-md hover:bg-gray-800 disabled:bg-gray-400 font-semibold"
+                    >
+                      {retryingOrderId === order.id ? 'Processing...' : 'Retry Payment'}
+                    </button>
+                  )}
                 </div>
               </div>
             ))}

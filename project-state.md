@@ -9,10 +9,12 @@ This document provides the definitive current state of the NewMedica e-commerce 
 **PHASE**: Final MVP Tasks
 **OVERALL ADHERENCE TO GEMINI.md / Warp.md**: 95%
 **MVP READINESS**: 95%
-**IMMEDIATE PRIORITY**: Task 0.1: Fix Incorrect Order Subtotal on Checkout Retry
+**IMMEDIATE PRIORITY**: Task 0.1: Refactor Checkout Logic for Simplicity and Robustness
 
 ### 🔴 CRITICAL BLOCKERS
-- **Critical Bug**: A critical bug (`Task 0.1`) exists where the order subtotal is not correctly updated on checkout retry.
+- **Refactor Required**: The current checkout logic (`Task 0.1`) for handling payment retries is complex and brittle. A decision has been made to refactor it for long-term stability.
+- **New Logic**: The system will be changed to always create a new order on every checkout attempt and clear the cart. Payment retries for failed (`pending`) orders will be handled separately from the user's order history page. This refactor is the highest priority task.
+
 ---
 
 ## Running the Project with Docker
@@ -65,7 +67,7 @@ The project uses GitHub Actions for Continuous Integration and Continuous Deploy
 
 **ARCHITECTURE**: ✅ Follows GEMINI.md / Warp.md layered approach (api → controllers → services → repositories → models)
 **TECH STACK**: ✅ FastAPI + SQLModel + PostgreSQL + Alembic (compliant)
-**CRITICAL ISSUES**: ❌ 1 critical bug identified (`Task 0.1`).
+**CRITICAL ISSUES**: ❌ 1 critical refactor identified (`Task 0.1`).
 
 ### ✅ COMPLIANT Features (Working as per GEMINI.md / Warp.md)
 
@@ -206,4 +208,4 @@ The project uses GitHub Actions for Continuous Integration and Continuous Deploy
 
 **WHEN GEMINI STARTS**: Focus immediately on the next high-priority task:
 
-*   **Task 0.1: Fix Incorrect Order Subtotal on Checkout Retry**
+*   **Task 0.1: Refactor Checkout Logic for Simplicity and Robustness**

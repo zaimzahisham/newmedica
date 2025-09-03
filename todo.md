@@ -6,34 +6,41 @@ This document outlines tasks to complete the MVP for NewMedica, **prioritized by
 
 ---
 
-## 🔴 PHASE 0: CRITICAL BUG FIXES
+## 🔴 PHASE 0: CRITICAL REFACTOR
 
-*Goal: Resolve critical bugs affecting core functionality.*
+*Goal: Improve core functionality for long-term stability.*
 
-### Task 0.1: Fix Incorrect Order Subtotal on Checkout Retry
+### Task 0.1: Refactor Checkout Logic for Simplicity and Robustness
 **Priority**: 🔴 CRITICAL
 **Dependencies**: None
-**Estimated Time**: 2-3 hours
+**Estimated Time**: 3-5 hours
 
 **Analysis**:
-When a user cancels a checkout, modifies their cart, and then checks out again, the system reuses the previous 'pending' order. However, it fails to update the `subtotal_amount` and `order_items` to reflect the new cart state, leading to incorrect order data, although the final `total_amount` is calculated correctly.
+The current logic for handling checkout retries is complex, as it tries to reuse a previous 'pending' order. This is brittle. A simpler, more robust approach has been approved:
+1.  A checkout attempt from the cart will **always** create a new order.
+2.  After the checkout is initiated (regardless of payment success), the user's cart will be cleared.
+3.  A failed payment will leave a decoupled, `pending` order record.
+4.  To retry payment, the user will go to their "Order History" page and click a "Retry Payment" button next to the pending order. Retry Payment will direct to checkout page with this order and user can continue checkout with any payment method (does not have to be the same as failed previously)
 
 **Action Required (TDD)**:
-1.  **Write a Failing Test**: In `tests/integration/test_order_logic.py`, create a test that replicates the bug's flow:
-    *   Create a user and product.
-    *   Add the product to the cart.
-    *   Simulate a checkout to create a `pending` order.
-    *   Modify the cart (e.g., increase item quantity).
-    *   Simulate a second checkout.
-    *   Assert that the final `Order` has the correctly updated `subtotal_amount` and that `order_items` reflect the new quantity.
-2.  **Implement the Fix**: In the `OrderService` (`app/services/order_service.py`), modify the logic that handles existing `pending` orders. Ensure that when a pending order is reused, it is entirely updated with the new cart's state, including `subtotal_amount`, `discount_amount`, `shipping_amount`, and all `order_items`.
-3.  **Verify**: Run the new test to ensure it passes and run the full test suite to check for regressions.
+
+**Part 1: Backend Refactor** **- ✅ COMPLETED**
+1.  **Update Tests**: In `tests/integration/test_order_logic.py`, rewrite the existing tests to assert the new behavior. The test should confirm that a second checkout from a modified cart creates a **new, distinct** order, and that the cart is empty after the first checkout attempt.
+2.  **Refactor `OrderService`**: Remove the logic that searches for and reuses existing `pending` orders. The `create_order_from_cart` method should always create a new `Order`.
+3.  **Implement Cart Clearing**: Ensure that after an order is successfully created and a payment intent is generated, the user's cart is cleared.
+
+**Part 2: Frontend Implementation**
+1.  **Add "Retry Payment" Button**: On the `/account/orders` page, add a "Retry Payment" button that is only visible for orders with a `payment_status` of `pending`.
+2.  **Create Retry Endpoint**: Implement a new backend endpoint (e.g., `POST /api/v1/orders/{order_id}/retry-payment`) that generates a new Stripe session for an existing order.
+3.  **Connect Frontend to Endpoint**: The "Retry Payment" button should call this new endpoint and redirect the user to Stripe.
 
 **Acceptance Criteria**:
-- [ ] A failing test is created that reproduces the bug.
-- [ ] The `OrderService` is updated to correctly recalculate all order fields when retrying a checkout.
-- [ ] The new test passes.
-- [ ] All existing tests pass.
+- [x] Backend tests are updated to reflect the new, simpler checkout logic and are all passing.
+- [x] The `OrderService` no longer reuses pending orders.
+- [ ] The user's cart is reliably cleared after a checkout is initiated.
+- [ ] A "Retry Payment" button appears on the frontend for pending orders in the user's account.
+- [ ] Clicking the button successfully redirects the user to a checkout page for that order.
+- [x] All existing tests pass, ensuring no regressions have been introduced.
 
 ---
 

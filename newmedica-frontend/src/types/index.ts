@@ -1,3 +1,4 @@
+export * from './payment';
 export interface Category {
   id: string;
   name: string;
