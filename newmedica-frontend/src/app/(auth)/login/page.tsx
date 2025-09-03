@@ -7,6 +7,7 @@ import { useAuthStore } from '@/store/authStore';
 import { useRouter } from 'next/navigation';
 import { loginSchema, registerSchema, LoginFormData, RegisterFormData } from '../_lib/auth';
 import { showSuccessToast } from '@/components/CustomAlert';
+import { getApiUrl } from '@/lib/utils/api';
 
 const LoginPage = () => {
   const login = useAuthStore((state) => state.login);
@@ -73,7 +74,7 @@ const LoginPage = () => {
     };
 
     try {
-      const response = await fetch("http://127.0.0.1:8000/api/v1/auth/register", {
+      const response = await fetch(`${getApiUrl()}/api/v1/auth/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
