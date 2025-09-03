@@ -39,6 +39,8 @@ jobs:
           tags: ${{ secrets.DOCKER_USERNAME }}/newmedica-frontend:latest
           build-args: |
             STRIPE_SECRET_KEY=${{ secrets.STRIPE_SECRET_KEY }}
+            NEXT_PUBLIC_API_BASE_URL=${{ secrets.NEXT_PUBLIC_API_BASE_URL }}
+            INTERNAL_API_BASE_URL=${{ secrets.INTERNAL_API_BASE_URL }}
 
   #  deploy:
 #    needs: build-and-push
