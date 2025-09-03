@@ -10,8 +10,8 @@ This document outlines tasks to complete the MVP for NewMedica, **prioritized by
 
 *Goal: Improve core functionality for long-term stability.*
 
-### Task 0.1: Refactor Checkout Logic for Simplicity and Robustness
-**Priority**: 🔴 CRITICAL
+### ✅ Task 0.1: Refactor Checkout Logic for Simplicity and Robustness
+**Priority**: ✅ COMPLETED
 **Dependencies**: None
 **Estimated Time**: 3-5 hours
 
@@ -29,7 +29,7 @@ The current logic for handling checkout retries is complex, as it tries to reuse
 2.  **Refactor `OrderService`**: Remove the logic that searches for and reuses existing `pending` orders. The `create_order_from_cart` method should always create a new `Order`.
 3.  **Implement Cart Clearing**: Ensure that after an order is successfully created and a payment intent is generated, the user's cart is cleared.
 
-**Part 2: Frontend Implementation**
+**Part 2: Frontend Implementation** **- ✅ COMPLETED**
 1.  **Add "Retry Payment" Button**: On the `/account/orders` page, add a "Retry Payment" button that is only visible for orders with a `payment_status` of `pending`.
 2.  **Create Retry Endpoint**: Implement a new backend endpoint (e.g., `POST /api/v1/orders/{order_id}/retry-payment`) that generates a new Stripe session for an existing order.
 3.  **Connect Frontend to Endpoint**: The "Retry Payment" button should call this new endpoint and redirect the user to Stripe.
@@ -37,9 +37,9 @@ The current logic for handling checkout retries is complex, as it tries to reuse
 **Acceptance Criteria**:
 - [x] Backend tests are updated to reflect the new, simpler checkout logic and are all passing.
 - [x] The `OrderService` no longer reuses pending orders.
-- [ ] The user's cart is reliably cleared after a checkout is initiated.
-- [ ] A "Retry Payment" button appears on the frontend for pending orders in the user's account.
-- [ ] Clicking the button successfully redirects the user to a checkout page for that order.
+- [x] The user's cart is reliably cleared after a checkout is initiated.
+- [x] A "Retry Payment" button appears on the frontend for pending orders in the user's account.
+- [x] Clicking the button successfully redirects the user to a checkout page for that order.
 - [x] All existing tests pass, ensuring no regressions have been introduced.
 
 ---

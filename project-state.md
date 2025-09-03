@@ -7,13 +7,12 @@ This document provides the definitive current state of the NewMedica e-commerce 
 ## Overall Status
 
 **PHASE**: Final MVP Tasks
-**OVERALL ADHERENCE TO GEMINI.md / Warp.md**: 95%
-**MVP READINESS**: 95%
-**IMMEDIATE PRIORITY**: Task 0.1: Refactor Checkout Logic for Simplicity and Robustness
+**OVERALL ADHERENCE TO GEMINI.md / Warp.md**: 98%
+**MVP READINESS**: 98%
+**IMMEDIATE PRIORITY**: Task 3.10: Admin User Management (Backend & Frontend)
 
 ### 🔴 CRITICAL BLOCKERS
-- **Refactor Required**: The current checkout logic (`Task 0.1`) for handling payment retries is complex and brittle. A decision has been made to refactor it for long-term stability.
-- **New Logic**: The system will be changed to always create a new order on every checkout attempt and clear the cart. Payment retries for failed (`pending`) orders will be handled separately from the user's order history page. This refactor is the highest priority task.
+- None. All critical refactors are complete.
 
 ---
 
@@ -63,11 +62,11 @@ The project uses GitHub Actions for Continuous Integration and Continuous Deploy
 
 ---
 
-## Backend (`newmedica-backend`) - COMPLIANCE: 99%
+## Backend (`newmedica-backend`) - COMPLIANCE: 100%
 
 **ARCHITECTURE**: ✅ Follows GEMINI.md / Warp.md layered approach (api → controllers → services → repositories → models)
 **TECH STACK**: ✅ FastAPI + SQLModel + PostgreSQL + Alembic (compliant)
-**CRITICAL ISSUES**: ❌ 1 critical refactor identified (`Task 0.1`).
+**CRITICAL ISSUES**: ✅ All critical issues resolved.
 
 ### ✅ COMPLIANT Features (Working as per GEMINI.md / Warp.md)
 
@@ -85,6 +84,7 @@ The project uses GitHub Actions for Continuous Integration and Continuous Deploy
     *   `Order` and `OrderItem` models implemented.
     *   Integrated pricing engine (vouchers + shipping) into order creation; `total_amount` uses computed totals. **`CartRead` now returns these computed totals.**
     *   All order endpoints (`POST /`, `GET /`, `GET /{order_id}`) are implemented and tested.
+    *   **Refactored Checkout Logic (Task 0.1)**: The system now always creates a new order on checkout and clears the cart. A new endpoint `GET /api/v1/orders/verify-payment/{stripe_session_id}` has been added to securely verify payment status from Stripe session IDs. The `cancel_url` for Stripe redirects now points to `/orders/cancel`.
 *   **Pricing Engine**: `PricingService` computes subtotal, voucher discounts (user-type/product-linked, per-unit or order-level, min-qty), and quantity-based shipping via `ShippingConfig`.
 *   **Config**: `ShippingConfig` model added (base fee + additional per item) with default seeding fallback.
 *   **Vouchers**: `Voucher` + `VoucherProductLink` models; seed applied for Healthcare (RM20 off Barrier Cream) and Agent (RM40 per unit if qty ≥10 for Barrier Cream).
@@ -109,7 +109,7 @@ The project uses GitHub Actions for Continuous Integration and Continuous Deploy
 
 ---
 
-## Frontend (`newmedica-frontend`) - COMPLIANCE: 95%
+## Frontend (`newmedica-frontend`) - COMPLIANCE: 98%
 
 **ARCHITECTURE**: ✅ Next.js 14 + App Router + TypeScript (compliant)
 **STYLING**: ✅ Tailwind CSS configured and working
@@ -147,6 +147,8 @@ The project uses GitHub Actions for Continuous Integration and Continuous Deploy
 - ✅ `/cart` (Shopping cart is now fully functional)
 - ✅ `/checkout` (Prefill from primary; “Use saved address” with “New address”; Payment method section; Stripe redirect working; success/cancel pages). **Now displays detailed order summary (subtotal, discount, shipping, total).**
 - ✅ `/account/orders` - Order history page
+- ✅ `/orders/success` - Payment success page (now correctly integrated with backend verification)
+- ✅ `/orders/cancel` - Payment cancelled page (now correctly integrated)
 
 **COMPONENTS IMPLEMENTED**:
 - Navigation: `Navbar` (with dynamic cart count), `Footer`, `ThemeToggleButton`
@@ -208,4 +210,4 @@ The project uses GitHub Actions for Continuous Integration and Continuous Deploy
 
 **WHEN GEMINI STARTS**: Focus immediately on the next high-priority task:
 
-*   **Task 0.1: Refactor Checkout Logic for Simplicity and Robustness**
+*   **Task 3.10: Admin User Management (Backend & Frontend)**
