@@ -96,7 +96,18 @@ async def get_test_user_type_by_name(session: AsyncSession, name: str) -> UserTy
     return result.scalar_one()
 
 async def register_user(client: AsyncClient, email: str, password: str, user_type_name: str):
-    register_data = {"email": email, "password": password, "userType": user_type_name}
+    extra_fields = {}
+    if user_type_name == "Agent":
+        extra_fields = {"companyName": "Test Agent Co", "coRegNo": "12345-X"}
+    elif user_type_name == "Healthcare":
+        extra_fields = {"department": "Test Ward", "companyName": "Test Hospital"}
+
+    register_data = {
+        "email": email, 
+        "password": password, 
+        "userType": user_type_name,
+        "extra_fields": extra_fields
+    }
     return await client.post("/api/v1/auth/register", json=register_data)
 
 async def get_user_token(client: AsyncClient, session: AsyncSession, user_type: str = "Basic") -> tuple[User, str]:

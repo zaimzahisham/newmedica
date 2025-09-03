@@ -172,3 +172,64 @@ async def test_login_incorrect_credentials_returns_unauthorized_error(async_clie
     assert "error" in error_data
     assert error_data["error"]["code"] == "UNAUTHORIZED"
     assert error_data["error"]["message"] == "Incorrect email or password"
+
+
+@pytest.mark.asyncio
+async def test_register_agent_with_missing_company_name_fails(
+    async_client: AsyncClient,
+):
+    """
+    Tests that registering an Agent user fails if extra_fields is missing companyName.
+    """
+    unique_email = f"test_agent_{uuid.uuid4()}@example.com"
+    password = "SecurePassword123!"
+
+    response = await async_client.post(
+        "/api/v1/auth/register",
+        json={
+            "email": unique_email,
+            "password": password,
+            "userType": "Agent",
+            "extra_fields": {"coRegNo": "12345"},  # Missing companyName
+        },
+    )
+
+    assert response.status_code == 422
+    error_data = response.json()
+    assert "detail" in error_data
+    # Check that the error message points to the specific validation failure
+    assert any(
+        "companyName is required for Agent users" in detail["msg"]
+        for detail in error_data["detail"]
+    )
+
+
+@pytest.mark.asyncio
+async def test_register_healthcare_with_missing_department_fails(
+    async_client: AsyncClient,
+):
+    """
+    Tests that registering a Healthcare user fails if extra_fields is missing department.
+    """
+    unique_email = f"test_healthcare_{uuid.uuid4()}@example.com"
+    password = "SecurePassword123!"
+
+    response = await async_client.post(
+        "/api/v1/auth/register",
+        json={
+            "email": unique_email,
+            "password": password,
+            "userType": "Healthcare",
+            "extra_fields": {
+                "companyName": "General Hospital"
+            },  # Missing department
+        },
+    )
+
+    assert response.status_code == 422
+    error_data = response.json()
+    assert "detail" in error_data
+    assert any(
+        "department is required for Healthcare users" in detail["msg"]
+        for detail in error_data["detail"]
+    )

@@ -94,6 +94,7 @@ The project uses GitHub Actions for Continuous Integration and Continuous Deploy
 *   **Data Models**: All core models now include `created_at` and `updated_at` timestamps with timezone awareness.
 *   **Test Suite**: All backend tests are now passing with expected external library warnings. (Note: SQLAlchemy relationship warnings observed, but not critical blockers.)
 *   **Configuration**: Secrets are managed via `.env` file.
+    *   **Validation**: `extra_fields` are now validated on registration for Agent and Healthcare users.
 *   **Admin Endpoints**: APIs for managing vouchers (CRUD) and updating shipping configuration are implemented.
 
 ### 🟡 HIGH PRIORITY GAPS (Required for MVP)

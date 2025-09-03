@@ -1,7 +1,7 @@
 import uuid
 from typing import Any, Dict, Optional
 
-from pydantic import BaseModel, ConfigDict, EmailStr
+from pydantic import BaseModel, ConfigDict, EmailStr, model_validator
 
 from .utils import to_camel
 
@@ -11,6 +11,25 @@ class UserCreate(BaseModel):
     password: str
     userType: str  # This will be the name like 'Basic', 'Agent', etc.
     extra_fields: Optional[Dict[str, Any]] = {}
+
+    @model_validator(mode='before')
+    @classmethod
+    def validate_extra_fields(cls, data: Any) -> Any:
+        if not isinstance(data, dict):
+            return data # Let Pydantic handle the error
+
+        user_type = data.get('userType')
+        extra_fields = data.get('extra_fields', {})
+
+        if user_type == 'Agent':
+            if not extra_fields.get('companyName'):
+                raise ValueError('companyName is required for Agent users')
+
+        elif user_type == 'Healthcare':
+            if not extra_fields.get('department'):
+                raise ValueError('department is required for Healthcare users')
+
+        return data
 
 
 class UserRead(BaseModel):
