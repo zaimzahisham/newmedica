@@ -4,14 +4,19 @@ import { useAuthStore } from '@/store/authStore';
 import { MapPin, User as UserIcon, Briefcase, FileText } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { getOrders, retryPayment } from '@/lib/api/orders';
 import { Order } from '@/types';
 import OrderDetailsModal from '@/app/(dashboard)/orders/_components/OrderDetailsModal';
 import { AnimatePresence } from 'framer-motion';
+import { useForm, SubmitHandler } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import * as z from 'zod';
+import { updateUserProfile, ProfileUpdateData } from '@/lib/api/user';
+import { showSuccessToast, showErrorAlert } from '@/components/CustomAlert';
 
 const AccountPage = () => {
-  const { user, loading, logout, token } = useAuthStore();
+  const { user, loading, logout, token, fetchUserProfile } = useAuthStore();
   const router = useRouter();
 
   const [recentOrders, setRecentOrders] = useState<Order[]>([]);
@@ -20,6 +25,7 @@ const AccountPage = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [retryingOrderId, setRetryingOrderId] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     if (!loading && !user) {
@@ -43,6 +49,67 @@ const AccountPage = () => {
     fetchRecentOrders();
   }, [user, token, loading, router]);
 
+  const incompleteFields = useMemo(() => {
+    if (!user) return [];
+    const fields: { name: keyof ProfileUpdateData; label: string }[] = [];
+    // Fields for all users
+    if (!user.lastName) fields.push({ name: 'lastName', label: 'Last Name' });
+    if (!user.hpNo) fields.push({ name: 'hpNo', label: 'HP No' });
+    if (!user.gender) fields.push({ name: 'gender', label: 'Gender' });
+    if (!user.dateOfBirth) fields.push({ name: 'dateOfBirth', label: 'Date of Birth' });
+
+    // Fields for Healthcare users
+    if (user.userType === 'Healthcare') {
+      if (!user.icNo) fields.push({ name: 'icNo', label: 'IC No' });
+      if (!user.hospitalName) fields.push({ name: 'hospitalName', label: 'Hospital Name' });
+      if (!user.department) fields.push({ name: 'department', label: 'Department' });
+      if (!user.position) fields.push({ name: 'position', label: 'Position' });
+    }
+
+    // Fields for Agent users
+    if (user.userType === 'Agent') {
+      if (!user.icNo) fields.push({ name: 'icNo', label: 'IC No' });
+      if (!user.companyName) fields.push({ name: 'companyName', label: 'Company Name' });
+      if (!user.companyAddress) fields.push({ name: 'companyAddress', label: 'Company Address' });
+      if (!user.coRegNo) fields.push({ name: 'coRegNo', label: 'Co Reg No' });
+      if (!user.coEmailAddress) fields.push({ name: 'coEmailAddress', label: 'Co Email Address' });
+      if (!user.tinNo) fields.push({ name: 'tinNo', label: 'TIN No' });
+      if (!user.picEinvoice) fields.push({ name: 'picEinvoice', label: 'PIC of E-invoice' });
+      if (!user.picEinvoiceEmail) fields.push({ name: 'picEinvoiceEmail', label: 'PIC of E-invoice Email' });
+      if (!user.picEinvoiceTelNo) fields.push({ name: 'picEinvoiceTelNo', label: 'PIC of E-invoice Tel No' });
+    }
+    return fields;
+  }, [user]);
+
+  const validationSchema = useMemo(() => {
+    const schemaFields: { [key in keyof ProfileUpdateData]?: z.ZodString } = {};
+    incompleteFields.forEach(field => {
+        schemaFields[field.name] = z.string().min(1, `${field.label} is required`);
+    });
+    return z.object(schemaFields);
+  }, [incompleteFields]);
+
+  type FormData = z.infer<typeof validationSchema>;
+
+  const { register, handleSubmit, formState: { errors } } = useForm<FormData>({
+    resolver: zodResolver(validationSchema),
+  });
+
+  const onSubmit: SubmitHandler<FormData> = async (data) => {
+    setIsSubmitting(true);
+    try {
+      await updateUserProfile(data as ProfileUpdateData);
+      if (token) await fetchUserProfile(token); // Re-fetch user data to update the store
+      showSuccessToast("Profile updated successfully!");
+    } catch (error) {
+      showErrorAlert("Failed to update profile. Please try again.");
+      console.error(error);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+
   const handleViewDetails = (order: Order) => {
     setSelectedOrder(order);
     setIsModalOpen(true);
@@ -58,7 +125,7 @@ const AccountPage = () => {
     try {
       const response = await retryPayment(orderId);
       if (response.payment_url) {
-        router.push(response.payment_url); // Use router.push for external redirects
+        router.push(response.payment_url);
       }
     } catch (error) {
       console.error("Retry payment failed", error);
@@ -70,31 +137,6 @@ const AccountPage = () => {
 
   if (loading || !user) {
     return <div>Loading...</div>;
-  }
-
-  const incompleteFields = [];
-  if (!user.gender) incompleteFields.push('Gender');
-  if (!user.dateOfBirth) incompleteFields.push('Date of Birth');
-
-  if (user.userType === 'Healthcare') {
-    if (!user.icNo) incompleteFields.push('IC No');
-    if (!user.hpNo) incompleteFields.push('HP No');
-    if (!user.hospitalName) incompleteFields.push('Hospital Name');
-    if (!user.department) incompleteFields.push('Department');
-    if (!user.position) incompleteFields.push('Position');
-  }
-
-  if (user.userType === 'Agent') {
-    if (!user.icNo) incompleteFields.push('IC No');
-    if (!user.hpNo) incompleteFields.push('HP No');
-    if (!user.companyName) incompleteFields.push('Company Name');
-    if (!user.companyAddress) incompleteFields.push('Company Address');
-    if (!user.coRegNo) incompleteFields.push('Co Reg No');
-    if (!user.coEmailAddress) incompleteFields.push('Co Email Address');
-    if (!user.tinNo) incompleteFields.push('TIN No');
-    if (!user.picEinvoice) incompleteFields.push('PIC of E-invoice');
-    if (!user.picEinvoiceEmail) incompleteFields.push('PIC of E-invoice Email');
-    if (!user.picEinvoiceTelNo) incompleteFields.push('PIC of E-invoice Tel No');
   }
 
   return (
@@ -184,14 +226,42 @@ const AccountPage = () => {
             {incompleteFields.length > 0 ? (
               <>
                 <p className="text-sm text-gray-500 mb-4">Complete the information for better shopping experience</p>
-                <form>
+                <form onSubmit={handleSubmit(onSubmit)}>
                   {incompleteFields.map((field) => (
-                    <div key={field} className="mb-4">
-                      <label className="block text-sm font-medium text-gray-700">{field}</label>
-                      <input type="text" placeholder={field} className="border p-2 rounded-md w-full mt-1" />
+                    <div key={field.name} className="mb-4">
+                      <label className="block text-sm font-medium text-gray-700">{field.label}</label>
+                      {field.name === 'gender' ? (
+                        <select
+                          {...register(field.name)}
+                          className="border p-2 rounded-md w-full mt-1"
+                        >
+                          <option value="">Select Gender</option>
+                          <option value="Male">Male</option>
+                          <option value="Female">Female</option>
+                          <option value="Other">Other</option>
+                        </select>
+                      ) : field.name === 'dateOfBirth' ? (
+                        <input
+                          type="date"
+                          {...register(field.name)}
+                          className="border p-2 rounded-md w-full mt-1"
+                        />
+                      ) : (
+                        <input
+                          type="text"
+                          placeholder={field.label}
+                          {...register(field.name)}
+                          className="border p-2 rounded-md w-full mt-1"
+                        />
+                      )}
+                      {errors[field.name] && (
+                        <p className="text-red-500 text-xs mt-1">{errors[field.name]?.message}</p>
+                      )}
                     </div>
                   ))}
-                  <button className="bg-black text-white w-full py-2 rounded-full">Complete</button>
+                  <button type="submit" disabled={isSubmitting} className="bg-black text-white w-full py-2 rounded-full disabled:bg-gray-400">
+                    {isSubmitting ? 'Saving...' : 'Complete'}
+                  </button>
                 </form>
               </>
             ) : (

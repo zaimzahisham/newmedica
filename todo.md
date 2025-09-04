@@ -75,25 +75,8 @@ The current logic for handling checkout retries is complex, as it tries to reuse
 - [x] Invalid `extra_fields` data results in appropriate error responses.
 - [x] All existing tests pass.
 
-### Task 3.10: Admin User Management (Backend & Frontend)
-**Priority**: 🟡 High
-**Dependencies**: None
-**Estimated Time**: 6-8 hours
-
-**Backend Action Required**:
-1. Implement `GET /api/v1/admin/users` to list pending Agent/Healthcare users.
-2. Implement `POST /api/v1/admin/users/{id}/approve` to approve a user.
-
-**Frontend Action Required**:
-1. Create `/admin` page with a UI to list and approve/reject Agent/Healthcare users.
-
-**Acceptance Criteria**:
-- [ ] Admin users can view a list of pending Agent/Healthcare registrations.
-- [ ] Admin users can approve or reject pending registrations.
-- [ ] Backend endpoints are secured for admin access only.
-
-### Task 3.11: Implement "Complete your profile" functionality
-**Priority**: 🟠 Medium
+### ✅ Task 3.11: Implement "Complete your profile" functionality
+**Priority**: 🟢 Completed
 **Dependencies**: None
 **Estimated Time**: 3-4 hours
 
@@ -103,8 +86,8 @@ The current logic for handling checkout retries is complex, as it tries to reuse
 3.  Ensure the form is validated and the data is saved correctly.
 
 **Acceptance Criteria**:
-- [ ] Users can update their profile information from the "Complete your profile" section.
-- [ ] The changes are reflected in the user's profile.
+- [x] Users can update their profile information from the "Complete your profile" section.
+- [x] The changes are reflected in the user's profile.
 
 ### Task 3.12: Implement "Change password" functionality
 **Priority**: 🟠 Medium
@@ -158,7 +141,6 @@ The current logic for handling checkout retries is complex, as it tries to reuse
 
 ### Task 4.2: Implement admin content management
 **Priority**: 🔵 Low
-**Dependencies**: Task 3.10
 **Estimated Time**: 8-12 hours
 
 **Action Required**:
@@ -169,6 +151,56 @@ The current logic for handling checkout retries is complex, as it tries to reuse
 **Acceptance Criteria**:
 - [ ] Admins can update the homepage content.
 - [ ] Admins can update the content of the static pages.
+
+### Task 4.3: Full Admin Dashboard (Post-MVP)
+**Priority**: 🔵 Low
+**Estimated Time**: 15-25 hours
+
+**Analysis**:
+While the backend has existing CRUD APIs for products, vouchers, and shipping, they are not accessible via a UI and require robust, admin-only security checks. This task involves hardening the backend with explicit admin authorization tests and then building the comprehensive frontend interface for site management.
+
+**Part 1: Backend Hardening & Test Coverage (TDD)**
+
+**Action Required**:
+1.  **Write Failing Tests First**: For each data domain (Products, Categories, Vouchers, Shipping Config), create a new test file (e.g., `tests/integration/admin/test_admin_products.py`). In this file, write integration tests that attempt to access the existing CRUD endpoints (e.g., `POST /api/v1/products`, `PUT /api/v1/vouchers/{id}`) using a token from a **non-admin user**. Assert that the API returns a `403 Forbidden` status code.
+2.  **Write Admin Access Tests**: Add tests to verify that a user with the `Admin` user type **can** successfully access these same endpoints.
+3.  **Implement Admin Security**: Review and update the dependency injection for all relevant API endpoints to ensure they are protected by a role-check that requires the `Admin` user type. The existing `get_current_active_user` dependency can be extended or a new `get_current_admin_user` dependency can be created.
+4.  **Run Full Test Suite**: After implementing the security layer, execute the entire backend test suite with `cd newmedica-backend && uv run pytest tests/ -v`. Confirm that all new tests pass and that no regressions have been introduced into existing functionality.
+
+**Part 2: Frontend Implementation**
+
+**Action Required**:
+1.  **Design Admin Dashboard Layout**: Create a protected route group for `/admin`. Build a main layout that includes a sidebar or top navigation for managing Users, Products, Categories, Vouchers, and Shipping.
+2.  **Implement CRUD Interfaces**: For each of the data domains, build the necessary frontend components:
+    *   Use **TanStack Table** to display lists of data.
+    *   Create forms (using React Hook Form + Zod) within modals or on dedicated pages for creating and editing items.
+    *   Implement delete confirmation dialogs.
+3.  **Connect to Backend**: Connect the frontend components to the newly secured backend APIs, ensuring that the admin user's authentication token is used for all requests.
+
+**Acceptance Criteria**:
+- [ ] New backend tests exist to verify that all data management endpoints are accessible only by `Admin` users.
+- [ ] The entire backend test suite passes, confirming no regressions.
+- [ ] A new, protected `/admin` section with a clear navigation structure is implemented on the frontend.
+- [ ] Admin users can perform full CRUD operations on Products, Categories, Vouchers, and Shipping Configuration from the frontend UI.
+- [ ] Non-admin users are redirected or shown an error when attempting to access any `/admin` URLs.
+
+### Task 4.4: Admin User Management (Post-MVP)
+**Priority**: 🔵 Low
+**Dependencies**: None
+**Estimated Time**: 6-8 hours
+**Note**: This is a low priority task. It can be implemented later, potentially alongside the "Verify email" functionality.
+
+**Backend Action Required**:
+1. Implement `GET /api/v1/admin/users` to list pending Agent/Healthcare users.
+2. Implement `POST /api/v1/admin/users/{id}/approve` to approve a user.
+
+**Frontend Action Required**:
+1. Create `/admin` page with a UI to list and approve/reject Agent/Healthcare users.
+
+**Acceptance Criteria**:
+- [ ] Admin users can view a list of pending Agent/Healthcare registrations.
+- [ ] Admin users can approve or reject pending registrations.
+- [ ] Backend endpoints are secured for admin access only.
 
 ---
 
