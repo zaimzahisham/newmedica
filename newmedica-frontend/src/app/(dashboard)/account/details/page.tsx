@@ -151,7 +151,7 @@ const AccountDetailsPage = () => {
         <Link href="/account" className="text-sm text-gray-600 hover:underline flex items-center">
           &larr; Back
         </Link>
-      </div>
+        </div>
       <h1 className="text-3xl font-bold text-gray-800 mb-8">My Account</h1>
 
       <form onSubmit={handleSubmit(onSubmit)}>
@@ -304,7 +304,9 @@ const AccountDetailsPage = () => {
             <Lock className="w-6 h-6 text-gray-500 mr-4 mt-1" />
             <div>
               <p className="font-semibold text-gray-800">Password</p>
-              <button className="text-sm text-indigo-600 hover:underline mt-2">Change password</button>
+              <Link href="/account/password" className="text-gray-600">
+                <button className="text-sm text-indigo-600 hover:underline mt-2">Change password</button>
+              </Link>
             </div>
           </div>
           <div className="border border-gray-200 rounded-md p-6 flex items-start">

@@ -46,3 +46,27 @@ export const updateUserProfile = async (data: ProfileUpdateData) => {
 
   return response.json();
 };
+
+export const changePassword = async (passwordData: { old_password: string; new_password: string; }) => {
+    const token = getAuthToken();
+    if (!token) {
+      throw new Error('Authentication token not found.');
+    }
+  
+    const response = await fetch(`${API_URL}/api/v1/users/me/password`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+      body: JSON.stringify(passwordData),
+    });
+  
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({})); // Catch if response is not JSON
+      console.error('Failed to change password:', errorData);
+      throw new Error(errorData.detail || 'Failed to change password');
+    }
+  
+    return response.json();
+  };
