@@ -144,6 +144,7 @@ The project uses GitHub Actions for Continuous Integration and Continuous Deploy
 - ✅ `/account` (User dashboard)
 - ✅ `/account/details` (Profile viewing)
 - ✅ `/account/address` (Address management: list/add/edit/delete/set-primary with animations and alerts)
+- ✅ `/account/password` (Change password functionality)
 - ✅ `/cart` (Shopping cart is now fully functional)
 - ✅ `/checkout` (Prefill from primary; “Use saved address” with “New address”; Payment method section; Stripe redirect working; success/cancel pages). **Now displays detailed order summary (subtotal, discount, shipping, total).**
 - ✅ `/account/orders` - Order history page
@@ -162,7 +163,6 @@ The project uses GitHub Actions for Continuous Integration and Continuous Deploy
 1.  **INCOMPLETE CORE MVP PAGES & FEATURES**:
     *   🟠 **Admin User Management**: `/admin` page for user approval is not yet built.
     
-    *   🟠 **Password Management**: "Change password" functionality is not implemented.
     *   🟠 **Email Verification**: User email verification flow is not implemented.
 2.  **Admin Interface Scope**:
     *   The only admin UI planned for the MVP is for user approval (`/admin`). No frontend exists for managing products, vouchers, categories, or shipping configurations, although some backend APIs are available.
@@ -206,9 +206,3 @@ The project uses GitHub Actions for Continuous Integration and Continuous Deploy
 ## NEXT ACTIONS FOR GEMINI CLI
 
 **WHEN GEMINI STARTS**: Focus immediately on the next high-priority task:
-
-*   **Task 3.10: Admin User Management (Backend & Frontend)**EMINI CLI
-
-**WHEN GEMINI STARTS**: Focus immediately on the next high-priority task:
-
-*   **Task 3.10: Admin User Management (Backend & Frontend)**

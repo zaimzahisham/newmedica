@@ -79,3 +79,10 @@ class UserUpdate(BaseModel):
     picEinvoice: Optional[str] = None
     picEinvoiceEmail: Optional[str] = None # Allow empty string
     picEinvoiceTelNo: Optional[str] = None
+
+class PasswordChange(BaseModel):
+    old_password: str
+    new_password: str
+
+class Msg(BaseModel):
+    message: str

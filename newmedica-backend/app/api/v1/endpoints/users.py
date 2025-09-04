@@ -7,7 +7,7 @@ from app.core.security import get_current_user
 from app.db.session import get_session
 from app.models.user import User
 from app.models.user_type import UserType
-from app.schemas.user import UserReadWithDetails, UserUpdate
+from app.schemas.user import UserReadWithDetails, UserUpdate, PasswordChange, Msg
 from app.schemas.voucher_schema import UserVoucherRead
 from app.repositories.voucher_repository import VoucherRepository
 from app.controllers.user_controller import UserController
@@ -61,6 +61,19 @@ async def update_user_me(
         **(user.extra_fields or {}),
     }
     return UserReadWithDetails.model_validate(response_data)
+
+@router.patch("/me/password", response_model=Msg)
+async def change_password(
+    *, 
+    session: AsyncSession = Depends(get_session),
+    current_user: User = Depends(get_current_user),
+    password_in: PasswordChange,
+):
+    """
+    Change own password.
+    """
+    user_controller = UserController(session)
+    return await user_controller.change_password(user=current_user, password_in=password_in)
 
 @router.get("/me/vouchers", response_model=List[UserVoucherRead])
 async def get_my_vouchers(

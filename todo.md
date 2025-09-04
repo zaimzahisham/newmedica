@@ -76,7 +76,7 @@ The current logic for handling checkout retries is complex, as it tries to reuse
 - [x] All existing tests pass.
 
 ### ✅ Task 3.11: Implement "Complete your profile" functionality
-**Priority**: 🟢 Completed
+**Priority**: ✅ COMPLETED
 **Dependencies**: None
 **Estimated Time**: 3-4 hours
 
@@ -89,8 +89,8 @@ The current logic for handling checkout retries is complex, as it tries to reuse
 - [x] Users can update their profile information from the "Complete your profile" section.
 - [x] The changes are reflected in the user's profile.
 
-### Task 3.12: Implement "Change password" functionality
-**Priority**: 🟠 Medium
+### ✅ Task 3.12: Implement "Change password" functionality
+**Priority**: ✅ COMPLETED
 **Dependencies**: None
 **Estimated Time**: 4-6 hours
 
@@ -101,24 +101,61 @@ The current logic for handling checkout retries is complex, as it tries to reuse
 4.  Implement a "Forgot Password" flow with email-based password reset.
 
 **Acceptance Criteria**:
-- [ ] Users can change their password.
+- [x] Users can change their password.
 - [ ] Users can reset their password if they forget it.
 
-### Task 3.13: Implement "Verify email" functionality
+### Task 3.13: Implement "Verify email" functionality (Backend)
 **Priority**: 🟠 Medium
 **Dependencies**: None
-**Estimated Time**: 4-6 hours
+**Estimated Time**: 2-3 hours
+**Status**: 🔵 Not Started
 
+**Part 1: Database & Migration**
 **Action Required**:
-1.  Implement a backend process to send a verification email to the user upon registration.
-2.  Create a frontend page to handle the email verification link.
-3.  Once verified, the user should be able to apply vouchers.
-4.  The "Verify email" button on the account details page should trigger the verification email to be sent again.
-
+1.  Add `email_verified_at: datetime | None` to the `User` model.
+2.  Generate and apply the Alembic migration script.
 **Acceptance Criteria**:
-- [ ] Users receive a verification email upon registration.
-- [ ] Users can verify their email by clicking a link.
-- [ ] Unverified users cannot apply vouchers.
+- [ ] `User` model in `app/models/user.py` is updated.
+- [ ] A new migration file exists in `app/db/alembic/versions/`.
+- [ ] The database schema is successfully updated.
+
+**Part 2: Core Verification Logic (TDD)**
+**Action Required**:
+1.  Create `tests/integration/test_email_verification.py` with failing tests for the verification flow.
+2.  Create `app/services/email_service.py` for token generation and simulated email sending.
+3.  Implement the verification logic in the `AuthService` or `UserService`.
+4.  Update the registration logic to send a verification email.
+5.  Update the `PricingService` to check for verification before applying vouchers.
+**Acceptance Criteria**:
+- [ ] New integration tests for email verification are created and pass.
+- [ ] Unverified users cannot use vouchers.
+
+**Part 3: API Endpoints**
+**Action Required**:
+1.  Create `POST /api/v1/auth/request-verification-token` endpoint.
+2.  Create `GET /api/v1/auth/verify-email` endpoint.
+**Acceptance Criteria**:
+- [ ] Both new endpoints are implemented and tested.
+
+### Task 3.14: Implement "Verify email" functionality (Frontend)
+**Priority**: 🟠 Medium
+**Dependencies**: Task 3.13 (Backend)
+**Estimated Time**: 2-3 hours
+**Status**: 🔵 Not Started
+
+**Part 1: API Integration**
+**Action Required**:
+1.  Add new functions to `src/lib/api/auth.ts` to call the new backend endpoints.
+**Acceptance Criteria**:
+- [ ] API library is updated.
+
+**Part 2: UI Implementation**
+**Action Required**:
+1.  Create the verification page at `/app/(auth)/verify-email/page.tsx`.
+2.  Add the "Verify Your Email" banner and button to the account details page.
+**Acceptance Criteria**:
+- [ ] Users can complete the verification flow from the frontend.
+- [ ] The account page correctly reflects the user's verification status.
 
 ---
 

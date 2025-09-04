@@ -1,4 +1,5 @@
 from typing import Optional
+from fastapi import HTTPException
 
 from passlib.context import CryptContext
 from sqlmodel.ext.asyncio.session import AsyncSession
@@ -7,7 +8,7 @@ from app.core.security import verify_password
 from app.models.user import User
 from app.repositories.user_repository import UserRepository
 from app.repositories.voucher_repository import VoucherRepository
-from app.schemas.user import UserCreate, UserUpdate
+from app.schemas.user import UserCreate, UserUpdate, PasswordChange
 
 pwd_context = CryptContext(schemes=["argon2"], deprecated="auto")
 
@@ -76,3 +77,13 @@ class UserService:
             return await self.repo.update(user, db_update_data)
 
         return user # Return the user as is if there's no data to update
+
+    async def change_password(self, user: User, password_in: PasswordChange):
+        if not verify_password(password_in.old_password, user.password_hash):
+            raise HTTPException(status_code=400, detail="Incorrect old password")
+
+        if verify_password(password_in.new_password, user.password_hash):
+            raise HTTPException(status_code=400, detail="New password must be different from the old password")
+
+        new_password_hash = self.get_password_hash(password_in.new_password)
+        await self.repo.update(user, {"password_hash": new_password_hash})
